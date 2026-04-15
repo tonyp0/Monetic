@@ -1,0 +1,121 @@
+import SwiftUI
+
+struct SetBudgetView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding var monthlyBudget: Double
+    @Binding var budgetSetMonth: String
+    let isNewMonthPrompt: Bool
+
+    @AppStorage("repeatMonthlyBudget") private var repeatMonthlyBudget: Bool = false
+    @State private var input: String = ""
+    @FocusState private var isFocused: Bool
+
+    private var currentMonthName: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter.string(from: Date())
+    }
+
+    private var parsedAmount: Double {
+        Double(input) ?? 0
+    }
+
+    private var currencySymbol: String {
+        Locale.current.currencySymbol ?? "$"
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 32) {
+                Spacer()
+
+                VStack(spacing: 8) {
+                    Text(isNewMonthPrompt ? "New Month" : "Monthly Budget")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    Text(isNewMonthPrompt
+                         ? "Set your budget for \(currentMonthName)"
+                         : "How much do you plan to spend in \(currentMonthName)?")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+
+                // Large currency display
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text(currencySymbol)
+                        .font(.system(size: 40, weight: .light))
+                        .foregroundColor(.secondary)
+                    Text(input.isEmpty ? "0" : input)
+                        .font(.system(size: 64, weight: .bold, design: .rounded))
+                        .minimumScaleFactor(0.4)
+                        .lineLimit(1)
+                }
+                .onTapGesture { isFocused = true }
+
+                // Hidden text field
+                TextField("", text: $input)
+                    .keyboardType(.decimalPad)
+                    .focused($isFocused)
+                    .frame(width: 1, height: 1)
+                    .opacity(0.01)
+
+                Spacer()
+
+                VStack(spacing: 12) {
+                    Button(action: save) {
+                        Text("Save Budget")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(parsedAmount <= 0)
+
+                    if isNewMonthPrompt {
+                        Button(action: keepSame) {
+                            Text("Keep Last Month's Budget")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+            .navigationTitle(currentMonthName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                if !isNewMonthPrompt {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Cancel") { dismiss() }
+                    }
+                }
+            }
+            .onAppear {
+                if monthlyBudget > 0 {
+                    input = String(format: "%.2f", monthlyBudget)
+                }
+                isFocused = true
+            }
+        }
+    }
+
+    private func save() {
+        monthlyBudget = parsedAmount
+        budgetSetMonth = currentMonthKey()
+        dismiss()
+    }
+
+    private func keepSame() {
+        budgetSetMonth = currentMonthKey()
+        dismiss()
+    }
+
+    private func currentMonthKey() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM"
+        return formatter.string(from: Date())
+    }
+}
