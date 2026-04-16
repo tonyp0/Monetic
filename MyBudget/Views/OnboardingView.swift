@@ -12,12 +12,13 @@ struct OnboardingView: View {
         ("Shopping",       "🛒", "pink"),
         ("Bills & Fees",   "📋", "red"),
         ("Health",         "💪", "blue"),
-        ("Travel",         "🧳", "teal"),
-        ("Work",           "💼", "indigo"),
+        ("Subscriptions",  "📱", "teal"),
+        ("Travel",         "🧳", "indigo"),
+        ("Work",           "💼", "blue"),
     ]
 
     @State private var selected: Set<String> = [
-        "Food & Dining", "Entertainment", "Transport", "Shopping", "Bills & Fees", "Health"
+        "Food & Dining", "Entertainment", "Transport", "Shopping", "Bills & Fees", "Health", "Subscriptions"
     ]
 
     var body: some View {
@@ -84,8 +85,8 @@ struct OnboardingView: View {
     }
 
     private func saveAndContinue() {
-        var orderIndex = 0
-        for cat in defaultCategories where selected.contains(cat.name) {
+        let toAdd = defaultCategories.filter { selected.contains($0.name) }
+        for (index, cat) in toAdd.enumerated() {
             let category = BudgetCategory(
                 name: cat.name,
                 color: cat.color,
@@ -93,10 +94,9 @@ struct OnboardingView: View {
                 budgetLimit: 0,
                 monthlyBudget: 0,
                 isDefault: true,
-                order: orderIndex
+                sortOrder: index
             )
             modelContext.insert(category)
-            orderIndex += 1
         }
         try? modelContext.save()
         hasCompletedOnboarding = true

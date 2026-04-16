@@ -15,8 +15,8 @@ struct CategoryDetailView: View {
         category.transactions.sorted { $0.date > $1.date }
     }
 
-    private var totalSpent: Double {
-        category.transactions.reduce(0) { $0 + $1.amount }
+    private var monthlySpent: Double {
+        category.monthlySpending()
     }
 
     var body: some View {
@@ -31,7 +31,7 @@ struct CategoryDetailView: View {
                         Text(category.name)
                             .font(.title2)
                             .fontWeight(.bold)
-                        Text("\(category.transactions.count) deduction\(category.transactions.count == 1 ? "" : "s")")
+                        Text("\(category.transactions.count) expense\(category.transactions.count == 1 ? "" : "s")")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
@@ -39,10 +39,10 @@ struct CategoryDetailView: View {
                     Spacer()
 
                     VStack(alignment: .trailing, spacing: 4) {
-                        Text("Total")
+                        Text("This Month")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text(totalSpent, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        Text(monthlySpent, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                             .font(.title3)
                             .fontWeight(.semibold)
                     }
@@ -53,9 +53,9 @@ struct CategoryDetailView: View {
                 // List
                 if sortedTransactions.isEmpty {
                     ContentUnavailableView(
-                        "No Deductions Yet",
+                        "No Expenses Yet",
                         systemImage: "tray",
-                        description: Text("Tap \"Add Deduction\" to record your first expense")
+                        description: Text("Tap \"Add Expense\" to record your first expense")
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
@@ -94,7 +94,7 @@ struct CategoryDetailView: View {
             }
             .safeAreaInset(edge: .bottom) {
                 Button(action: { showingAddTransaction = true }) {
-                    Label("Add Deduction", systemImage: "plus.circle.fill")
+                    Label("Add Expense", systemImage: "plus.circle.fill")
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -117,14 +117,14 @@ struct CategoryDetailView: View {
                 isPresented: $showingDeleteConfirm,
                 titleVisibility: .visible
             ) {
-                Button("Delete Group & All Deductions", role: .destructive) {
+                Button("Delete Group & All Expenses", role: .destructive) {
                     modelContext.delete(category)
                     try? modelContext.save()
                     dismiss()
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("This will permanently delete the group and all \(category.transactions.count) deduction\(category.transactions.count == 1 ? "" : "s") inside it.")
+                Text("This will permanently delete the group and all \(category.transactions.count) expense\(category.transactions.count == 1 ? "" : "s") inside it.")
             }
         }
     }
@@ -142,11 +142,23 @@ struct TransactionRow: View {
     let transaction: Transaction
 
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(transaction.notes.isEmpty ? "Deduction" : transaction.notes)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                HStack(spacing: 6) {
+                    Text(transaction.notes.isEmpty ? "Expense" : transaction.notes)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    if transaction.isRecurring {
+                        Text(transaction.recurringFrequency.capitalized)
+                            .font(.caption2)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.accentColor.opacity(0.15))
+                            .foregroundColor(.accentColor)
+                            .cornerRadius(4)
+                    }
+                }
                 Text(transaction.date, style: .date)
                     .font(.caption)
                     .foregroundColor(.secondary)

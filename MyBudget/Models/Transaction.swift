@@ -8,6 +8,8 @@ final class Transaction: Identifiable {
     var date: Date
     var notes: String
     var category: BudgetCategory?
+    var isRecurring: Bool
+    var recurringFrequency: String   // "monthly" | "yearly" | "" if not recurring
     var createdAt: Date
 
     init(
@@ -16,14 +18,17 @@ final class Transaction: Identifiable {
         date: Date = Date(),
         notes: String = "",
         category: BudgetCategory? = nil,
+        isRecurring: Bool = false,
+        recurringFrequency: String = "",
         createdAt: Date = Date()
     ) {
         self.id = id
         self.amount = amount
-        // FIX: Truncate date to the start of the day to ensure clean month-based comparisons
         self.date = Calendar.current.startOfDay(for: date)
         self.notes = notes
         self.category = category
+        self.isRecurring = isRecurring
+        self.recurringFrequency = isRecurring ? recurringFrequency : ""
         self.createdAt = createdAt
     }
 

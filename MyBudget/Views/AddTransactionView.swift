@@ -13,6 +13,8 @@ struct AddTransactionView: View {
     @State private var date: Date = Date()
     @State private var notes: String = ""
     @State private var selectedCategory: BudgetCategory?
+    @State private var isRecurring: Bool = false
+    @State private var recurringFrequency: String = "monthly"
     @FocusState private var amountFocused: Bool
 
     init(category: BudgetCategory? = nil) {
@@ -59,6 +61,23 @@ struct AddTransactionView: View {
                         .lineLimit(3)
                 }
 
+                // Recurring
+                Section("Repeat") {
+                    Toggle("Recurring Expense", isOn: $isRecurring)
+                    if isRecurring {
+                        Picker("Frequency", selection: $recurringFrequency) {
+                            Text("Monthly").tag("monthly")
+                            Text("Yearly").tag("yearly")
+                        }
+                        .pickerStyle(.segmented)
+                        Text(recurringFrequency == "monthly"
+                             ? "This amount will count toward your budget every month."
+                             : "This amount will count every year in the same month.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
                 // Category
                 Section("Group") {
                     if let preset = presetCategory {
@@ -94,7 +113,7 @@ struct AddTransactionView: View {
                     }
                 }
             }
-            .navigationTitle("Add Deduction")
+            .navigationTitle("Add Expense")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -124,10 +143,11 @@ struct AddTransactionView: View {
             amount: amountValue,
             date: date,
             notes: notes,
-            category: category
+            category: category,
+            isRecurring: isRecurring,
+            recurringFrequency: recurringFrequency
         )
         modelContext.insert(transaction)
-        // Explicitly maintain the relationship both ways
         category.transactions.append(transaction)
         dismiss()
     }

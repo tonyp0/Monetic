@@ -9,13 +9,17 @@ struct EditTransactionView: View {
     @State private var amount: String = ""
     @State private var date: Date = Date()
     @State private var notes: String = ""
+    @State private var isRecurring: Bool = false
+    @State private var recurringFrequency: String = "monthly"
     @State private var showingDeleteConfirm = false
 
     init(transaction: Transaction) {
         self.transaction = transaction
-        _amount = State(initialValue: String(format: "%.2f", transaction.amount))
-        _date   = State(initialValue: transaction.date)
-        _notes  = State(initialValue: transaction.notes)
+        _amount             = State(initialValue: String(format: "%.2f", transaction.amount))
+        _date               = State(initialValue: transaction.date)
+        _notes              = State(initialValue: transaction.notes)
+        _isRecurring        = State(initialValue: transaction.isRecurring)
+        _recurringFrequency = State(initialValue: transaction.recurringFrequency.isEmpty ? "monthly" : transaction.recurringFrequency)
     }
 
     private var isValid: Bool {
@@ -50,6 +54,17 @@ struct EditTransactionView: View {
                         .lineLimit(3)
                 }
 
+                Section("Repeat") {
+                    Toggle("Recurring Expense", isOn: $isRecurring)
+                    if isRecurring {
+                        Picker("Frequency", selection: $recurringFrequency) {
+                            Text("Monthly").tag("monthly")
+                            Text("Yearly").tag("yearly")
+                        }
+                        .pickerStyle(.segmented)
+                    }
+                }
+
                 if let cat = transaction.category {
                     Section("Group") {
                         HStack(spacing: 12) {
@@ -61,13 +76,13 @@ struct EditTransactionView: View {
                 }
 
                 Section {
-                    Button("Delete Deduction", role: .destructive) {
+                    Button("Delete Expense", role: .destructive) {
                         showingDeleteConfirm = true
                     }
                     .frame(maxWidth: .infinity)
                 }
             }
-            .navigationTitle("Edit Deduction")
+            .navigationTitle("Edit Expense")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -79,7 +94,7 @@ struct EditTransactionView: View {
                         .disabled(!isValid)
                 }
             }
-            .confirmationDialog("Delete this deduction?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
+            .confirmationDialog("Delete this expense?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
                 Button("Delete", role: .destructive) { delete() }
                 Button("Cancel", role: .cancel) {}
             }
@@ -91,6 +106,8 @@ struct EditTransactionView: View {
         transaction.amount = amountValue
         transaction.date = Calendar.current.startOfDay(for: date)
         transaction.notes = notes
+        transaction.isRecurring = isRecurring
+        transaction.recurringFrequency = isRecurring ? recurringFrequency : ""
         dismiss()
     }
 

@@ -4,14 +4,13 @@ import Charts
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \BudgetCategory.order) private var categories: [BudgetCategory]
+    @Query(sort: \BudgetCategory.sortOrder) private var categories: [BudgetCategory]
     @State private var selectedCategory: BudgetCategory?
     @State private var showingAddCategory = false
     @State private var showingAddTransaction = false
     @State private var showingSetBudget = false
     @State private var showingSettings = false
     @State private var chartsExpanded: Bool = true
-    @State private var isEditingOrder: Bool = false
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     @AppStorage("monthlyBudget") private var monthlyBudget: Double = 0
     @AppStorage("budgetSetMonth") private var budgetSetMonth: String = ""
@@ -43,9 +42,9 @@ struct ContentView: View {
                     percentage: spendingPercentage,
                     onSetBudget: { showingSetBudget = true }
                 )
-                .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 4, trailing: 16))
-                .listRowBackground(Color.clear)
+                .listRowBackground(Color(.systemGroupedBackground))
                 .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 8, trailing: 16))
 
                 // Charts Section
                 if !categories.isEmpty && categories.contains(where: { $0.monthlySpending() > 0 }) {
@@ -61,63 +60,44 @@ struct ContentView: View {
                                 .rotationEffect(.degrees(chartsExpanded ? 0 : -90))
                         }
                     }
-                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16))
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(Color(.systemGroupedBackground))
                     .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
 
                     if chartsExpanded {
                         SpendingChartsView(categories: categories)
-                            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 4, trailing: 16))
-                            .listRowBackground(Color.clear)
+                            .listRowBackground(Color(.systemGroupedBackground))
                             .listRowSeparator(.hidden)
-                            .transition(.opacity)
+                            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 8, trailing: 16))
+                            .transition(.opacity.combined(with: .move(edge: .top)))
                     }
                 }
 
-                // Groups Header
+                // Groups header
                 HStack {
                     Text("Groups").font(.title3).fontWeight(.semibold)
                     Spacer()
-                    if isEditingOrder {
-                        Button("Done") {
-                            withAnimation { isEditingOrder = false }
-                        }
-                        .fontWeight(.semibold)
-                    } else {
-                        HStack(spacing: 16) {
-                            if !categories.isEmpty {
-                                Button(action: { withAnimation { isEditingOrder = true } }) {
-                                    Image(systemName: "arrow.up.arrow.down")
-                                        .font(.subheadline)
-                                }
-                            }
-                            Button(action: { showingAddCategory = true }) {
-                                Label("Add Group", systemImage: "plus.circle.fill")
-                                    .font(.subheadline)
-                            }
-                        }
+                    Button(action: { showingAddCategory = true }) {
+                        Label("Add Group", systemImage: "plus.circle.fill").font(.subheadline)
                     }
                 }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
-                .listRowBackground(Color.clear)
+                .listRowBackground(Color(.systemGroupedBackground))
                 .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 4, trailing: 16))
 
-                // Groups List
+                // Groups
                 if categories.isEmpty {
                     ContentUnavailableView(
                         "No Groups Yet",
                         systemImage: "tray",
-                        description: Text("Add a group to start organizing your deductions")
+                        description: Text("Add a group to start organizing your expenses")
                     )
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(Color(.systemGroupedBackground))
                     .listRowSeparator(.hidden)
                 } else {
                     ForEach(categories) { category in
                         GroupRow(category: category)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                if !isEditingOrder { selectedCategory = category }
-                            }
+                            .onTapGesture { selectedCategory = category }
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(role: .destructive) {
                                     deleteCategory(category)
@@ -125,20 +105,16 @@ struct ContentView: View {
                                     Label("Delete", systemImage: "trash")
                                 }
                             }
-                            .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
                     }
-                    .onMove(perform: moveCategories)
+                    .onMove(perform: reorderCategories)
                 }
             }
             .listStyle(.plain)
-            .scrollContentBackground(.hidden)
             .background(Color(.systemGroupedBackground))
-            .environment(\.editMode, Binding(
-                get: { isEditingOrder ? EditMode.active : EditMode.inactive },
-                set: { isEditingOrder = ($0 == .active) }
-            ))
+            .scrollContentBackground(.hidden)
             .navigationTitle("My Budget")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -146,7 +122,8 @@ struct ContentView: View {
                         Image(systemName: "gearshape").foregroundColor(.secondary)
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    EditButton()
                     Button(action: { showingAddTransaction = true }) {
                         Image(systemName: "plus")
                     }
@@ -159,10 +136,18 @@ struct ContentView: View {
                     isNewMonthPrompt: false
                 )
             }
-            .sheet(isPresented: $showingSettings) { SettingsView() }
-            .sheet(isPresented: $showingAddCategory) { AddCategoryView() }
-            .sheet(isPresented: $showingAddTransaction) { AddTransactionView() }
-            .sheet(item: $selectedCategory) { category in CategoryDetailView(category: category) }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
+            }
+            .sheet(isPresented: $showingAddCategory) {
+                AddCategoryView()
+            }
+            .sheet(isPresented: $showingAddTransaction) {
+                AddTransactionView()
+            }
+            .sheet(item: $selectedCategory) { category in
+                CategoryDetailView(category: category)
+            }
             .fullScreenCover(isPresented: Binding(
                 get: { !hasCompletedOnboarding },
                 set: { if !$0 { hasCompletedOnboarding = true } }
@@ -170,38 +155,26 @@ struct ContentView: View {
                 OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
             }
             .onAppear {
+                // Mark existing users as already onboarded so they skip onboarding
                 if !hasCompletedOnboarding && !categories.isEmpty {
                     hasCompletedOnboarding = true
                 }
-                initializeOrdersIfNeeded()
                 checkMonthRollover()
             }
         }
     }
 
-    private func moveCategories(from source: IndexSet, to destination: Int) {
-        var reordered = categories
-        reordered.move(fromOffsets: source, toOffset: destination)
-        for (index, cat) in reordered.enumerated() {
-            cat.order = index
-        }
+    private func deleteCategory(_ category: BudgetCategory) {
+        modelContext.delete(category)
         try? modelContext.save()
     }
 
-    private func initializeOrdersIfNeeded() {
-        guard categories.count > 1 else { return }
-        // If all orders are the same (uninitialized default), assign sequential values
-        let allSameOrder = Set(categories.map { $0.order }).count == 1
-        if allSameOrder {
-            for (i, cat) in categories.enumerated() {
-                cat.order = i
-            }
-            try? modelContext.save()
+    private func reorderCategories(from source: IndexSet, to destination: Int) {
+        var items = Array(categories)
+        items.move(fromOffsets: source, toOffset: destination)
+        for (index, item) in items.enumerated() {
+            item.sortOrder = index
         }
-    }
-
-    private func deleteCategory(_ category: BudgetCategory) {
-        modelContext.delete(category)
         try? modelContext.save()
     }
 
@@ -361,7 +334,7 @@ struct GroupRow: View {
                 Text(category.name)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text("\(category.transactions.count) deduction\(category.transactions.count == 1 ? "" : "s")")
+                Text("\(category.transactions.count) expense\(category.transactions.count == 1 ? "" : "s")")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

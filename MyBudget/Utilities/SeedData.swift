@@ -24,7 +24,8 @@ actor SeedData {
             BudgetCategory(name: "Transport", color: "green", icon: "🚗", budgetLimit: 0, monthlyBudget: 0, isDefault: true),
             BudgetCategory(name: "Shopping", color: "pink", icon: "🛒", budgetLimit: 0, monthlyBudget: 0, isDefault: true),
             BudgetCategory(name: "Bills & Fees", color: "red", icon: "📋", budgetLimit: 0, monthlyBudget: 0, isDefault: true),
-            BudgetCategory(name: "Health", color: "blue", icon: "💪", budgetLimit: 0, monthlyBudget: 0, isDefault: true)
+            BudgetCategory(name: "Health", color: "blue", icon: "💪", budgetLimit: 0, monthlyBudget: 0, isDefault: true),
+            BudgetCategory(name: "Subscriptions", color: "teal", icon: "📱", budgetLimit: 0, monthlyBudget: 0, isDefault: true)
         ]
 
         for category in defaultCategories {

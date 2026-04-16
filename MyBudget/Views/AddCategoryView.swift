@@ -85,7 +85,7 @@ struct AddCategoryView: View {
             budgetLimit: 0,
             monthlyBudget: 0,
             isDefault: false,
-            order: existingCategories.count
+            sortOrder: existingCategories.count
         )
         modelContext.insert(category)
         try? modelContext.save()
