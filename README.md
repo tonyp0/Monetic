@@ -50,3 +50,19 @@ The project currently targets `iOS 17.0+`.
 ## Status
 
 This is a native iOS app under active development and currently stores data locally on device using SwiftData.
+
+## Built With Claude Code
+
+This project was developed using [Claude Code](https://claude.ai/code) with the following plugins and skills:
+
+### Plugins
+- **[everything-claude-code](https://github.com/anthropics/claude-code)** — core skill library providing SwiftUI patterns, feature development workflows, and code review tools
+- **[claude-mem](https://github.com/anthropics/claude-code)** — persistent memory across sessions to maintain project context and coding preferences
+- **[superpowers](https://github.com/anthropics/claude-code)** — meta-skills for planning, brainstorming, and execution workflows
+
+### Skills Used
+- `everything-claude-code:swiftui-patterns` — guidance on SwiftUI layout, state management, and navigation patterns
+- `everything-claude-code:feature-dev` — structured workflow for implementing new features
+- `everything-claude-code:code-review` — code quality review during development
+- `superpowers:brainstorming` — planning app structure and feature design
+- `superpowers:executing-plans` — step-by-step implementation of development plans
