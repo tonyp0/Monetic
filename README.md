@@ -1,6 +1,6 @@
-# MyBudget
+# Monetic
 
-MyBudget is a simple iOS budgeting app for tracking monthly spending in a way that feels lightweight and approachable. Instead of trying to be a full finance platform, the app focuses on the basics: setting a monthly budget, organizing expenses into groups, logging transactions, and seeing how your spending is trending throughout the month.
+Monetic is a simple iOS budgeting app for tracking monthly spending in a way that feels lightweight and approachable. Instead of trying to be a full finance platform, the app focuses on the basics: setting a monthly budget, organizing expenses into groups, logging transactions, and seeing how your spending is trending throughout the month.
 
 ## What The App Does
 
