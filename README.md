@@ -17,13 +17,13 @@ When the app first launches, users are guided through a short onboarding flow th
 
 ## Why It Was Made
 
-MyBudget was made to offer a more personal and less overwhelming way to manage day-to-day spending. A lot of budgeting tools feel overly complex, cluttered, or built around features that casual users may not need. This app takes a simpler approach by focusing on the core habit of staying aware of where money is going each month.
+Monetic was made to offer a more personal and less overwhelming way to manage day-to-day spending. A lot of budgeting tools feel overly complex, cluttered, or built around features that casual users may not need. This app takes a simpler approach by focusing on the core habit of staying aware of where money is going each month.
 
 The goal is to make budgeting feel easy to start, easy to keep up with, and useful at a glance.
 
 ## Framework And Tech Stack
 
-MyBudget is built with Apple's modern native iOS tools:
+Monetic is built with Apple's modern native iOS tools:
 
 - `SwiftUI` for the user interface and navigation
 - `SwiftData` for local data persistence
