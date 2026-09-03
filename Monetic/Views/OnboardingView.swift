@@ -28,7 +28,7 @@ struct OnboardingView: View {
                 VStack(spacing: 10) {
                     Text("👋")
                         .font(.system(size: 56))
-                    Text("Welcome to MyBudget")
+                    Text("Welcome to Monetic")
                         .font(.title2)
                         .fontWeight(.bold)
                     Text("Choose which groups to start with.\nYou can add or remove more later.")

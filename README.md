@@ -43,7 +43,7 @@ The project currently targets `iOS 17.0+`.
 
 ## Running The Project
 
-1. Open `MyBudget.xcodeproj` in Xcode.
+1. Open `Monetic.xcodeproj` in Xcode.
 2. Choose an iPhone simulator or connected device.
 3. Build and run the app.
 

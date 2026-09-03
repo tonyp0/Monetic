@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct MyBudgetApp: App {
+struct MoneticApp: App {
     @AppStorage("appAppearance") var appearance: String = "system"
 
     var sharedModelContainer: ModelContainer = {

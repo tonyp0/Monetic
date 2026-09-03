@@ -148,10 +148,10 @@ struct EditBudgetView: View {
                 Text("Are you sure you want to delete \"\(category.name)\"? This will also delete all transactions in this category.")
             }
             .onChange(of: isDarkMode) { newValue in
-                UserDefaults.standard.set(newValue, forKey: "MyBudget_darkMode")
+                UserDefaults.standard.set(newValue, forKey: "Monetic_darkMode")
             }
             .task {
-                isDarkMode = UserDefaults.standard.bool(forKey: "MyBudget_darkMode")
+                isDarkMode = UserDefaults.standard.bool(forKey: "Monetic_darkMode")
             }
         }
     }
