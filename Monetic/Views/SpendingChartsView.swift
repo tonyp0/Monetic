@@ -84,7 +84,7 @@ struct SpendingChartsView: View {
                         AxisMarks(position: .leading) { value in
                             AxisValueLabel {
                                 if let amount = value.as(Double.self) {
-                                    Text(amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD").precision(.fractionLength(0)))
+                                    Text(amount, format: .currency(code: Currency.code).precision(.fractionLength(0)))
                                         .font(.caption2)
                                 }
                             }

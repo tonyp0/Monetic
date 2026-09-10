@@ -42,7 +42,7 @@ struct CategoryDetailView: View {
                         Text("This Month")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text(monthlySpent, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        Text(monthlySpent, format: .currency(code: Currency.code))
                             .font(.title3)
                             .fontWeight(.semibold)
                     }
@@ -164,7 +164,7 @@ struct TransactionRow: View {
                     .foregroundColor(.secondary)
             }
             Spacer()
-            Text(transaction.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+            Text(transaction.amount, format: .currency(code: Currency.code))
                 .font(.subheadline)
                 .fontWeight(.semibold)
         }

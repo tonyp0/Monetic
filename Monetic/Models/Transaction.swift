@@ -31,11 +31,4 @@ final class Transaction: Identifiable {
         self.recurringFrequency = isRecurring ? recurringFrequency : ""
         self.createdAt = createdAt
     }
-
-    var formattedAmount: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale.current
-        return formatter.string(from: NSNumber(value: amount)) ?? "$\(amount)"
-    }
 }

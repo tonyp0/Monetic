@@ -35,7 +35,7 @@ struct AddTransactionView: View {
                 // Amount
                 Section("Amount") {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(Locale.current.currencySymbol ?? "$")
+                        Text(Currency.symbol)
                             .font(.title)
                             .foregroundColor(.secondary)
                         TextField("0.00", text: $amount)

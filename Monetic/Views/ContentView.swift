@@ -179,7 +179,7 @@ struct ContentView: View {
     }
 
     private func checkMonthRollover() {
-        let currentMonth = currentMonthKey()
+        let currentMonth = MonthKey.key()
         guard budgetSetMonth != currentMonth else { return }
 
         if repeatMonthlyBudget && monthlyBudget > 0 {
@@ -187,12 +187,6 @@ struct ContentView: View {
         } else {
             showingSetBudget = true
         }
-    }
-
-    private func currentMonthKey() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM"
-        return formatter.string(from: Date())
     }
 }
 
@@ -219,7 +213,7 @@ struct BudgetSummaryCard: View {
                         .foregroundColor(.secondary)
                         .textCase(.uppercase)
                     if monthlyBudget > 0 {
-                        Text(monthlyBudget, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        Text(monthlyBudget, format: .currency(code: Currency.code))
                             .font(.largeTitle)
                             .fontWeight(.bold)
                     } else {
@@ -256,7 +250,7 @@ struct BudgetSummaryCard: View {
                         Text("Spent")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text(totalSpent, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        Text(totalSpent, format: .currency(code: Currency.code))
                             .font(.subheadline)
                             .fontWeight(.semibold)
                     }
@@ -265,7 +259,7 @@ struct BudgetSummaryCard: View {
                         Text(remaining >= 0 ? "Remaining" : "Over Budget")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text(abs(remaining), format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        Text(abs(remaining), format: .currency(code: Currency.code))
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundColor(remaining < 0 ? .red : .primary)
@@ -287,14 +281,9 @@ struct CategoryIcon: View {
     let size: CGFloat
     let frame: CGFloat
 
-    private var isEmoji: Bool {
-        // SF Symbol names are ASCII only; emoji contain non-ASCII scalars
-        icon.unicodeScalars.contains { $0.value > 127 }
-    }
-
     var body: some View {
         Group {
-            if isEmoji {
+            if icon.isEmojiIcon {
                 Text(icon)
                     .font(.system(size: size))
             } else {
@@ -313,13 +302,12 @@ struct GroupRow: View {
     let category: BudgetCategory
 
     private var spent: Double { category.monthlySpending() }
-    private var isEmoji: Bool { category.icon.unicodeScalars.contains { $0.value > 127 } }
 
     var body: some View {
         HStack(spacing: 12) {
             // Emoji or SF Symbol — no background box
             Group {
-                if isEmoji {
+                if category.icon.isEmojiIcon {
                     Text(category.icon)
                         .font(.system(size: 28))
                 } else {
@@ -341,7 +329,7 @@ struct GroupRow: View {
 
             Spacer()
 
-            Text(spent, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+            Text(spent, format: .currency(code: Currency.code))
                 .font(.subheadline)
                 .fontWeight(.semibold)
                 .foregroundColor(spent > 0 ? .primary : .secondary)

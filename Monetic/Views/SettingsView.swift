@@ -48,7 +48,7 @@ struct SettingsView: View {
                         HStack {
                             Text("Current Budget")
                             Spacer()
-                            Text(monthlyBudget, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                            Text(monthlyBudget, format: .currency(code: Currency.code))
                                 .foregroundColor(.secondary)
                         }
                         if !budgetSetMonth.isEmpty {
@@ -76,10 +76,6 @@ struct SettingsView: View {
     }
 
     private var formattedMonth: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM"
-        guard let date = formatter.date(from: budgetSetMonth) else { return budgetSetMonth }
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: date)
+        MonthKey.displayName(forKey: budgetSetMonth)
     }
 }

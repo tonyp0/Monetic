@@ -11,17 +11,11 @@ struct SetBudgetView: View {
     @FocusState private var isFocused: Bool
 
     private var currentMonthName: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: Date())
+        MonthKey.displayName()
     }
 
     private var parsedAmount: Double {
         Double(input) ?? 0
-    }
-
-    private var currencySymbol: String {
-        Locale.current.currencySymbol ?? "$"
     }
 
     var body: some View {
@@ -44,7 +38,7 @@ struct SetBudgetView: View {
 
                 // Large currency display
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(currencySymbol)
+                    Text(Currency.symbol)
                         .font(.system(size: 40, weight: .light))
                         .foregroundColor(.secondary)
                     Text(input.isEmpty ? "0" : input)
@@ -104,18 +98,12 @@ struct SetBudgetView: View {
 
     private func save() {
         monthlyBudget = parsedAmount
-        budgetSetMonth = currentMonthKey()
+        budgetSetMonth = MonthKey.key()
         dismiss()
     }
 
     private func keepSame() {
-        budgetSetMonth = currentMonthKey()
+        budgetSetMonth = MonthKey.key()
         dismiss()
-    }
-
-    private func currentMonthKey() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM"
-        return formatter.string(from: Date())
     }
 }
