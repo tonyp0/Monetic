@@ -23,7 +23,7 @@ struct EditTransactionView: View {
     }
 
     private var isValid: Bool {
-        (Double(amount) ?? 0) > 0
+        (AmountInput.parse(amount) ?? 0) > 0
     }
 
     var body: some View {
@@ -31,14 +31,14 @@ struct EditTransactionView: View {
             Form {
                 Section("Amount") {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(Locale.current.currencySymbol ?? "$")
+                        Text(Currency.symbol)
                             .font(.title)
                             .foregroundColor(.secondary)
                         TextField("0.00", text: $amount)
                             .font(.title)
                             .keyboardType(.decimalPad)
                             .onChange(of: amount) { _, newValue in
-                                amount = AddTransactionView.sanitizeAmount(newValue)
+                                amount = AmountInput.sanitize(newValue)
                             }
                     }
                     .padding(.vertical, 4)
@@ -102,7 +102,7 @@ struct EditTransactionView: View {
     }
 
     private func save() {
-        guard let amountValue = Double(amount), amountValue > 0 else { return }
+        guard let amountValue = AmountInput.parse(amount), amountValue > 0 else { return }
         transaction.amount = amountValue
         transaction.date = Calendar.current.startOfDay(for: date)
         transaction.notes = notes

@@ -15,9 +15,9 @@
 		A1000006 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000006 /* AddTransactionView.swift */; };
 		A1000007 /* EditTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000007 /* EditTransactionView.swift */; };
 		A1000008 /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000008 /* AddCategoryView.swift */; };
-		A1000009 /* EditBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000009 /* EditBudgetView.swift */; };
-		A100000A /* SeedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000A /* SeedData.swift */; };
 		A100000B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B100000B /* Assets.xcassets */; };
+		A1000012 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000012 /* Formatting.swift */; };
+		A1000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B1000013 /* PrivacyInfo.xcprivacy */; };
 		A100000C /* SetBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000C /* SetBudgetView.swift */; };
 		A100000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000D /* SettingsView.swift */; };
 		A100000E /* SpendingChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000F /* SpendingChartsView.swift */; };
@@ -34,8 +34,6 @@
 		B1000006 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		B1000007 /* EditTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTransactionView.swift; sourceTree = "<group>"; };
 		B1000008 /* AddCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoryView.swift; sourceTree = "<group>"; };
-		B1000009 /* EditBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBudgetView.swift; sourceTree = "<group>"; };
-		B100000A /* SeedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedData.swift; sourceTree = "<group>"; };
 		B100000B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B100000C /* SetBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetBudgetView.swift; sourceTree = "<group>"; };
 		B100000D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -43,6 +41,8 @@
 		B100000F /* SpendingChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingChartsView.swift; sourceTree = "<group>"; };
 		B1000010 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B1000011 /* EditCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryView.swift; sourceTree = "<group>"; };
+		B1000012 /* Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatting.swift; sourceTree = "<group>"; };
+		B1000013 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +72,7 @@
 				D1000005 /* Views */,
 				D1000006 /* Utilities */,
 				B100000B /* Assets.xcassets */,
+				B1000013 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Monetic;
 			sourceTree = "<group>";
@@ -101,7 +102,6 @@
 				B1000006 /* AddTransactionView.swift */,
 				B1000007 /* EditTransactionView.swift */,
 				B1000008 /* AddCategoryView.swift */,
-				B1000009 /* EditBudgetView.swift */,
 				B100000C /* SetBudgetView.swift */,
 				B100000D /* SettingsView.swift */,
 				B100000F /* SpendingChartsView.swift */,
@@ -114,7 +114,7 @@
 		D1000006 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				B100000A /* SeedData.swift */,
+				B1000012 /* Formatting.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -178,6 +178,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A100000B /* Assets.xcassets in Resources */,
+				A1000013 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,13 +197,12 @@
 				A1000006 /* AddTransactionView.swift in Sources */,
 				A1000007 /* EditTransactionView.swift in Sources */,
 				A1000008 /* AddCategoryView.swift in Sources */,
-				A1000009 /* EditBudgetView.swift in Sources */,
-				A100000A /* SeedData.swift in Sources */,
 				A100000C /* SetBudgetView.swift in Sources */,
 				A100000D /* SettingsView.swift in Sources */,
 				A100000E /* SpendingChartsView.swift in Sources */,
 				A1000010 /* OnboardingView.swift in Sources */,
 				A1000011 /* EditCategoryView.swift in Sources */,
+				A1000012 /* Formatting.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,7 +353,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1";
 			};
 			name = Debug;
 		};
@@ -382,7 +382,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1";
 			};
 			name = Release;
 		};

@@ -11,17 +11,11 @@ struct SetBudgetView: View {
     @FocusState private var isFocused: Bool
 
     private var currentMonthName: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: Date())
+        MonthKey.displayName()
     }
 
     private var parsedAmount: Double {
-        Double(input) ?? 0
-    }
-
-    private var currencySymbol: String {
-        Locale.current.currencySymbol ?? "$"
+        AmountInput.parse(input) ?? 0
     }
 
     var body: some View {
@@ -44,7 +38,7 @@ struct SetBudgetView: View {
 
                 // Large currency display
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(currencySymbol)
+                    Text(Currency.symbol)
                         .font(.system(size: 40, weight: .light))
                         .foregroundColor(.secondary)
                     Text(input.isEmpty ? "0" : input)
@@ -60,6 +54,9 @@ struct SetBudgetView: View {
                     .focused($isFocused)
                     .frame(width: 1, height: 1)
                     .opacity(0.01)
+                    .onChange(of: input) { _, newValue in
+                        input = AmountInput.sanitize(newValue)
+                    }
 
                 Spacer()
 
@@ -73,9 +70,12 @@ struct SetBudgetView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(parsedAmount <= 0)
 
+                    // The new-month prompt has no Cancel, so it always needs one
+                    // other way out — otherwise a user with no previous budget
+                    // is stuck here on first launch.
                     if isNewMonthPrompt {
                         Button(action: keepSame) {
-                            Text("Keep Last Month's Budget")
+                            Text(monthlyBudget > 0 ? "Keep Last Month's Budget" : "Skip for Now")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
@@ -104,18 +104,12 @@ struct SetBudgetView: View {
 
     private func save() {
         monthlyBudget = parsedAmount
-        budgetSetMonth = currentMonthKey()
+        budgetSetMonth = MonthKey.key()
         dismiss()
     }
 
     private func keepSame() {
-        budgetSetMonth = currentMonthKey()
+        budgetSetMonth = MonthKey.key()
         dismiss()
-    }
-
-    private func currentMonthKey() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM"
-        return formatter.string(from: Date())
     }
 }

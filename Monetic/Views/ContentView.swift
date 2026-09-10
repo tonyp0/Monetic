@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var showingAddCategory = false
     @State private var showingAddTransaction = false
     @State private var showingSetBudget = false
+    @State private var isNewMonthPrompt = false
     @State private var showingSettings = false
     @State private var chartsExpanded: Bool = true
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
@@ -40,7 +41,10 @@ struct ContentView: View {
                     totalSpent: totalSpentThisMonth,
                     remaining: remaining,
                     percentage: spendingPercentage,
-                    onSetBudget: { showingSetBudget = true }
+                    onSetBudget: {
+                        isNewMonthPrompt = false
+                        showingSetBudget = true
+                    }
                 )
                 .listRowBackground(Color(.systemGroupedBackground))
                 .listRowSeparator(.hidden)
@@ -133,8 +137,11 @@ struct ContentView: View {
                 SetBudgetView(
                     monthlyBudget: $monthlyBudget,
                     budgetSetMonth: $budgetSetMonth,
-                    isNewMonthPrompt: false
+                    isNewMonthPrompt: isNewMonthPrompt
                 )
+                // A new-month prompt has its own explicit exits, so it can't be
+                // swiped away without recording the month — that was the nag loop.
+                .interactiveDismissDisabled(isNewMonthPrompt)
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
@@ -179,20 +186,15 @@ struct ContentView: View {
     }
 
     private func checkMonthRollover() {
-        let currentMonth = currentMonthKey()
+        let currentMonth = MonthKey.key()
         guard budgetSetMonth != currentMonth else { return }
 
         if repeatMonthlyBudget && monthlyBudget > 0 {
             budgetSetMonth = currentMonth
         } else {
+            isNewMonthPrompt = true
             showingSetBudget = true
         }
-    }
-
-    private func currentMonthKey() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM"
-        return formatter.string(from: Date())
     }
 }
 
@@ -219,7 +221,7 @@ struct BudgetSummaryCard: View {
                         .foregroundColor(.secondary)
                         .textCase(.uppercase)
                     if monthlyBudget > 0 {
-                        Text(monthlyBudget, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        Text(monthlyBudget, format: .currency(code: Currency.code))
                             .font(.largeTitle)
                             .fontWeight(.bold)
                     } else {
@@ -256,7 +258,7 @@ struct BudgetSummaryCard: View {
                         Text("Spent")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text(totalSpent, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        Text(totalSpent, format: .currency(code: Currency.code))
                             .font(.subheadline)
                             .fontWeight(.semibold)
                     }
@@ -265,7 +267,7 @@ struct BudgetSummaryCard: View {
                         Text(remaining >= 0 ? "Remaining" : "Over Budget")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text(abs(remaining), format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        Text(abs(remaining), format: .currency(code: Currency.code))
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundColor(remaining < 0 ? .red : .primary)
@@ -287,14 +289,9 @@ struct CategoryIcon: View {
     let size: CGFloat
     let frame: CGFloat
 
-    private var isEmoji: Bool {
-        // SF Symbol names are ASCII only; emoji contain non-ASCII scalars
-        icon.unicodeScalars.contains { $0.value > 127 }
-    }
-
     var body: some View {
         Group {
-            if isEmoji {
+            if icon.isEmojiIcon {
                 Text(icon)
                     .font(.system(size: size))
             } else {
@@ -313,13 +310,19 @@ struct GroupRow: View {
     let category: BudgetCategory
 
     private var spent: Double { category.monthlySpending() }
-    private var isEmoji: Bool { category.icon.unicodeScalars.contains { $0.value > 127 } }
+    private var hasLimit: Bool { category.monthlyBudget > 0 }
+    private var isOver: Bool { category.isOverBudget() }
+
+    private var amountColor: Color {
+        if isOver { return .red }
+        return spent > 0 ? .primary : .secondary
+    }
 
     var body: some View {
         HStack(spacing: 12) {
             // Emoji or SF Symbol — no background box
             Group {
-                if isEmoji {
+                if category.icon.isEmojiIcon {
                     Text(category.icon)
                         .font(.system(size: 28))
                 } else {
@@ -330,21 +333,39 @@ struct GroupRow: View {
             }
             .frame(width: 32, alignment: .leading)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(category.name)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text("\(category.transactions.count) expense\(category.transactions.count == 1 ? "" : "s")")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+
+                if hasLimit {
+                    Text("of \(category.monthlyBudget, format: .currency(code: Currency.code)) this month")
+                        .font(.caption)
+                        .foregroundColor(isOver ? .red : .secondary)
+
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color.gray.opacity(0.2))
+                            Capsule()
+                                .fill(isOver ? Color.red : Color.accentColor)
+                                .frame(width: progressWidth(in: geo.size.width))
+                        }
+                    }
+                    .frame(height: 4)
+                } else {
+                    Text("\(category.transactions.count) expense\(category.transactions.count == 1 ? "" : "s")")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
 
             Spacer()
 
-            Text(spent, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+            Text(spent, format: .currency(code: Currency.code))
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .foregroundColor(spent > 0 ? .primary : .secondary)
+                .foregroundColor(amountColor)
 
             Image(systemName: "chevron.right")
                 .font(.caption2)
@@ -355,5 +376,12 @@ struct GroupRow: View {
         .padding(.trailing, 14)
         .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(12)
+    }
+
+    /// Keeps a sliver visible for small amounts so the bar never reads as empty.
+    private func progressWidth(in available: CGFloat) -> CGFloat {
+        let percentage = min(category.monthlySpendingPercentage(), 1.0)
+        guard percentage > 0 else { return 0 }
+        return max(available * percentage, 3)
     }
 }
