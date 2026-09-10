@@ -26,7 +26,7 @@ struct AddTransactionView: View {
     }
 
     private var isValid: Bool {
-        (Double(amount) ?? 0) > 0 && effectiveCategory != nil
+        (AmountInput.parse(amount) ?? 0) > 0 && effectiveCategory != nil
     }
 
     var body: some View {
@@ -43,7 +43,7 @@ struct AddTransactionView: View {
                             .keyboardType(.decimalPad)
                             .focused($amountFocused)
                             .onChange(of: amount) { _, newValue in
-                                amount = Self.sanitizeAmount(newValue)
+                                amount = AmountInput.sanitize(newValue)
                             }
                     }
                     .padding(.vertical, 4)
@@ -135,10 +135,11 @@ struct AddTransactionView: View {
     }
 
     private func save() {
-        let normalized = amount.replacingOccurrences(of: ",", with: ".")
-        guard let amountValue = Double(normalized), amountValue > 0,
+        guard let amountValue = AmountInput.parse(amount), amountValue > 0,
               let category = effectiveCategory else { return }
 
+        // Setting `category` is enough — SwiftData maintains the inverse
+        // relationship, so appending to category.transactions as well is redundant.
         let transaction = Transaction(
             amount: amountValue,
             date: date,
@@ -148,19 +149,6 @@ struct AddTransactionView: View {
             recurringFrequency: recurringFrequency
         )
         modelContext.insert(transaction)
-        category.transactions.append(transaction)
         dismiss()
-    }
-
-    // Strips anything that isn't a digit or decimal separator; allows only one separator and max 2 decimal places.
-    static func sanitizeAmount(_ input: String) -> String {
-        let decimalSep: Character = Locale.current.decimalSeparator?.first ?? "."
-        let allowed: Set<Character> = ["0","1","2","3","4","5","6","7","8","9", decimalSep]
-        let result = String(input.filter { allowed.contains($0) })
-        let parts = result.components(separatedBy: String(decimalSep))
-        if parts.count > 1 {
-            return parts[0] + String(decimalSep) + String(parts[1].prefix(2))
-        }
-        return result
     }
 }

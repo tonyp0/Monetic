@@ -81,7 +81,7 @@ struct CategoryDetailView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button(action: { showingEditCategory = true }) {
-                            Label("Edit Name & Emoji", systemImage: "pencil")
+                            Label("Edit Group", systemImage: "pencil")
                         }
                         Divider()
                         Button(role: .destructive, action: { showingDeleteConfirm = true }) {

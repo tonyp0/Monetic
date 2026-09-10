@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var showingAddCategory = false
     @State private var showingAddTransaction = false
     @State private var showingSetBudget = false
+    @State private var isNewMonthPrompt = false
     @State private var showingSettings = false
     @State private var chartsExpanded: Bool = true
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
@@ -40,7 +41,10 @@ struct ContentView: View {
                     totalSpent: totalSpentThisMonth,
                     remaining: remaining,
                     percentage: spendingPercentage,
-                    onSetBudget: { showingSetBudget = true }
+                    onSetBudget: {
+                        isNewMonthPrompt = false
+                        showingSetBudget = true
+                    }
                 )
                 .listRowBackground(Color(.systemGroupedBackground))
                 .listRowSeparator(.hidden)
@@ -133,8 +137,11 @@ struct ContentView: View {
                 SetBudgetView(
                     monthlyBudget: $monthlyBudget,
                     budgetSetMonth: $budgetSetMonth,
-                    isNewMonthPrompt: false
+                    isNewMonthPrompt: isNewMonthPrompt
                 )
+                // A new-month prompt has its own explicit exits, so it can't be
+                // swiped away without recording the month — that was the nag loop.
+                .interactiveDismissDisabled(isNewMonthPrompt)
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
@@ -185,6 +192,7 @@ struct ContentView: View {
         if repeatMonthlyBudget && monthlyBudget > 0 {
             budgetSetMonth = currentMonth
         } else {
+            isNewMonthPrompt = true
             showingSetBudget = true
         }
     }
@@ -302,6 +310,13 @@ struct GroupRow: View {
     let category: BudgetCategory
 
     private var spent: Double { category.monthlySpending() }
+    private var hasLimit: Bool { category.monthlyBudget > 0 }
+    private var isOver: Bool { category.isOverBudget() }
+
+    private var amountColor: Color {
+        if isOver { return .red }
+        return spent > 0 ? .primary : .secondary
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -318,13 +333,31 @@ struct GroupRow: View {
             }
             .frame(width: 32, alignment: .leading)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(category.name)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text("\(category.transactions.count) expense\(category.transactions.count == 1 ? "" : "s")")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+
+                if hasLimit {
+                    Text("of \(category.monthlyBudget, format: .currency(code: Currency.code)) this month")
+                        .font(.caption)
+                        .foregroundColor(isOver ? .red : .secondary)
+
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color.gray.opacity(0.2))
+                            Capsule()
+                                .fill(isOver ? Color.red : Color.accentColor)
+                                .frame(width: progressWidth(in: geo.size.width))
+                        }
+                    }
+                    .frame(height: 4)
+                } else {
+                    Text("\(category.transactions.count) expense\(category.transactions.count == 1 ? "" : "s")")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
 
             Spacer()
@@ -332,7 +365,7 @@ struct GroupRow: View {
             Text(spent, format: .currency(code: Currency.code))
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .foregroundColor(spent > 0 ? .primary : .secondary)
+                .foregroundColor(amountColor)
 
             Image(systemName: "chevron.right")
                 .font(.caption2)
@@ -343,5 +376,12 @@ struct GroupRow: View {
         .padding(.trailing, 14)
         .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(12)
+    }
+
+    /// Keeps a sliver visible for small amounts so the bar never reads as empty.
+    private func progressWidth(in available: CGFloat) -> CGFloat {
+        let percentage = min(category.monthlySpendingPercentage(), 1.0)
+        guard percentage > 0 else { return 0 }
+        return max(available * percentage, 3)
     }
 }

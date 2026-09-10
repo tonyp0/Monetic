@@ -49,6 +49,26 @@ enum MonthKey {
     }
 }
 
+// MARK: - Amount Entry
+/// Shared handling for the decimal-pad currency fields.
+enum AmountInput {
+    /// Strips anything that isn't a digit or the locale decimal separator,
+    /// allowing a single separator and at most two decimal places.
+    static func sanitize(_ input: String) -> String {
+        let separator: Character = Locale.current.decimalSeparator?.first ?? "."
+        let allowed: Set<Character> = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", separator]
+        let filtered = String(input.filter { allowed.contains($0) })
+        let parts = filtered.components(separatedBy: String(separator))
+        guard parts.count > 1 else { return filtered }
+        return parts[0] + String(separator) + String(parts[1].prefix(2))
+    }
+
+    /// Parses sanitized input, tolerating either decimal separator.
+    static func parse(_ input: String) -> Double? {
+        Double(input.replacingOccurrences(of: ",", with: "."))
+    }
+}
+
 // MARK: - Icons
 extension String {
     /// SF Symbol names are ASCII only, so any non-ASCII scalar means an emoji icon.

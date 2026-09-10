@@ -15,7 +15,7 @@ struct SetBudgetView: View {
     }
 
     private var parsedAmount: Double {
-        Double(input) ?? 0
+        AmountInput.parse(input) ?? 0
     }
 
     var body: some View {
@@ -54,6 +54,9 @@ struct SetBudgetView: View {
                     .focused($isFocused)
                     .frame(width: 1, height: 1)
                     .opacity(0.01)
+                    .onChange(of: input) { _, newValue in
+                        input = AmountInput.sanitize(newValue)
+                    }
 
                 Spacer()
 
@@ -67,9 +70,12 @@ struct SetBudgetView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(parsedAmount <= 0)
 
+                    // The new-month prompt has no Cancel, so it always needs one
+                    // other way out — otherwise a user with no previous budget
+                    // is stuck here on first launch.
                     if isNewMonthPrompt {
                         Button(action: keepSame) {
-                            Text("Keep Last Month's Budget")
+                            Text(monthlyBudget > 0 ? "Keep Last Month's Budget" : "Skip for Now")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }

@@ -5,32 +5,11 @@ import SwiftData
 struct MoneticApp: App {
     @AppStorage("appAppearance") var appearance: String = "system"
 
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            BudgetCategory.self,
-            Transaction.self
-        ])
-        let modelConfiguration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false
-        )
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            // Schema changed during development — wipe the old store so the app
-            // doesn't crash on launch. Data is re-created fresh on next run.
-            let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-            let storeURL = appSupport.appendingPathComponent("default.store")
-            try? FileManager.default.removeItem(at: storeURL)
-            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("shm"))
-            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("wal"))
-            do {
-                return try ModelContainer(for: schema, configurations: [modelConfiguration])
-            } catch {
-                fatalError("Could not recreate ModelContainer after migration failure: \(error)")
-            }
-        }
-    }()
+    private let store: Result<ModelContainer, Error>
+
+    init() {
+        store = Self.loadStore()
+    }
 
     var preferredScheme: ColorScheme? {
         switch appearance {
@@ -42,9 +21,73 @@ struct MoneticApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .preferredColorScheme(preferredScheme)
+            switch store {
+            case .success(let container):
+                ContentView()
+                    .preferredColorScheme(preferredScheme)
+                    .modelContainer(container)
+            case .failure(let error):
+                StoreUnavailableView(error: error)
+                    .preferredColorScheme(preferredScheme)
+            }
         }
-        .modelContainer(sharedModelContainer)
+    }
+
+    private static func loadStore() -> Result<ModelContainer, Error> {
+        let schema = Schema([
+            BudgetCategory.self,
+            Transaction.self
+        ])
+        let configuration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false
+        )
+
+        do {
+            return .success(try ModelContainer(for: schema, configurations: [configuration]))
+        } catch {
+            #if DEBUG
+            // Schema changes during development leave an incompatible store behind.
+            // Wiping it is only ever acceptable here — in a release build the same
+            // failure could be transient, and destroying real budget history to
+            // recover from it is far worse than reporting the error.
+            removeStore()
+            if let container = try? ModelContainer(for: schema, configurations: [configuration]) {
+                return .success(container)
+            }
+            #endif
+            return .failure(error)
+        }
+    }
+
+    #if DEBUG
+    private static func removeStore() {
+        guard let appSupport = FileManager.default
+            .urls(for: .applicationSupportDirectory, in: .userDomainMask)
+            .first else { return }
+
+        let storeURL = appSupport.appendingPathComponent("default.store")
+        for url in [storeURL,
+                    storeURL.appendingPathExtension("shm"),
+                    storeURL.appendingPathExtension("wal")] {
+            try? FileManager.default.removeItem(at: url)
+        }
+    }
+    #endif
+}
+
+// MARK: - Store Unavailable
+/// Shown when the database can't be opened. Deliberately offers no "reset"
+/// action — the store is left untouched so the data is still recoverable.
+struct StoreUnavailableView: View {
+    let error: Error
+
+    var body: some View {
+        ContentUnavailableView {
+            Label("Can't Open Your Budget", systemImage: "exclamationmark.triangle")
+        } description: {
+            Text("Monetic couldn't load its data. Your information hasn't been deleted. Try restarting the app — if this keeps happening, restarting your device or reinstalling from a backup usually resolves it.")
+        }
+        .padding()
     }
 }

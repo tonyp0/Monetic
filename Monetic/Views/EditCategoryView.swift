@@ -8,12 +8,16 @@ struct EditCategoryView: View {
 
     @State private var name: String
     @State private var selectedEmoji: String
+    @State private var monthlyLimit: String
     @State private var showingEmojiPicker = false
 
     init(category: BudgetCategory) {
         self.category = category
         _name = State(initialValue: category.name)
         _selectedEmoji = State(initialValue: category.icon)
+        _monthlyLimit = State(initialValue: category.monthlyBudget > 0
+                              ? String(format: "%.2f", category.monthlyBudget)
+                              : "")
     }
 
     var body: some View {
@@ -49,6 +53,34 @@ struct EditCategoryView: View {
                             .cornerRadius(12)
                     }
                     .padding(.horizontal)
+
+                    // Monthly limit
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Monthly Limit")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .textCase(.uppercase)
+                            .padding(.horizontal, 4)
+
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            Text(Currency.symbol)
+                                .foregroundColor(.secondary)
+                            TextField("No limit", text: $monthlyLimit)
+                                .keyboardType(.decimalPad)
+                                .onChange(of: monthlyLimit) { _, newValue in
+                                    monthlyLimit = AmountInput.sanitize(newValue)
+                                }
+                        }
+                        .padding()
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .cornerRadius(12)
+
+                        Text("Leave empty for no limit. Groups over their limit are highlighted on the main screen.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 4)
+                    }
+                    .padding(.horizontal)
                 }
 
                 Spacer()
@@ -75,6 +107,8 @@ struct EditCategoryView: View {
     private func save() {
         category.name = name.trimmingCharacters(in: .whitespaces)
         category.icon = selectedEmoji
+        // An empty field clears the limit rather than leaving the old one behind.
+        category.monthlyBudget = AmountInput.parse(monthlyLimit) ?? 0
         try? modelContext.save()
         dismiss()
     }
