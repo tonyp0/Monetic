@@ -19,26 +19,23 @@ struct ContentView: View {
 
     init() {}
 
-    private var totalSpentThisMonth: Double {
-        categories.reduce(0) { $0 + $1.monthlySpending() }
-    }
-
-    private var remaining: Double {
-        monthlyBudget - totalSpentThisMonth
-    }
-
-    /// Unclamped on purpose — the ring needs to know it has been *passed*, not
-    /// just that it's full.
-    private var spendRatio: Double {
-        guard monthlyBudget > 0 else { return 0 }
-        return totalSpentThisMonth / monthlyBudget
-    }
-
-    private var hasSpending: Bool {
-        categories.contains { $0.monthlySpending() > 0 }
-    }
-
     var body: some View {
+        // Computed once per render and threaded through instead of letting
+        // every row and chart call `category.monthlySpending()` on its own —
+        // that method rescans a category's whole transaction list, so N
+        // independent call sites turned one render into an O(categories ×
+        // transactions) scan and was the source of the lag after adding an
+        // expense.
+        let categorySpending = Dictionary(
+            uniqueKeysWithValues: categories.map { ($0.id, $0.monthlySpending()) }
+        )
+        let totalSpent = categorySpending.values.reduce(0, +)
+        let remaining = monthlyBudget - totalSpent
+        // Unclamped on purpose — the ring needs to know it has been *passed*,
+        // not just that it's full.
+        let ratio = monthlyBudget > 0 ? totalSpent / monthlyBudget : 0
+        let hasSpending = categorySpending.values.contains { $0 > 0 }
+
         NavigationStack {
             ZStack {
                 BrandBackground()
@@ -47,9 +44,9 @@ struct ContentView: View {
                     Group {
                         BudgetHeroCard(
                             monthlyBudget: monthlyBudget,
-                            totalSpent: totalSpentThisMonth,
+                            totalSpent: totalSpent,
                             remaining: remaining,
-                            ratio: spendRatio,
+                            ratio: ratio,
                             onSetBudget: {
                                 isNewMonthPrompt = false
                                 showingSetBudget = true
@@ -59,7 +56,7 @@ struct ContentView: View {
                         .padding(.bottom, 10)
 
                         if hasSpending {
-                            chartsSection
+                            chartsSection(spendingByCategory: categorySpending)
                         }
 
                         BrandSectionHeader(title: "Groups") {
@@ -89,7 +86,7 @@ struct ContentView: View {
                             .brandListRow()
                     } else {
                         ForEach(categories) { category in
-                            GroupCard(category: category)
+                            GroupCard(category: category, spent: categorySpending[category.id] ?? 0)
                                 .contentShape(Rectangle())
                                 .onTapGesture { selectedCategory = category }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -173,7 +170,7 @@ struct ContentView: View {
     }
 
     @ViewBuilder
-    private var chartsSection: some View {
+    private func chartsSection(spendingByCategory: [UUID: Double]) -> some View {
         Button(action: {
             withAnimation(.easeInOut(duration: 0.25)) { chartsExpanded.toggle() }
         }) {
@@ -189,7 +186,7 @@ struct ContentView: View {
         .padding(.bottom, 8)
 
         if chartsExpanded {
-            SpendingChartsView(categories: categories)
+            SpendingChartsView(categories: categories, spendingByCategory: spendingByCategory)
                 .transition(.opacity.combined(with: .move(edge: .top)))
         }
     }
@@ -344,10 +341,13 @@ struct BudgetHeroCard: View {
 
 struct GroupCard: View {
     let category: BudgetCategory
+    // Computed once by the caller and passed in — `category.monthlySpending()`
+    // rescans every transaction, so each row calling it independently turns an
+    // O(categories) list into an O(categories × transactions) one.
+    let spent: Double
 
-    private var spent: Double { category.monthlySpending() }
     private var hasLimit: Bool { category.monthlyBudget > 0 }
-    private var isOver: Bool { category.isOverBudget() }
+    private var isOver: Bool { hasLimit && spent > category.monthlyBudget }
     private var hue: Color { CategoryPalette.color(for: category.color) }
 
     var body: some View {
@@ -366,7 +366,7 @@ struct GroupCard: View {
                         .foregroundStyle(isOver ? Brand.danger : Brand.textTertiary)
 
                     BrandProgressBar(
-                        percentage: category.monthlySpendingPercentage(),
+                        percentage: category.monthlyBudget > 0 ? spent / category.monthlyBudget : 0,
                         tint: isOver ? Brand.danger : hue
                     )
                     .padding(.top, 1)

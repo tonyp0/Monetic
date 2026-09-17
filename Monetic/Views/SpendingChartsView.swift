@@ -3,16 +3,25 @@ import Charts
 
 struct SpendingChartsView: View {
     let categories: [BudgetCategory]
+    // Computed once by the caller — `category.monthlySpending()` rescans a
+    // category's whole transaction list, and this view used to call it from
+    // the filter, the sort comparator, each chart mark, and the legend, so a
+    // handful of categories turned into dozens of redundant full scans.
+    let spendingByCategory: [UUID: Double]
+
+    private func spending(for category: BudgetCategory) -> Double {
+        spendingByCategory[category.id] ?? 0
+    }
 
     // Categories that have spending this month
     private var activeCategories: [BudgetCategory] {
         categories
-            .filter { $0.monthlySpending() > 0 }
-            .sorted { $0.monthlySpending() > $1.monthlySpending() }
+            .filter { spending(for: $0) > 0 }
+            .sorted { spending(for: $0) > spending(for: $1) }
     }
 
     private var totalSpent: Double {
-        activeCategories.reduce(0) { $0 + $1.monthlySpending() }
+        activeCategories.reduce(0) { $0 + spending(for: $1) }
     }
 
     // All transactions this month across all categories, grouped by day
@@ -54,7 +63,7 @@ struct SpendingChartsView: View {
 
             Chart(activeCategories, id: \.id) { category in
                 SectorMark(
-                    angle: .value("Spent", category.monthlySpending()),
+                    angle: .value("Spent", spending(for: category)),
                     innerRadius: .ratio(0.66),
                     angularInset: 2.5
                 )
@@ -102,7 +111,7 @@ struct SpendingChartsView: View {
 
                     Spacer(minLength: 8)
 
-                    Text(category.monthlySpending(), format: .currency(code: Currency.code))
+                    Text(spending(for: category), format: .currency(code: Currency.code))
                         .font(Brand.number(13, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
