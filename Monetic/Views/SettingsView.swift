@@ -7,6 +7,8 @@ struct SettingsView: View {
     @AppStorage("monthlyBudget") private var monthlyBudget: Double = 0
     @AppStorage("budgetSetMonth") private var budgetSetMonth: String = ""
     @AppStorage("lastMonthlyBudget") private var lastMonthlyBudget: Double = 0
+    // new property
+    @AppStorage("selectedCurrencyCode") private var selectedCurrencyCode: String = ""
 
     var body: some View {
         NavigationStack {
@@ -16,6 +18,7 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: Brand.Space.stack) {
                         appearanceCard
+                        currencyCard
                         budgetCard
                         if monthlyBudget > 0 {
                             thisMonthCard
@@ -60,6 +63,34 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .brandCard()
     }
+    
+    // MARK: Currency
+    
+    private var currencyCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Currency").brandEyebrow()
+            
+            
+            Picker("Currency", selection: $selectedCurrencyCode) {
+                Text("Device Default").tag("")
+                Text("USD").tag("USD")
+                Text("EUR").tag("EUR")
+                Text("GBP").tag("GBP")
+                Text("JPY").tag("JPY")
+            }
+                      .pickerStyle(.menu)
+                      .tint(Brand.accent)
+            
+            Text(selectedCurrencyCode.isEmpty
+                ? "Amounts follow your device's region."
+                : "Amounts are shown in \(selectedCurrencyCode).")
+                .font(.caption)
+                .foregroundStyle(Brand.textTertiary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .brandCard()
+    }
+    
 
     // MARK: Budget
 
@@ -218,3 +249,5 @@ struct AppearanceSelector: View {
         )
     }
 }
+
+

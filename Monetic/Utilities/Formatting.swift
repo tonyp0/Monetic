@@ -4,12 +4,23 @@ import Foundation
 enum Currency {
     /// Currency code for the user's locale, falling back to USD.
     static var code: String {
-        Locale.current.currency?.identifier ?? "USD"
+        let stored = UserDefaults.standard.string(forKey: "selectedCurrencyCode") ?? ""
+        if !stored.isEmpty {
+            return stored
+        }
+        return Locale.current.currency?.identifier ?? "USD"
+        
+        
+        
     }
-
+    
     /// Currency symbol for the user's locale, falling back to "$".
     static var symbol: String {
-        Locale.current.currencySymbol ?? "$"
+        let currencyCode = code
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        return formatter.currencySymbol ?? Locale.current.currencySymbol ?? "$"
     }
 }
 
