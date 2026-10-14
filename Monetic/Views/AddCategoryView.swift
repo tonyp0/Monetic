@@ -53,6 +53,7 @@ struct AddCategoryView: View {
                         .font(Brand.display(15, .semibold))
                         .foregroundStyle(Brand.accent)
                         .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                        .accessibilityIdentifier("saveGroupButton")
                 }
             }
             .sheet(isPresented: $showingEmojiPicker) {

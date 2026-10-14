@@ -4,7 +4,9 @@
   <img src="Marketing/Brand/monetic-logo.png" alt="Monetic logo" width="140">
 </p>
 
-Monetic is a simple iOS budgeting app for tracking monthly spending in a way that feels lightweight and approachable. Instead of trying to be a full finance platform, the app focuses on the basics: setting a monthly budget, organizing expenses into groups, logging transactions, and seeing how your spending is trending throughout the month.
+Monetic is a simple iOS budgeting app made to aid in the early financial literacy of kids in grades K-12. Building healthy money habits early is the main goal behind developing this app.
+
+It tracks monthly spending in a way that feels lightweight and approachable. Instead of trying to be a full finance platform, the app focuses on the basics: setting a monthly budget, organizing expenses into groups, logging transactions, and seeing how your spending is trending throughout the month.
 
 ## What The App Does
 
@@ -21,7 +23,9 @@ When the app first launches, users are guided through a short onboarding flow th
 
 ## Why It Was Made
 
-Monetic was made to offer a more personal and less overwhelming way to manage day-to-day spending. A lot of budgeting tools feel overly complex, cluttered, or built around features that casual users may not need. This app takes a simpler approach by focusing on the core habit of staying aware of where money is going each month.
+The main goal of Monetic is to aid in the early financial literacy of kids in grades K-12. Learning to set a budget, track spending, and see where money goes are skills that are best started young, and the app is designed to make those first steps simple and approachable for students.
+
+Monetic was also made to offer a more personal and less overwhelming way to manage day-to-day spending. A lot of budgeting tools feel overly complex, cluttered, or built around features that casual users may not need. This app takes a simpler approach by focusing on the core habit of staying aware of where money is going each month.
 
 The goal is to make budgeting feel easy to start, easy to keep up with, and useful at a glance.
 
