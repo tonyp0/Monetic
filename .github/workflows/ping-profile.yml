@@ -1,0 +1,30 @@
+# Pings tonyp0/tonyp0 so the profile cards re-render right after you push here.
+# Needs a repo secret PROFILE_DISPATCH_TOKEN (fine-grained PAT, only tonyp0/tonyp0, Actions: read & write).
+# Without the secret it does nothing.
+name: Refresh profile cards
+
+on:
+  push:
+  pull_request:
+    types: [opened, closed]
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Ask the profile repo to re-render
+        env:
+          TOKEN: ${{ secrets.PROFILE_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::notice::PROFILE_DISPATCH_TOKEN not set, skipping profile refresh"
+            exit 0
+          fi
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/tonyp0/tonyp0/actions/workflows/profile-cards.yml/dispatches \
+            -d '{"ref":"main"}'
+          echo "Profile refresh requested"
