@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03B03B9BBF5E85FD02EAB020 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE7CE24EEFF1B87C4E239069 /* Foundation.framework */; };
 		A1000001 /* MoneticApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000001 /* MoneticApp.swift */; };
 		A1000002 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000002 /* Category.swift */; };
 		A1000003 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000003 /* Transaction.swift */; };
@@ -16,19 +17,31 @@
 		A1000007 /* EditTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000007 /* EditTransactionView.swift */; };
 		A1000008 /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000008 /* AddCategoryView.swift */; };
 		A100000B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B100000B /* Assets.xcassets */; };
-		A1000012 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000012 /* Formatting.swift */; };
-		A1000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B1000013 /* PrivacyInfo.xcprivacy */; };
 		A100000C /* SetBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000C /* SetBudgetView.swift */; };
 		A100000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000D /* SettingsView.swift */; };
 		A100000E /* SpendingChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000F /* SpendingChartsView.swift */; };
 		A1000010 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000010 /* OnboardingView.swift */; };
 		A1000011 /* EditCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000011 /* EditCategoryView.swift */; };
+		A1000012 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000012 /* Formatting.swift */; };
+		A1000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B1000013 /* PrivacyInfo.xcprivacy */; };
 		A1000014 /* Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000014 /* Brand.swift */; };
 		A1000015 /* CategoryPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000015 /* CategoryPalette.swift */; };
 		A1000016 /* BrandComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000016 /* BrandComponents.swift */; };
+		E0BCC8B273864A5B8E9EA023 /* MoneticDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C9D277B56DC435FFF10111 /* MoneticDemoUITests.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		60070BC5E69472F7DC39EBDC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E1000001;
+			remoteInfo = Monetic;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		63217E82E7C52865521A44DB /* MoneticUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoneticUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1000001 /* MoneticApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneticApp.swift; sourceTree = "<group>"; };
 		B1000002 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		B1000003 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
@@ -49,6 +62,8 @@
 		B1000014 /* Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Brand.swift; sourceTree = "<group>"; };
 		B1000015 /* CategoryPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryPalette.swift; sourceTree = "<group>"; };
 		B1000016 /* BrandComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandComponents.swift; sourceTree = "<group>"; };
+		CE7CE24EEFF1B87C4E239069 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		D4C9D277B56DC435FFF10111 /* MoneticDemoUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MoneticDemoUITests.swift; path = MoneticDemoUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,14 +74,49 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FB05EC60787168F68BFC29EB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03B03B9BBF5E85FD02EAB020 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1D25BDC601A95418B163632E /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				CE7CE24EEFF1B87C4E239069 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		6194ADE799D51C4DA57EEDF6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1D25BDC601A95418B163632E /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A54156BDCB334A4184612502 /* MoneticUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D4C9D277B56DC435FFF10111 /* MoneticDemoUITests.swift */,
+			);
+			name = MoneticUITests;
+			path = MoneticUITests;
+			sourceTree = "<group>";
+		};
 		D1000001 = {
 			isa = PBXGroup;
 			children = (
 				D1000002 /* Monetic */,
 				D1000003 /* Products */,
+				6194ADE799D51C4DA57EEDF6 /* Frameworks */,
+				A54156BDCB334A4184612502 /* MoneticUITests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -88,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				B100000E /* Monetic.app */,
+				63217E82E7C52865521A44DB /* MoneticUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -139,6 +190,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		2122BE7697AA9F580BD70B53 /* MoneticUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9EE544A62C3AA4598D58C1BE /* Build configuration list for PBXNativeTarget "MoneticUITests" */;
+			buildPhases = (
+				3BE137F5358EDB8641376970 /* Sources */,
+				FB05EC60787168F68BFC29EB /* Frameworks */,
+				CB27EEDD8656F5E418071340 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7D0BD77F6CC8439C95706092 /* PBXTargetDependency */,
+			);
+			name = MoneticUITests;
+			productName = MoneticUITests;
+			productReference = 63217E82E7C52865521A44DB /* MoneticUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		E1000001 /* Monetic */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F1000003 /* Build configuration list for PBXNativeTarget "Monetic" */;
@@ -185,11 +254,19 @@
 			projectRoot = "";
 			targets = (
 				E1000001 /* Monetic */,
+				2122BE7697AA9F580BD70B53 /* MoneticUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		CB27EEDD8656F5E418071340 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E1000003 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -202,6 +279,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3BE137F5358EDB8641376970 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E0BCC8B273864A5B8E9EA023 /* MoneticDemoUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E1000002 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -228,7 +313,51 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		7D0BD77F6CC8439C95706092 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Monetic;
+			target = E1000001 /* Monetic */;
+			targetProxy = 60070BC5E69472F7DC39EBDC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		62D267A31EF6F3A6CDB4509B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8G78MS4583;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tpatrick.Monetic.UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = Monetic;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F1C062699675A951AC0907EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8G78MS4583;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tpatrick.Monetic.UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = Monetic;
+			};
+			name = Debug;
+		};
 		G1000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -373,7 +502,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -402,13 +531,22 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9EE544A62C3AA4598D58C1BE /* Build configuration list for PBXNativeTarget "MoneticUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				62D267A31EF6F3A6CDB4509B /* Release */,
+				F1C062699675A951AC0907EE /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F1000002 /* Build configuration list for PBXProject "Monetic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

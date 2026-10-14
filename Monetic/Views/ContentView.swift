@@ -75,6 +75,7 @@ struct ContentView: View {
                                 )
                             }
                             .buttonStyle(.plain)
+                            .accessibilityIdentifier("addGroupButton")
                         }
                         .padding(.top, 14)
                         .padding(.bottom, 6)
@@ -119,6 +120,7 @@ struct ContentView: View {
                         Image(systemName: "gearshape")
                             .foregroundStyle(Brand.textSecondary)
                     }
+                    .accessibilityIdentifier("settingsButton")
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     EditButton()
@@ -128,6 +130,7 @@ struct ContentView: View {
                             .font(.system(size: 20))
                             .foregroundStyle(Brand.accent)
                     }
+                    .accessibilityIdentifier("addTransactionButton")
                 }
             }
             .tint(Brand.accent)
@@ -165,6 +168,21 @@ struct ContentView: View {
                     hasCompletedOnboarding = true
                 }
                 checkMonthRollover()
+            }
+            .onChange(of: hasCompletedOnboarding) { _, completed in
+                // The budget-rollover check runs from onAppear, which fires
+                // once at launch — at the same moment the onboarding
+                // fullScreenCover is first presented. Triggering the New
+                // Month sheet then races the cover: both end up "presented"
+                // in SwiftUI's state at once, so only one renders while the
+                // other sits beneath it, still reporting as on-screen to
+                // accessibility/automation even though it isn't visible or
+                // interactive. Re-run the check once onboarding actually
+                // finishes so the budget prompt reliably shows afterward
+                // instead of racing it.
+                if completed {
+                    checkMonthRollover()
+                }
             }
         }
     }
@@ -206,6 +224,9 @@ struct ContentView: View {
     }
 
     private func checkMonthRollover() {
+        // Don't race the onboarding fullScreenCover — it only makes sense to
+        // prompt for a budget once onboarding has actually finished.
+        guard hasCompletedOnboarding else { return }
         let currentMonth = MonthKey.key()
         guard budgetSetMonth != currentMonth else { return }
 

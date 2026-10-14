@@ -215,6 +215,13 @@ struct AddTransactionView: View {
             recurringFrequency: recurringFrequency
         )
         modelContext.insert(transaction)
+        // Every other insert path in the app (onboarding, AddCategoryView)
+        // explicitly saves right after inserting — this one didn't, so
+        // dismiss() could fire before autosave committed the new
+        // transaction, leaving the category's spend reflecting stale data
+        // for a beat (or, observed in practice, not catching up at all
+        // within the dismiss/re-render window).
+        try? modelContext.save()
         dismiss()
     }
 }
