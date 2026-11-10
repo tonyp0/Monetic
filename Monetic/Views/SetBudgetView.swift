@@ -48,6 +48,7 @@ struct SetBudgetView: View {
                     TextField("", text: $input)
                         .keyboardType(.decimalPad)
                         .focused($isFocused)
+                        .accessibilityIdentifier("budgetAmountField")
                         .frame(width: 1, height: 1)
                         .opacity(0.01)
                         .onChange(of: input) { _, newValue in
@@ -75,6 +76,7 @@ struct SetBudgetView: View {
                             Button("Save Budget", action: save)
                                 .buttonStyle(GradientButtonStyle())
                                 .disabled(parsedAmount <= 0)
+                                .accessibilityIdentifier("saveBudgetButton")
 
                             // The new-month prompt has no Cancel, so it always needs one
                             // other way out — otherwise a user with no previous budget

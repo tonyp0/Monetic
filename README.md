@@ -115,6 +115,51 @@ Pre-launch. No App Store or TestFlight link yet — the CTA collects interest vi
 2. Choose an iPhone simulator or connected device.
 3. Build and run the app.
 
+## Running Tests
+
+**Rule: run the unit suite before opening a PR, and add a test with every bug fix.**
+
+- **Xcode:** Product → Test (⌘U) runs everything.
+- **Command line:** `scripts/test.sh` picks an available iPhone simulator for you:
+
+  ```sh
+  scripts/test.sh        # unit tests only, the fast pre-PR check
+  scripts/test.sh ui     # UI tests only
+  scripts/test.sh all    # everything, including the demo tour
+  ```
+
+  To choose the simulator yourself, set `DESTINATION`, or call xcodebuild directly:
+
+  ```sh
+  xcodebuild test -project Monetic.xcodeproj -scheme Monetic \
+    -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.0' \
+    -only-testing:MoneticTests
+  ```
+
+  `name=` only matches a simulator on the newest iOS you have installed unless you also give `OS=`. `xcrun simctl list devices available` shows what you have.
+
+- **After updating Xcode**, simulators stay disabled ("CoreSimulator is out of date") until first-launch setup runs. Open Xcode once, or run `sudo xcodebuild -runFirstLaunch`. `scripts/test.sh` checks for this.
+
+What's covered:
+
+| Suite | What it checks |
+| --- | --- |
+| `MoneticTests/CategoryTransactionTests` | Adding expenses works for all 9 starter groups plus a custom one: saving, reloading, totals, recurring, validation, creating groups |
+| `MoneticTests/BudgetCategoryTests` | Which expenses count toward a month (one-time, monthly, yearly, month and year boundaries), budget % and over-budget |
+| `MoneticTests/PersistenceTests` | Deleting groups and expenses, editing amounts and dates, reordering |
+| `MoneticTests/TransactionTests`, `FormattingTests`, `MonthRolloverTests` | Date normalization, amount entry, month keys, currency, icons, the new-month budget prompt |
+| `MoneticUITests/AddExpenseUITests` | End to end: onboarding → set budget → add expense → group and home totals update |
+
+`MoneticUITests/MoneticDemoUITests` is a screen-recording tour, not a correctness test.
+
+Writing a test:
+
+- Use Swift Testing (`@Test`, `#expect`) for unit tests and put shared helpers in `MoneticTests/TestSupport.swift`. Use XCTest only for UI tests.
+- Use a fresh in-memory store (`TestSupport.makeContainer()`) and fixed dates (`TestSupport.date(2026, 3, 14)`). Never depend on today's date or the device locale.
+- Add every new test file to its target in Xcode. The project doesn't use synchronized folders.
+- If a test finds a bug you aren't fixing yet, wrap the expectation in `withKnownIssue("…")` so the suite stays green and the bug stays visible.
+- UI tests launch the app with `-UITesting YES` (Debug builds only). The app then starts with an empty in-memory store and first-launch settings.
+
 ## Status
 
 This is a native iOS app under active development and currently stores data locally on device using SwiftData.

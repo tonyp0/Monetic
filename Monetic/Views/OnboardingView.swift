@@ -5,7 +5,9 @@ struct OnboardingView: View {
     @Environment(\.modelContext) private var modelContext
     @Binding var hasCompletedOnboarding: Bool
 
-    private let defaultCategories: [(name: String, icon: String, color: String)] = [
+    /// The starter groups offered on first launch. Static so tests can iterate
+    /// the same list the app ships instead of keeping a copy of it.
+    nonisolated static let defaultCategories: [(name: String, icon: String, color: String)] = [
         ("Food & Dining",  "🍔", "amber"),
         ("Entertainment",  "🎉", "violet"),
         ("Transport",      "🚗", "mint"),
@@ -30,7 +32,7 @@ struct OnboardingView: View {
 
                 ScrollView {
                     VStack(spacing: 9) {
-                        ForEach(defaultCategories, id: \.name) { cat in
+                        ForEach(Self.defaultCategories, id: \.name) { cat in
                             categoryRow(cat)
                         }
                     }
@@ -119,6 +121,7 @@ struct OnboardingView: View {
                 Text(selected.isEmpty ? "Skip for Now" : "Get Started")
             }
             .buttonStyle(GradientButtonStyle())
+            .accessibilityIdentifier("getStartedButton")
 
             Text(selected.isEmpty
                  ? "You can add groups whenever you're ready."
@@ -145,6 +148,13 @@ struct OnboardingView: View {
     }
 
     private func saveAndContinue() {
+        Self.insertStarterGroups(named: selected, into: modelContext)
+        try? modelContext.save()
+        hasCompletedOnboarding = true
+    }
+
+    /// Inserts the chosen starter groups in their listed order.
+    static func insertStarterGroups(named selected: Set<String>, into modelContext: ModelContext) {
         let toAdd = defaultCategories.filter { selected.contains($0.name) }
         for (index, cat) in toAdd.enumerated() {
             let category = BudgetCategory(
@@ -158,7 +168,5 @@ struct OnboardingView: View {
             )
             modelContext.insert(category)
         }
-        try? modelContext.save()
-        hasCompletedOnboarding = true
     }
 }

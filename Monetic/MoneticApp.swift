@@ -42,6 +42,17 @@ struct MoneticApp: App {
             BudgetCategory.self,
             Transaction.self
         ])
+
+        #if DEBUG
+        // Automated tests launch with -UITesting so every run starts from an
+        // empty, throwaway store and first-launch settings, never real data.
+        if ProcessInfo.processInfo.arguments.contains("-UITesting") {
+            resetSettingsForTesting()
+            let inMemory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            return Result { try ModelContainer(for: schema, configurations: [inMemory]) }
+        }
+        #endif
+
         let configuration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false
@@ -65,6 +76,21 @@ struct MoneticApp: App {
     }
 
     #if DEBUG
+    private static func resetSettingsForTesting() {
+        let keys = [
+            "hasCompletedOnboarding",
+            "monthlyBudget",
+            "budgetSetMonth",
+            "repeatMonthlyBudget",
+            "lastMonthlyBudget",
+            "selectedCurrencyCode",
+            "appAppearance",
+        ]
+        for key in keys {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+    }
+
     private static func removeStore() {
         guard let appSupport = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)

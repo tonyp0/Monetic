@@ -63,6 +63,7 @@ struct AddTransactionView: View {
                         .font(Brand.display(15, .semibold))
                         .foregroundStyle(Brand.accent)
                         .disabled(!isValid)
+                        .accessibilityIdentifier("saveExpenseButton")
                 }
             }
             .onAppear {
@@ -201,19 +202,15 @@ struct AddTransactionView: View {
     }
 
     private func save() {
-        guard let amountValue = AmountInput.parse(amount), amountValue > 0,
-              let category = effectiveCategory else { return }
-
-        // Setting `category` is enough — SwiftData maintains the inverse
-        // relationship, so appending to category.transactions as well is redundant.
-        let transaction = Transaction(
-            amount: amountValue,
+        guard let transaction = Self.makeTransaction(
+            amountText: amount,
             date: date,
             notes: notes,
-            category: category,
+            category: effectiveCategory,
             isRecurring: isRecurring,
             recurringFrequency: recurringFrequency
-        )
+        ) else { return }
+
         modelContext.insert(transaction)
         // Every other insert path in the app (onboarding, AddCategoryView)
         // explicitly saves right after inserting — this one didn't, so
@@ -223,5 +220,30 @@ struct AddTransactionView: View {
         // within the dismiss/re-render window).
         try? modelContext.save()
         dismiss()
+    }
+
+    /// The expense `save()` inserts, or nil when the amount isn't a positive
+    /// number or no group is chosen.
+    static func makeTransaction(
+        amountText: String,
+        date: Date,
+        notes: String,
+        category: BudgetCategory?,
+        isRecurring: Bool,
+        recurringFrequency: String
+    ) -> Transaction? {
+        guard let amountValue = AmountInput.parse(amountText), amountValue > 0,
+              let category else { return nil }
+
+        // Setting `category` is enough — SwiftData maintains the inverse
+        // relationship, so appending to category.transactions as well is redundant.
+        return Transaction(
+            amount: amountValue,
+            date: date,
+            notes: notes,
+            category: category,
+            isRecurring: isRecurring,
+            recurringFrequency: recurringFrequency
+        )
     }
 }

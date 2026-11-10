@@ -398,6 +398,7 @@ struct AmountEntryCard: View {
                     .foregroundStyle(Brand.textSecondary)
 
                 TextField("0.00", text: $amount)
+                    .accessibilityIdentifier("amountField")
                     .font(Brand.number(40))
                     .foregroundStyle(Brand.textPrimary)
                     .keyboardType(.decimalPad)

@@ -84,18 +84,28 @@ struct AddCategoryView: View {
     }
 
     private func save() {
-        let category = BudgetCategory(
-            name: name.trimmingCharacters(in: .whitespaces),
-            color: nextColorKey,
+        let category = Self.makeCategory(
+            name: name,
             icon: selectedEmoji,
-            budgetLimit: 0,
-            monthlyBudget: 0,
-            isDefault: false,
-            sortOrder: existingCategories.count
+            existingCount: existingCategories.count
         )
         modelContext.insert(category)
         try? modelContext.save()
         dismiss()
+    }
+
+    /// The group `save()` inserts. New groups go to the end of the list and
+    /// take the next palette hue, matching `nextColorKey`.
+    static func makeCategory(name: String, icon: String, existingCount: Int) -> BudgetCategory {
+        BudgetCategory(
+            name: name.trimmingCharacters(in: .whitespaces),
+            color: CategoryPalette.key(forIndex: existingCount),
+            icon: icon,
+            budgetLimit: 0,
+            monthlyBudget: 0,
+            isDefault: false,
+            sortOrder: existingCount
+        )
     }
 }
 
