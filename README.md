@@ -119,6 +119,8 @@ Pre-launch. No App Store or TestFlight link yet — the CTA collects interest vi
 
 **Rule: run the unit suite before opening a PR, and add a test with every bug fix.**
 
+Pull requests into `main` also run the unit suite automatically on GitHub Actions (`.github/workflows/tests.yml`).
+
 - **Xcode:** Product → Test (⌘U) runs everything.
 - **Command line:** `scripts/test.sh` picks an available iPhone simulator for you:
 

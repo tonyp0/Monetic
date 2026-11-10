@@ -12,19 +12,25 @@ set -eu
 cd "$(dirname "$0")/.."
 
 # After an Xcode update, simulators stay disabled until first-launch setup runs.
-if ! xcodebuild -checkFirstLaunchStatus >/dev/null 2>&1; then
+# Local Macs only: CI images come set up, and the fix needs sudo anyway.
+if [ -z "${CI:-}" ] && ! xcodebuild -checkFirstLaunchStatus >/dev/null 2>&1; then
     echo "Xcode hasn't finished its first-launch setup, so simulators are unavailable."
     echo "Run:  sudo xcodebuild -runFirstLaunch   (or open Xcode once), then try again."
     exit 1
 fi
 
 if [ -z "${DESTINATION:-}" ]; then
-    # `simctl list` groups devices by runtime, oldest first, so the last iPhone
-    # listed is on the newest iOS installed.
-    udid=$(xcrun simctl list devices available \
-        | grep -E '^ +iPhone' \
+    # Pick the iPhone simulator on the newest iOS this Xcode can actually run.
+    # `simctl list` can't be used for this: it also lists runtimes that belong
+    # to other installed Xcodes, and its order isn't reliably by version.
+    udid=$(xcodebuild -showdestinations -project Monetic.xcodeproj -scheme Monetic 2>/dev/null \
+        | grep 'platform:iOS Simulator' \
+        | grep 'name:iPhone' \
+        | grep 'OS:' \
+        | sed -E 's/.*id:([0-9A-F-]+), OS:([0-9.]+),.*/\2 \1/' \
+        | sort -t. -k1,1n -k2,2n -k3,3n \
         | tail -n 1 \
-        | sed -E 's/.*\(([0-9A-F-]{36})\).*/\1/')
+        | cut -d' ' -f2)
     if [ -z "$udid" ]; then
         echo "No iPhone simulator found. Add one in Xcode → Window → Devices and Simulators."
         exit 1
