@@ -11,7 +11,7 @@ final class MoneticDemoUITests: XCTestCase {
 
     func testFullFeatureTour() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "-UITesting", "YES"]
         app.launch()
 
         // MARK: Onboarding (there's a startup race between the onboarding

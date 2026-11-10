@@ -1,0 +1,34 @@
+# Runs the unit test suite on every pull request into main that touches app
+# or test code. UI tests are left to local runs (scripts/test.sh ui).
+name: Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "Monetic/**"
+      - "MoneticTests/**"
+      - "MoneticUITests/**"
+      - "Monetic.xcodeproj/**"
+      - "scripts/**"
+      - ".github/workflows/tests.yml"
+
+concurrency:
+  group: tests-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Unit tests
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode and simulator runtimes
+        run: |
+          xcodebuild -version
+          xcrun simctl list runtimes
+
+      - name: Run unit tests
+        run: scripts/test.sh unit

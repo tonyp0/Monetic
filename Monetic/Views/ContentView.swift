@@ -215,26 +215,49 @@ struct ContentView: View {
     }
 
     private func reorderCategories(from source: IndexSet, to destination: Int) {
-        var items = Array(categories)
+        Self.reorder(Array(categories), from: source, to: destination)
+        try? modelContext.save()
+    }
+
+    /// Applies a drag-to-reorder by renumbering every group's `sortOrder`.
+    static func reorder(_ categories: [BudgetCategory], from source: IndexSet, to destination: Int) {
+        var items = categories
         items.move(fromOffsets: source, toOffset: destination)
         for (index, item) in items.enumerated() {
             item.sortOrder = index
         }
-        try? modelContext.save()
     }
 
     private func checkMonthRollover() {
-        // Don't race the onboarding fullScreenCover — it only makes sense to
-        // prompt for a budget once onboarding has actually finished.
-        guard hasCompletedOnboarding else { return }
-        let currentMonth = MonthKey.key()
-        guard budgetSetMonth != currentMonth else { return }
+        let rollover = Self.monthRollover(
+            hasCompletedOnboarding: hasCompletedOnboarding,
+            budgetSetMonth: budgetSetMonth,
+            currentMonth: MonthKey.key(),
+            monthlyBudget: monthlyBudget
+        )
+        guard rollover.shouldPrompt else { return }
 
-        if monthlyBudget > 0 {
-            lastMonthlyBudget = monthlyBudget
+        if let carried = rollover.lastMonthlyBudget {
+            lastMonthlyBudget = carried
         }
         isNewMonthPrompt = true
         showingSetBudget = true
+    }
+
+    /// Whether to show the new-month budget prompt, and the budget to remember
+    /// as last month's (nil leaves `lastMonthlyBudget` alone).
+    static func monthRollover(
+        hasCompletedOnboarding: Bool,
+        budgetSetMonth: String,
+        currentMonth: String,
+        monthlyBudget: Double
+    ) -> (shouldPrompt: Bool, lastMonthlyBudget: Double?) {
+        // Don't race the onboarding fullScreenCover — it only makes sense to
+        // prompt for a budget once onboarding has actually finished.
+        guard hasCompletedOnboarding else { return (false, nil) }
+        guard budgetSetMonth != currentMonth else { return (false, nil) }
+
+        return (true, monthlyBudget > 0 ? monthlyBudget : nil)
     }
 }
 
@@ -331,6 +354,7 @@ struct BudgetHeroCard: View {
         VStack(spacing: 4) {
             Text(label).brandEyebrow()
             Text(value, format: .currency(code: Currency.code))
+                .accessibilityIdentifier("\(label.lowercased())Total")
                 .font(Brand.number(17, .semibold))
                 .foregroundStyle(tint)
                 .minimumScaleFactor(0.6)

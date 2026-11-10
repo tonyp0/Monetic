@@ -69,6 +69,7 @@ struct CategoryDetailView: View {
                     Label("Add Expense", systemImage: "plus")
                 }
                 .buttonStyle(GradientButtonStyle())
+                .accessibilityIdentifier("addExpenseButton")
                 .padding(.horizontal, Brand.Space.gutter)
                 .padding(.top, 8)
                 .padding(.bottom, 8)
@@ -123,6 +124,7 @@ struct CategoryDetailView: View {
                 VStack(alignment: .trailing, spacing: 3) {
                     Text("This Month").brandEyebrow()
                     Text(monthlySpent, format: .currency(code: Currency.code))
+                        .accessibilityIdentifier("groupMonthlySpent")
                         .font(Brand.number(20))
                         .foregroundStyle(isOver ? Brand.danger : Brand.textPrimary)
                         .minimumScaleFactor(0.6)
@@ -196,10 +198,17 @@ struct CategoryDetailView: View {
     }
 
     private func deleteTransactions(at offsets: IndexSet) {
-        let sorted = sortedTransactions
+        Self.deleteTransactions(at: offsets, from: sortedTransactions, in: modelContext)
+    }
+
+    /// Deletes swiped rows. `offsets` index into `rows` as displayed.
+    static func deleteTransactions(at offsets: IndexSet, from rows: [Transaction], in modelContext: ModelContext) {
         for index in offsets {
-            modelContext.delete(sorted[index])
+            modelContext.delete(rows[index])
         }
+        // Until the context saves, the group's `transactions` still includes
+        // the deleted rows, so its count and total would lag behind the list.
+        try? modelContext.save()
     }
 }
 

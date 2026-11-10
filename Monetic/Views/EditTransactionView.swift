@@ -150,17 +150,45 @@ struct EditTransactionView: View {
     }
 
     private func save() {
-        guard let amountValue = AmountInput.parse(amount), amountValue > 0 else { return }
+        guard Self.saveEdits(
+            amountText: amount,
+            date: date,
+            notes: notes,
+            isRecurring: isRecurring,
+            recurringFrequency: recurringFrequency,
+            to: transaction,
+            in: modelContext
+        ) else { return }
+        dismiss()
+    }
+
+    /// Writes the edited fields onto `transaction` and saves. Returns false,
+    /// changing nothing, when the amount isn't a positive number.
+    @discardableResult
+    static func saveEdits(
+        amountText: String,
+        date: Date,
+        notes: String,
+        isRecurring: Bool,
+        recurringFrequency: String,
+        to transaction: Transaction,
+        in modelContext: ModelContext
+    ) -> Bool {
+        guard let amountValue = AmountInput.parse(amountText), amountValue > 0 else { return false }
         transaction.amount = amountValue
         transaction.date = Calendar.current.startOfDay(for: date)
         transaction.notes = notes
         transaction.isRecurring = isRecurring
         transaction.recurringFrequency = isRecurring ? recurringFrequency : ""
-        dismiss()
+        // Saved explicitly, like AddTransactionView.save(), so the edit is
+        // committed before the sheet dismisses instead of waiting on autosave.
+        try? modelContext.save()
+        return true
     }
 
     private func delete() {
         modelContext.delete(transaction)
+        try? modelContext.save()
         dismiss()
     }
 }
