@@ -47,14 +47,16 @@ struct FormattingTests {
         #expect(AmountInput.parse(input) == nil)
     }
 
-    @Test("Parse rejects number spellings that aren't money amounts", arguments: ["inf", "nan", "1e3", "0x10"])
+    @Test("Parse rejects number spellings that aren't money amounts", arguments: ["inf", "nan", "1e3", "0x10", "+5", " 5"])
     func parseRejectsNonDecimalSpellings(_ input: String) {
-        // Double(_:) accepts these, so parse() turns "inf" into an infinite
-        // amount. Not reachable today because the amount field sanitizes
-        // first (see the next test), but parse() alone doesn't guard it.
-        withKnownIssue("AmountInput.parse accepts inf/nan/exponent/hex spellings") {
-            #expect(AmountInput.parse(input) == nil)
-        }
+        // Double(_:) accepts most of these, which once let parse() turn "inf"
+        // into an infinite amount.
+        #expect(AmountInput.parse(input) == nil)
+    }
+
+    @Test("Parse still reads negative amounts so the Save button can reject them")
+    func parseReadsNegative() {
+        #expect(AmountInput.parse("-5") == -5)
     }
 
     @Test("Sanitizing first turns non-decimal spellings into nothing parseable", arguments: ["inf", "nan", "infinity"])

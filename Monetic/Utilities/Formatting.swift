@@ -75,8 +75,13 @@ enum AmountInput {
     }
 
     /// Parses sanitized input, tolerating either decimal separator.
+    /// Only plain decimal amounts are accepted — `Double(_:)` on its own would
+    /// also take "inf", "nan", exponents like "1e3" and hex like "0x10".
     static func parse(_ input: String) -> Double? {
-        Double(input.replacingOccurrences(of: ",", with: "."))
+        let normalized = input.replacingOccurrences(of: ",", with: ".")
+        let unsigned = normalized.hasPrefix("-") ? normalized.dropFirst() : Substring(normalized)
+        guard unsigned.allSatisfy({ ("0"..."9").contains($0) || $0 == "." }) else { return nil }
+        return Double(normalized)
     }
 }
 

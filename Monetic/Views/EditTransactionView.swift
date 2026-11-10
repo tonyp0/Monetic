@@ -162,7 +162,7 @@ struct EditTransactionView: View {
         dismiss()
     }
 
-    /// Writes the edited fields onto `transaction`. Returns false,
+    /// Writes the edited fields onto `transaction` and saves. Returns false,
     /// changing nothing, when the amount isn't a positive number.
     @discardableResult
     static func saveEdits(
@@ -180,11 +180,15 @@ struct EditTransactionView: View {
         transaction.notes = notes
         transaction.isRecurring = isRecurring
         transaction.recurringFrequency = isRecurring ? recurringFrequency : ""
+        // Saved explicitly, like AddTransactionView.save(), so the edit is
+        // committed before the sheet dismisses instead of waiting on autosave.
+        try? modelContext.save()
         return true
     }
 
     private func delete() {
         modelContext.delete(transaction)
+        try? modelContext.save()
         dismiss()
     }
 }

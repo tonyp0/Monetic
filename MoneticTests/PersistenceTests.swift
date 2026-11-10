@@ -86,6 +86,85 @@ struct PersistenceTests {
         #expect(group.monthlySpending(asOf: april) == 40)
     }
 
+    // MARK: Edit Expense screen
+
+    @Test("Saving on the Edit Expense screen is committed to the store right away")
+    func editScreenSavePersists() throws {
+        let group = try TestSupport.makeGroup(in: context)
+        let expense = try TestSupport.addTransaction(40, to: group, on: march, in: context)
+
+        let saved = EditTransactionView.saveEdits(
+            amountText: TestSupport.amountText("55.50"), date: march, notes: "Updated",
+            isRecurring: false, recurringFrequency: "monthly", to: expense, in: context
+        )
+
+        #expect(saved)
+        let id = expense.id
+        let reloaded = try #require(try ModelContext(container).fetch(FetchDescriptor<Transaction>(
+            predicate: #Predicate { $0.id == id }
+        )).first)
+        #expect(reloaded.amount == 55.5)
+        #expect(reloaded.notes == "Updated")
+    }
+
+    @Test("The Edit Expense screen won't save an invalid amount", arguments: ["", "0", "-5", "abc"])
+    func editScreenRejectsInvalidAmount(_ amountText: String) throws {
+        let group = try TestSupport.makeGroup(in: context)
+        let expense = try TestSupport.addTransaction(40, to: group, on: march, in: context)
+
+        let saved = EditTransactionView.saveEdits(
+            amountText: amountText, date: TestSupport.date(2026, 4, 2), notes: "Changed",
+            isRecurring: false, recurringFrequency: "monthly", to: expense, in: context
+        )
+
+        #expect(saved == false)
+        #expect(expense.amount == 40)
+        #expect(expense.notes == "")
+        #expect(expense.date == Calendar.current.startOfDay(for: march))
+    }
+
+    @Test("Turning off Recurring on the Edit Expense screen clears the frequency")
+    func editScreenClearsFrequency() throws {
+        let group = try TestSupport.makeGroup(in: context)
+        let expense = try TestSupport.addTransaction(
+            15, to: group, on: march, isRecurring: true, recurringFrequency: "monthly", in: context
+        )
+
+        EditTransactionView.saveEdits(
+            amountText: "15", date: march, notes: "",
+            isRecurring: false, recurringFrequency: "monthly", to: expense, in: context
+        )
+
+        #expect(expense.isRecurring == false)
+        #expect(expense.recurringFrequency == "")
+        #expect(group.monthlySpending(asOf: TestSupport.date(2026, 4, 14)) == 0)
+    }
+
+    // MARK: Swipe to delete
+
+    @Test("Swiping to delete removes the swiped row, not a different one")
+    func swipeDeleteRemovesCorrectRow() throws {
+        let group = try TestSupport.makeGroup(in: context)
+        let older = try TestSupport.addTransaction(10, to: group, on: TestSupport.date(2026, 3, 1), in: context)
+        let newer = try TestSupport.addTransaction(20, to: group, on: TestSupport.date(2026, 3, 20), in: context)
+        // As CategoryDetailView lists them: newest first.
+        let rows = [newer, older]
+
+        CategoryDetailView.deleteTransactions(at: IndexSet(integer: 1), from: rows, in: context)
+
+        #expect(group.transactions.map(\.id) == [newer.id])
+    }
+
+    @Test("Swiping to delete is committed to the store right away")
+    func swipeDeletePersists() throws {
+        let group = try TestSupport.makeGroup(in: context)
+        let expense = try TestSupport.addTransaction(10, to: group, on: march, in: context)
+
+        CategoryDetailView.deleteTransactions(at: IndexSet(integer: 0), from: [expense], in: context)
+
+        #expect(try ModelContext(container).fetchCount(FetchDescriptor<Transaction>()) == 0)
+    }
+
     // MARK: Reordering
 
     @Test("Dragging the last group to the top renumbers every group")

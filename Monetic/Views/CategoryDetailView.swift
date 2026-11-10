@@ -206,6 +206,9 @@ struct CategoryDetailView: View {
         for index in offsets {
             modelContext.delete(rows[index])
         }
+        // Until the context saves, the group's `transactions` still includes
+        // the deleted rows, so its count and total would lag behind the list.
+        try? modelContext.save()
     }
 }
 
