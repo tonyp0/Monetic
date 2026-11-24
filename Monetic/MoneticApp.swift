@@ -25,7 +25,7 @@ struct MoneticApp: App {
         WindowGroup {
             switch store {
             case .success(let container):
-                ContentView()
+                RootView()
                     .preferredColorScheme(preferredScheme)
                     .tint(Brand.accent)
                     .modelContainer(container)
@@ -37,11 +37,16 @@ struct MoneticApp: App {
         }
     }
 
+    /// Every model the app stores. Adding a model here is a lightweight
+    /// migration — `StoreMigrationTests` proves an older store still opens.
+    static let schema = Schema([
+        BudgetCategory.self,
+        Transaction.self,
+        Trip.self
+    ])
+
     private static func loadStore() -> Result<ModelContainer, Error> {
-        let schema = Schema([
-            BudgetCategory.self,
-            Transaction.self
-        ])
+        let schema = Self.schema
 
         #if DEBUG
         // Automated tests launch with -UITesting so every run starts from an

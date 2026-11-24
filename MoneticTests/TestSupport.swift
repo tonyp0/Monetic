@@ -7,11 +7,12 @@ import Testing
 /// store and its own fixed dates, so nothing depends on today, the device
 /// locale, or data left behind by a previous run.
 enum TestSupport {
-    /// A fresh, empty, in-memory store. Never touches the on-disk database.
+    /// A fresh, empty, in-memory store with the app's full schema. Never
+    /// touches the on-disk database.
     static func makeContainer() throws -> ModelContainer {
         try ModelContainer(
-            for: BudgetCategory.self, Transaction.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            for: MoneticApp.schema,
+            configurations: [ModelConfiguration(isStoredInMemoryOnly: true)]
         )
     }
 

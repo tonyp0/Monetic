@@ -80,6 +80,20 @@ extension View {
             .tracking(1.1)
             .foregroundStyle(Brand.textSecondary)
     }
+
+    /// Screens that need swipe-to-delete or drag-to-reorder are a `List`;
+    /// this strips the stock row chrome so they don't look like one.
+    func brandListRow(vertical: CGFloat = 0) -> some View {
+        self
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets(
+                top: vertical,
+                leading: Brand.Space.gutter,
+                bottom: vertical,
+                trailing: Brand.Space.gutter
+            ))
+    }
 }
 
 // MARK: - Buttons
@@ -114,6 +128,24 @@ struct GradientButtonStyle: ButtonStyle {
                 .scaleEffect(configuration.isPressed ? 0.97 : 1)
                 .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
         }
+    }
+}
+
+/// Destructive action at the foot of a screen ("Delete Trip"): same shape,
+/// tinted with the danger colour instead of filled.
+struct DestructiveButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(Brand.display(15, .semibold))
+            .foregroundStyle(Brand.danger)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(
+                RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous)
+                    .fill(Brand.danger.opacity(0.12))
+            )
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 
@@ -387,10 +419,11 @@ struct BrandSegmented: View {
 struct AmountEntryCard: View {
     @Binding var amount: String
     var focus: FocusState<Bool>.Binding
+    var label: String = "Amount"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Amount").brandEyebrow()
+            Text(label).brandEyebrow()
 
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text(Currency.symbol)
@@ -410,5 +443,167 @@ struct AmountEntryCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .brandCard()
+    }
+}
+
+// MARK: - Tag
+
+/// A small accent-tinted capsule label ("Coming soon").
+struct BrandTag: View {
+    let text: String
+    var tint: Color = Brand.accent
+
+    var body: some View {
+        Text(text)
+            .font(Brand.display(12, .semibold))
+            .foregroundStyle(tint)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(tint.opacity(0.14)))
+    }
+}
+
+// MARK: - Stepper
+
+/// A whole-number stepper in brand chrome, replacing the stock `Stepper`.
+/// VoiceOver reads it as one adjustable control.
+struct BrandStepper: View {
+    let title: String
+    @Binding var value: Int
+    let range: ClosedRange<Int>
+    /// Optional unit for the spoken value, e.g. ("traveler", "travelers").
+    var unit: (singular: String, plural: String)? = nil
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(title)
+                .font(Brand.display(15, .medium))
+                .foregroundStyle(Brand.textPrimary)
+
+            Spacer(minLength: 8)
+
+            stepButton(systemImage: "minus", enabled: value > range.lowerBound) {
+                value = max(value - 1, range.lowerBound)
+            }
+
+            Text("\(value)")
+                .font(Brand.number(20, .semibold))
+                .foregroundStyle(Brand.textPrimary)
+                .monospacedDigit()
+                .frame(minWidth: 28)
+                .contentTransition(.numericText())
+                .animation(.easeOut(duration: 0.15), value: value)
+
+            stepButton(systemImage: "plus", enabled: value < range.upperBound) {
+                value = min(value + 1, range.upperBound)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue(spokenValue)
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment: value = min(value + 1, range.upperBound)
+            case .decrement: value = max(value - 1, range.lowerBound)
+            @unknown default: break
+            }
+        }
+    }
+
+    private var spokenValue: String {
+        guard let unit else { return "\(value)" }
+        return "\(value) \(value == 1 ? unit.singular : unit.plural)"
+    }
+
+    private func stepButton(systemImage: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(enabled ? Brand.accent : Brand.textTertiary)
+                .frame(width: 34, height: 34)
+                .background(Circle().fill(enabled ? Brand.accent.opacity(0.14) : Brand.track))
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+    }
+}
+
+// MARK: - Empty state
+
+/// Icon, headline, one line of explanation and a primary button, on a card.
+struct BrandEmptyStateCard: View {
+    let systemImage: String
+    let title: String
+    let message: String
+    let actionTitle: String
+    var actionIdentifier: String? = nil
+    let action: () -> Void
+
+    var body: some View {
+        VStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Brand.accent.opacity(0.12))
+                .frame(width: 54, height: 54)
+                .overlay(
+                    Image(systemName: systemImage)
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundStyle(Brand.accent)
+                )
+                .accessibilityHidden(true)
+
+            Text(title)
+                .font(Brand.display(17, .semibold))
+                .foregroundStyle(Brand.textPrimary)
+
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(Brand.textSecondary)
+                .multilineTextAlignment(.center)
+
+            Button(actionTitle, action: action)
+                .buttonStyle(GradientButtonStyle())
+                .accessibilityIdentifier(actionIdentifier ?? "")
+                .padding(.top, 4)
+        }
+        .frame(maxWidth: .infinity)
+        .brandCard(padding: 22)
+    }
+}
+
+// MARK: - Tab bar
+
+/// Brand colours for the root tab bar. UIKit appearance is the only way to
+/// colour unselected items, so this is applied once before the bar is built.
+enum BrandTabBar {
+    static func applyAppearance() {
+        let selected = UIColor(Brand.accent)
+        let unselected = UIColor(Brand.textTertiary)
+        let titleFont = UIFont.systemFont(ofSize: 10, weight: .semibold)
+        let roundedFont = titleFont.fontDescriptor.withDesign(.rounded)
+            .map { UIFont(descriptor: $0, size: 10) } ?? titleFont
+
+        let item = UITabBarItemAppearance()
+        item.normal.iconColor = unselected
+        item.normal.titleTextAttributes = [.foregroundColor: unselected, .font: roundedFont]
+        item.selected.iconColor = selected
+        item.selected.titleTextAttributes = [.foregroundColor: selected, .font: roundedFont]
+
+        let appearance = UITabBarAppearance()
+        if #available(iOS 26, *) {
+            // The system's glass bar already floats over content; painting it
+            // opaque would fight that, so only the item colours are branded.
+            appearance.configureWithDefaultBackground()
+        } else {
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = UIColor(Brand.surface)
+            appearance.shadowColor = UIColor(Brand.hairline)
+        }
+        appearance.stackedLayoutAppearance = item
+        appearance.inlineLayoutAppearance = item
+        appearance.compactInlineLayoutAppearance = item
+
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+        UITabBar.appearance().unselectedItemTintColor = unselected
     }
 }

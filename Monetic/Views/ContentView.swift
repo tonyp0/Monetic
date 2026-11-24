@@ -261,23 +261,6 @@ struct ContentView: View {
     }
 }
 
-// MARK: - List row styling
-/// The home screen is a `List` so that swipe-to-delete and drag-to-reorder keep
-/// working; these modifiers strip the stock chrome so it doesn't look like one.
-private extension View {
-    func brandListRow(vertical: CGFloat = 0) -> some View {
-        self
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden)
-            .listRowInsets(EdgeInsets(
-                top: vertical,
-                leading: Brand.Space.gutter,
-                bottom: vertical,
-                trailing: Brand.Space.gutter
-            ))
-    }
-}
-
 // MARK: - Budget Hero
 
 struct BudgetHeroCard: View {
