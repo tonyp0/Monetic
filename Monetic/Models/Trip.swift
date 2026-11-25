@@ -18,10 +18,26 @@ final class Trip: Identifiable {
     var notes: String
     var createdAt: Date
 
+    // Estimator inputs and result (prompt 2). Every new property has a
+    // default so stores saved before it existed migrate automatically.
+    /// The `CostLocation` the estimate used, or nil for a free-text destination.
+    var locationID: String? = nil
+    /// `TravelStyle` raw value.
+    var travelStyle: String = TravelStyle.standard.rawValue
+    /// Rooms the user chose; nil means the travel style's default.
+    var roomsOverride: Int? = nil
+    /// Flights for the whole group, as typed; nil when left empty.
+    var flightsTotal: Double? = nil
+    /// The `TripEstimate` saved with the trip, JSON-encoded.
+    var estimateBreakdown: Data? = nil
+
     /// Where `estimatedTotal` came from. Stored as its raw string, like
     /// `Transaction.recurringFrequency`, so new sources don't need a migration.
     enum EstimateSource: String {
+        /// Typed in, or an estimate the user then edited.
         case manual
+        /// Exactly the per diem estimate in `estimateBreakdown`.
+        case perDiem
     }
 
     /// Where a trip sits relative to a given day.
@@ -40,6 +56,11 @@ final class Trip: Identifiable {
         estimateSource: String = EstimateSource.manual.rawValue,
         notes: String = "",
         createdAt: Date = Date(),
+        locationID: String? = nil,
+        travelStyle: TravelStyle = .standard,
+        roomsOverride: Int? = nil,
+        flightsTotal: Double? = nil,
+        estimate: TripEstimate? = nil,
         calendar: Calendar = .current
     ) {
         let start = calendar.startOfDay(for: startDate)
@@ -53,6 +74,26 @@ final class Trip: Identifiable {
         self.estimateSource = estimateSource
         self.notes = notes
         self.createdAt = createdAt
+        self.locationID = locationID
+        self.travelStyle = travelStyle.rawValue
+        self.roomsOverride = roomsOverride
+        self.flightsTotal = flightsTotal
+        self.estimateBreakdown = estimate.flatMap { try? JSONEncoder().encode($0) }
+    }
+
+    /// The breakdown saved with the trip, if it was estimated.
+    var savedEstimate: TripEstimate? {
+        get { estimateBreakdown.flatMap { try? JSONDecoder().decode(TripEstimate.self, from: $0) } }
+        set { estimateBreakdown = newValue.flatMap { try? JSONEncoder().encode($0) } }
+    }
+
+    var style: TravelStyle { TravelStyle(rawValue: travelStyle) ?? .standard }
+
+    /// Per diem estimates are in U.S. dollars and Monetic doesn't convert
+    /// currencies, so they're always shown in USD. Totals the user typed are
+    /// in their own currency.
+    var totalCurrencyCode: String {
+        estimateSource == EstimateSource.perDiem.rawValue ? "USD" : Currency.code
     }
 
     /// Nights away: Mar 14 → Mar 21 is 7.

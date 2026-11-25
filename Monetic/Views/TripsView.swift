@@ -188,7 +188,7 @@ struct TripRow: View {
             Spacer(minLength: 8)
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text(trip.estimatedTotal, format: .currency(code: Currency.code))
+                Text(trip.estimatedTotal, format: .currency(code: trip.totalCurrencyCode))
                     .font(Brand.number(16, .semibold))
                     .foregroundStyle(status == .past ? Brand.textSecondary : Brand.textPrimary)
                     .lineLimit(1)

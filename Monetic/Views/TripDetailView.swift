@@ -17,6 +17,15 @@ struct TripDetailView: View {
                 VStack(spacing: Brand.Space.stack) {
                     headerCard
 
+                    if let estimate = trip.savedEstimate {
+                        TripBreakdownCard(
+                            estimate: estimate,
+                            editedTotal: trip.estimateSource == Trip.EstimateSource.perDiem.rawValue
+                                ? nil : trip.estimatedTotal,
+                            editedCurrencyCode: trip.totalCurrencyCode
+                        )
+                    }
+
                     if !trip.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         notesCard
                     }
@@ -110,7 +119,7 @@ struct TripDetailView: View {
     private func stat(label: String, value: Double, identifier: String) -> some View {
         VStack(spacing: 4) {
             Text(label).brandEyebrow()
-            Text(value, format: .currency(code: Currency.code))
+            Text(value, format: .currency(code: trip.totalCurrencyCode))
                 .font(Brand.number(20, .semibold))
                 .foregroundStyle(Brand.textPrimary)
                 .minimumScaleFactor(0.6)

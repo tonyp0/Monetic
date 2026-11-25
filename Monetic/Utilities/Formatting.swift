@@ -74,6 +74,22 @@ enum AmountInput {
         return parts[0] + String(separator) + String(parts[1].prefix(2))
     }
 
+    /// Text for a pre-filled amount field, with the locale's decimal
+    /// separator so later typing isn't stripped by `sanitize`: "2400.50" or
+    /// "2400,50".
+    static func text(cents: Int) -> String {
+        let separator = Locale.current.decimalSeparator ?? "."
+        let sign = cents < 0 ? "-" : ""
+        let magnitude = abs(cents)
+        let fraction = magnitude % 100
+        return "\(sign)\(magnitude / 100)\(separator)\(fraction < 10 ? "0" : "")\(fraction)"
+    }
+
+    /// The typed amount in whole cents, or nil if it isn't a plain number.
+    static func cents(_ input: String) -> Int? {
+        parse(input).map { Int(($0 * 100).rounded()) }
+    }
+
     /// Parses sanitized input, tolerating either decimal separator.
     /// Only plain decimal amounts are accepted — `Double(_:)` on its own would
     /// also take "inf", "nan", exponents like "1e3" and hex like "0x10".

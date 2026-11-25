@@ -45,7 +45,8 @@ struct AddTripView: View {
     }
 
     private func save() {
-        guard let trip = draft.makeTrip() else { return }
+        let location = draft.locationID.flatMap { CostDataStore.shared?.location(id: $0) }
+        guard let trip = draft.makeTrip(estimate: draft.estimate(location: location)) else { return }
         modelContext.insert(trip)
         // Saved explicitly, like the other add screens, so the new trip is
         // committed before the sheet dismisses instead of waiting on autosave.

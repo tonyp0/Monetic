@@ -16,6 +16,12 @@ enum TestSupport {
         )
     }
 
+    /// The small hand-written per diem dataset in `Fixtures/`, so estimator
+    /// tests don't change when the real data is regenerated.
+    static func fixtureCostData() throws -> CostDataStore {
+        try CostDataStore(bundle: Bundle(for: FixtureBundleToken.self), resource: "cost-data-fixture")
+    }
+
     /// A fixed date in the current calendar — the same calendar the spending
     /// math uses. Noon keeps it well clear of midnight and DST changes.
     static func date(_ year: Int, _ month: Int, _ day: Int, hour: Int = 12, minute: Int = 0) -> Date {
@@ -100,6 +106,9 @@ enum TestSupport {
         return transaction
     }
 }
+
+/// Anchors `Bundle(for:)` to the test bundle.
+final class FixtureBundleToken {}
 
 /// One spending group to run the "add expense" tests against: either one of
 /// the onboarding starters or a group the user made themselves.

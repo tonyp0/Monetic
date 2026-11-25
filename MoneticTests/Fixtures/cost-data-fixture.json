@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "currency": "USD",
+    "generatedAt": "2000-01-01",
+    "sources": [
+      { "id": "gsa", "name": "Test GSA source", "publisher": "Test publisher", "effective": "2000-01-01", "url": "https://example.invalid/gsa", "page": "https://example.invalid/gsa" },
+      { "id": "dos", "name": "Test State source", "publisher": "Test publisher", "effective": "2000-01-01", "url": "https://example.invalid/dos", "page": "https://example.invalid/dos" }
+    ]
+  },
+  "locations": [
+    { "id": "TEST-CANCUN", "name": "Cancún", "country": "Mexico", "aliases": ["Cancun"], "source": "dos", "effective": "2024-08-01",
+      "seasons": [ { "start": "01-01", "end": "12-31", "lodgingPerNight": 200, "mealsPerDay": 100 } ] },
+    { "id": "TEST-OTHER-MX", "name": "Other areas", "country": "Mexico", "source": "dos", "effective": "2024-08-01",
+      "seasons": [ { "start": "01-01", "end": "12-31", "lodgingPerNight": 150, "mealsPerDay": 90 } ] },
+    { "id": "TEST-SAO-PAULO", "name": "São Paulo", "country": "Brazil", "source": "dos", "effective": "2025-03-01",
+      "seasons": [ { "start": "01-01", "end": "12-31", "lodgingPerNight": 180, "mealsPerDay": 70 } ] },
+    { "id": "TEST-SKI-TOWN", "name": "Ski Town", "country": "United States", "region": "CO", "regionName": "Colorado", "aliases": ["Ski Village"], "source": "gsa", "effective": "2026-10-01",
+      "seasons": [
+        { "start": "04-01", "end": "11-30", "lodgingPerNight": 150, "mealsPerDay": 80 },
+        { "start": "12-01", "end": "03-31", "lodgingPerNight": 400, "mealsPerDay": 90 }
+      ] },
+    { "id": "TEST-LEAP", "name": "Leap City", "country": "United States", "region": "TX", "regionName": "Texas", "source": "gsa", "effective": "2026-10-01",
+      "seasons": [
+        { "start": "01-01", "end": "02-28", "lodgingPerNight": 100, "mealsPerDay": 50 },
+        { "start": "03-01", "end": "12-31", "lodgingPerNight": 120, "mealsPerDay": 60 }
+      ] },
+    { "id": "TEST-ODD", "name": "Odd Town", "country": "Peru", "source": "dos", "effective": "2025-01-01",
+      "seasons": [ { "start": "01-01", "end": "12-31", "lodgingPerNight": 101, "mealsPerDay": 33 } ] }
+  ]
+}

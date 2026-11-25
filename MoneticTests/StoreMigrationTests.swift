@@ -95,4 +95,88 @@ struct StoreMigrationTests {
         #expect(try context.fetchCount(FetchDescriptor<Transaction>()) == 2)
         #expect(try context.fetch(FetchDescriptor<Trip>()).map(\.name) == ["Spring Break"])
     }
+    @Test("A store saved by the first Trips release opens with estimator fields defaulted")
+    func promptOneTripsMigrate() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("StoreMigrationTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let storeURL = directory.appendingPathComponent("default.store")
+
+        let promptOne = Schema([BudgetCategory.self, Transaction.self, PromptOneTrips.Trip.self])
+        let tripID = UUID()
+        do {
+            let container = try ModelContainer(for: promptOne,
+                                               configurations: [ModelConfiguration(schema: promptOne, url: storeURL)])
+            let context = ModelContext(container)
+            context.insert(BudgetCategory(name: "Travel", sortOrder: 0))
+            context.insert(PromptOneTrips.Trip(
+                id: tripID, name: "Spring Break", destination: "Cancún, Mexico",
+                startDate: TestSupport.date(2027, 3, 20), endDate: TestSupport.date(2027, 3, 27),
+                travelers: 4, estimatedTotal: 2400, estimateSource: "manual", notes: "Booked", createdAt: march
+            ))
+            try context.save()
+        }
+
+        let container = try ModelContainer(
+            for: MoneticApp.schema,
+            configurations: [ModelConfiguration(schema: MoneticApp.schema, url: storeURL)]
+        )
+        let context = ModelContext(container)
+        let trip = try #require(try context.fetch(FetchDescriptor<Trip>()).first)
+        #expect(trip.id == tripID)
+        #expect(trip.name == "Spring Break")
+        #expect(trip.destination == "Cancún, Mexico")
+        #expect(trip.travelers == 4)
+        #expect(trip.estimatedTotal == 2400)
+        #expect(trip.estimateSource == "manual")
+        #expect(trip.notes == "Booked")
+        #expect(trip.perPersonTotal == 600)
+        // New in prompt 2, filled from their defaults:
+        #expect(trip.locationID == nil)
+        #expect(trip.travelStyle == "standard")
+        #expect(trip.roomsOverride == nil)
+        #expect(trip.flightsTotal == nil)
+        #expect(trip.savedEstimate == nil)
+        #expect(try context.fetchCount(FetchDescriptor<BudgetCategory>()) == 1)
+
+        // And the migrated trip takes an estimate.
+        trip.travelStyle = TravelStyle.budget.rawValue
+        trip.flightsTotal = 800
+        try context.save()
+        #expect(try ModelContext(container).fetch(FetchDescriptor<Trip>()).first?.flightsTotal == 800)
+    }
+}
+
+/// `Trip` exactly as the first Trips release (prompt 1) stored it. SwiftData
+/// names the entity after the class, so this writes a store the new `Trip`
+/// model then has to migrate.
+enum PromptOneTrips {
+    @Model
+    final class Trip {
+        @Attribute(.unique) var id: UUID
+        var name: String
+        var destination: String
+        var startDate: Date
+        var endDate: Date
+        var travelers: Int
+        var estimatedTotal: Double
+        var estimateSource: String
+        var notes: String
+        var createdAt: Date
+
+        init(id: UUID, name: String, destination: String, startDate: Date, endDate: Date,
+             travelers: Int, estimatedTotal: Double, estimateSource: String, notes: String, createdAt: Date) {
+            self.id = id
+            self.name = name
+            self.destination = destination
+            self.startDate = startDate
+            self.endDate = endDate
+            self.travelers = travelers
+            self.estimatedTotal = estimatedTotal
+            self.estimateSource = estimateSource
+            self.notes = notes
+            self.createdAt = createdAt
+        }
+    }
 }

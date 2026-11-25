@@ -10,7 +10,13 @@ struct EditTripView: View {
 
     init(trip: Trip) {
         self.trip = trip
-        _draft = State(initialValue: TripDraft(trip: trip))
+        var draft = TripDraft(trip: trip)
+        // A trip that saved the estimate keeps following it: refresh it
+        // from today's data so the total and breakdown agree.
+        if let location = trip.locationID.flatMap({ CostDataStore.shared?.location(id: $0) }) {
+            draft = TripDraft(trip: trip, estimate: draft.estimate(location: location))
+        }
+        _draft = State(initialValue: draft)
     }
 
     var body: some View {
@@ -51,7 +57,8 @@ struct EditTripView: View {
     }
 
     private func save() {
-        guard draft.apply(to: trip) else { return }
+        let location = draft.locationID.flatMap { CostDataStore.shared?.location(id: $0) }
+        guard draft.apply(to: trip, estimate: draft.estimate(location: location)) else { return }
         // Saved explicitly, like EditTransactionView, so the edit is committed
         // before the sheet dismisses.
         try? modelContext.save()

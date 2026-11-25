@@ -47,6 +47,13 @@
 		D7CFE34E8B6496319EFF9730 /* TripPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B835BBF1C9FE7A7CD90DA331 /* TripPersistenceTests.swift */; };
 		8ACF4EADF13BE353D23A458A /* StoreMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 456FC8D81601CF345D21E141 /* StoreMigrationTests.swift */; };
 		3BAC82D7EC907C4C89C37E26 /* TripsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F78FA0505F424D39478A4F9 /* TripsUITests.swift */; };
+		B053842E8E5A9B4C2BC9650C /* CostDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDF9EA7EC223E465F838992 /* CostDataStore.swift */; };
+		D4043E16D85866647BD0898B /* TripEstimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD92C8D5BCA897B4AC84607F /* TripEstimator.swift */; };
+		1C1FEA43A4722FF36226D379 /* cost-data.json in Resources */ = {isa = PBXBuildFile; fileRef = 2232F73F158ABE51B35F235B /* cost-data.json */; };
+		5D3AA372CAF04EA84EB0FBDA /* TripBreakdownCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B19EFEDB2326F593E8AE91 /* TripBreakdownCard.swift */; };
+		B3E4500F51BA68D6AEDCE966 /* CostDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78FBCB56C0FE46F49D4B04 /* CostDataStoreTests.swift */; };
+		B8EF314DAAA9BB5CA180E047 /* TripEstimatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C8EF72D43B368497BFF03A2 /* TripEstimatorTests.swift */; };
+		AFBCDA1188298D6EF0280C20 /* cost-data-fixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B8E6C06F7D28EF3313DBD2 /* cost-data-fixture.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,6 +117,13 @@
 		B835BBF1C9FE7A7CD90DA331 /* TripPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripPersistenceTests.swift; sourceTree = "<group>"; };
 		456FC8D81601CF345D21E141 /* StoreMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreMigrationTests.swift; sourceTree = "<group>"; };
 		3F78FA0505F424D39478A4F9 /* TripsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripsUITests.swift; sourceTree = "<group>"; };
+		9DDF9EA7EC223E465F838992 /* CostDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostDataStore.swift; sourceTree = "<group>"; };
+		BD92C8D5BCA897B4AC84607F /* TripEstimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripEstimator.swift; sourceTree = "<group>"; };
+		2232F73F158ABE51B35F235B /* cost-data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cost-data.json; sourceTree = "<group>"; };
+		F4B19EFEDB2326F593E8AE91 /* TripBreakdownCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripBreakdownCard.swift; sourceTree = "<group>"; };
+		9B78FBCB56C0FE46F49D4B04 /* CostDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostDataStoreTests.swift; sourceTree = "<group>"; };
+		8C8EF72D43B368497BFF03A2 /* TripEstimatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripEstimatorTests.swift; sourceTree = "<group>"; };
+		19B8E6C06F7D28EF3313DBD2 /* cost-data-fixture.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cost-data-fixture.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,9 +161,12 @@
 				2FA7D5F5A7997B54BA04F9A2 /* PersistenceTests.swift */,
 				D6323C907BE5646AE59969DD /* FormattingTests.swift */,
 				74B6B7E08C0CB876E17847E6 /* MonthRolloverTests.swift */,
+				01B783E5B87E0DAF97340768 /* Fixtures */,
 				61B9E054470E4A0A74AE532A /* TripTests.swift */,
 				B835BBF1C9FE7A7CD90DA331 /* TripPersistenceTests.swift */,
 				456FC8D81601CF345D21E141 /* StoreMigrationTests.swift */,
+				9B78FBCB56C0FE46F49D4B04 /* CostDataStoreTests.swift */,
+				8C8EF72D43B368497BFF03A2 /* TripEstimatorTests.swift */,
 			);
 			path = MoneticTests;
 			sourceTree = "<group>";
@@ -182,6 +199,8 @@
 				D1000004 /* Models */,
 				D1000005 /* Views */,
 				D1000006 /* Utilities */,
+				D52289913B5F805FCBEAB7F8 /* Estimating */,
+				B32674D49DCE844A0B0F3365 /* Resources */,
 				B100000B /* Assets.xcassets */,
 				B1000013 /* PrivacyInfo.xcprivacy */,
 			);
@@ -228,6 +247,7 @@
 				DA267079C9FA5FCFB935E199 /* AddTripView.swift */,
 				C27535FEE0CFC3D1FEE7203D /* EditTripView.swift */,
 				B455F70FCC4DF60960A3E6E2 /* TripDetailView.swift */,
+				F4B19EFEDB2326F593E8AE91 /* TripBreakdownCard.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -248,6 +268,31 @@
 				B1000016 /* BrandComponents.swift */,
 			);
 			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		D52289913B5F805FCBEAB7F8 /* Estimating */ = {
+			isa = PBXGroup;
+			children = (
+				9DDF9EA7EC223E465F838992 /* CostDataStore.swift */,
+				BD92C8D5BCA897B4AC84607F /* TripEstimator.swift */,
+			);
+			path = Estimating;
+			sourceTree = "<group>";
+		};
+		B32674D49DCE844A0B0F3365 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2232F73F158ABE51B35F235B /* cost-data.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		01B783E5B87E0DAF97340768 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				19B8E6C06F7D28EF3313DBD2 /* cost-data-fixture.json */,
+			);
+			path = Fixtures;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -346,6 +391,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AFBCDA1188298D6EF0280C20 /* cost-data-fixture.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +408,7 @@
 			files = (
 				A100000B /* Assets.xcassets in Resources */,
 				A1000013 /* PrivacyInfo.xcprivacy in Resources */,
+				1C1FEA43A4722FF36226D379 /* cost-data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -382,6 +429,8 @@
 				0B3DE0B2DC47AB08AED940F2 /* TripTests.swift in Sources */,
 				D7CFE34E8B6496319EFF9730 /* TripPersistenceTests.swift in Sources */,
 				8ACF4EADF13BE353D23A458A /* StoreMigrationTests.swift in Sources */,
+				B3E4500F51BA68D6AEDCE966 /* CostDataStoreTests.swift in Sources */,
+				B8EF314DAAA9BB5CA180E047 /* TripEstimatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,6 +473,9 @@
 				F993D9912518E1460BEFF34E /* AddTripView.swift in Sources */,
 				2A765E45A99B21CE183A81D6 /* EditTripView.swift in Sources */,
 				0F91B01013C037791DE1F19D /* TripDetailView.swift in Sources */,
+				B053842E8E5A9B4C2BC9650C /* CostDataStore.swift in Sources */,
+				D4043E16D85866647BD0898B /* TripEstimator.swift in Sources */,
+				5D3AA372CAF04EA84EB0FBDA /* TripBreakdownCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

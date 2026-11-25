@@ -94,6 +94,67 @@ final class TripsUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["budgetTotal"].label, "$500.00")
     }
 
+    func testEstimatingTripFromPerDiemRates() throws {
+        finishOnboarding()
+        app.tabBars.buttons["tripsTab"].tap()
+        let addTrip = app.buttons["addTripButton"]
+        XCTAssertTrue(addTrip.waitForExistence(timeout: 5))
+        addTrip.tap()
+
+        let nameField = app.textFields["tripNameField"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText("Cancun Week")
+
+        // MARK: Search the bundled per diem data and pick a place
+        let destinationField = app.textFields["tripDestinationField"]
+        destinationField.tap()
+        destinationField.typeText("cancun")
+        let result = app.buttons["destinationResult_DOS-MEXICO-CANCUN"]
+        XCTAssertTrue(result.waitForExistence(timeout: 2), "Cancun didn't come up in search")
+        result.tap()
+        XCTAssertEqual(destinationField.value as? String, "Cancun, Mexico")
+
+        // MARK: The breakdown appears straight away, from bundled data only
+        let total = app.staticTexts["breakdownTotal"]
+        XCTAssertTrue(total.waitForExistence(timeout: 1), "breakdown took more than a second")
+        for item in ["lodging", "food", "localTransport", "activities"] {
+            XCTAssertTrue(app.descendants(matching: .any)["breakdownRow_\(item)"].exists, "missing \(item) row")
+        }
+        XCTAssertTrue(app.staticTexts["flightsGapNote"].exists, "should flag that flights aren't included")
+        let source = app.descendants(matching: .any)["estimateSourceLine"]
+        XCTAssertTrue(source.exists)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(
+            format: "label BEGINSWITH 'Based on U.S. government per diem rates (U.S. Department of State, effective'"
+        )).firstMatch.exists, "source line missing")
+        XCTAssertTrue(app.staticTexts["styleAssumptionNote"].label.hasPrefix("Assumption:"))
+
+        let save = app.buttons["saveTripButton"]
+        XCTAssertTrue(save.isEnabled, "the estimate fills the total, so Save should be enabled")
+
+        // MARK: Adding flights closes the gap
+        let before = total.label
+        let flights = app.textFields["flightsField"]
+        flights.tap()
+        flights.typeText("500")
+        XCTAssertTrue(app.descendants(matching: .any)["breakdownRow_flights"].waitForExistence(timeout: 2))
+        XCTAssertFalse(app.staticTexts["flightsGapNote"].exists)
+        XCTAssertNotEqual(total.label, before, "total should include flights")
+        let estimated = total.label
+
+        save.tap()
+
+        // MARK: The list and detail show the per diem total in USD
+        let row = app.buttons["tripRow_Cancun Week"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        XCTAssertTrue(row.label.contains(estimated), "row \(row.label) should show \(estimated)")
+        row.tap()
+        XCTAssertTrue(app.staticTexts["tripTotal"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["tripTotal"].label, estimated)
+        XCTAssertTrue(app.descendants(matching: .any)["breakdownCard"].exists, "detail should show the saved breakdown")
+        XCTAssertTrue(app.descendants(matching: .any)["breakdownRow_flights"].exists)
+    }
+
     // MARK: - Steps
 
     /// Completes onboarding and the first-month budget prompt, checking on the

@@ -16,6 +16,15 @@ struct TripDraft: Equatable {
     var amountText: String = ""
     var notes: String = ""
 
+    // Estimator inputs (prompt 2).
+    /// The picked `CostLocation`; nil for free text, which needs a typed total.
+    var locationID: String? = nil
+    var travelStyle: TravelStyle = .standard
+    /// Rooms the user chose; nil follows the style's default.
+    var roomsOverride: Int? = nil
+    /// Flights for the whole group, as typed.
+    var flightsText: String = ""
+
     init(
         name: String = "",
         destination: String = "",
@@ -42,8 +51,9 @@ struct TripDraft: Equatable {
         return TripDraft(startDate: start, endDate: end)
     }
 
-    /// The current values of an existing trip, for editing.
-    init(trip: Trip) {
+    /// The current values of an existing trip, for editing. A trip whose
+    /// total was the estimate keeps following it (`estimate` is the fresh one).
+    init(trip: Trip, estimate: TripEstimate? = nil) {
         self.init(
             name: trip.name,
             destination: trip.destination,
@@ -53,6 +63,63 @@ struct TripDraft: Equatable {
             amountText: String(format: "%.2f", trip.estimatedTotal),
             notes: trip.notes
         )
+        locationID = trip.locationID
+        travelStyle = trip.style
+        roomsOverride = trip.roomsOverride
+        flightsText = trip.flightsTotal.map { AmountInput.text(cents: Int(($0 * 100).rounded())) } ?? ""
+        if trip.estimateSource == Trip.EstimateSource.perDiem.rawValue, let estimate {
+            amountText = AmountInput.text(cents: estimate.totalCents)
+        }
+    }
+
+    // MARK: Estimate
+
+    var flightsTotal: Double? {
+        AmountInput.parse(flightsText).flatMap { $0 > 0 ? $0 : nil }
+    }
+
+    var rooms: Int {
+        min(max(roomsOverride ?? TripEstimator.defaultRooms(travelers: travelers, style: travelStyle), 1),
+            max(travelers, 1))
+    }
+
+    func estimate(location: CostLocation?, calendar: Calendar = .current) -> TripEstimate? {
+        guard let location else { return nil }
+        return TripEstimator.estimate(
+            location: location, nights: nights(calendar: calendar), travelers: travelers,
+            style: travelStyle, flightTotal: flightsTotal, startDate: startDate,
+            rooms: roomsOverride, calendar: calendar
+        )
+    }
+
+    /// True when the total field holds exactly the estimate.
+    func isUsingEstimate(_ estimate: TripEstimate?) -> Bool {
+        guard let estimate else { return false }
+        return AmountInput.cents(amountText) == estimate.totalCents
+    }
+
+    /// Keeps the total following the estimate until the user edits it: an
+    /// empty field, or one still showing the old estimate, takes the new one.
+    mutating func estimateChanged(from old: TripEstimate?, to new: TripEstimate?) {
+        guard let new else { return }
+        let blank = amountText.trimmingCharacters(in: .whitespaces).isEmpty
+        if blank || (old.map { AmountInput.cents(amountText) == $0.totalCents } ?? false) {
+            amountText = AmountInput.text(cents: new.totalCents)
+        }
+    }
+
+    mutating func useEstimate(_ estimate: TripEstimate) {
+        amountText = AmountInput.text(cents: estimate.totalCents)
+    }
+
+    mutating func select(_ location: CostLocation) {
+        locationID = location.id
+        destination = location.displayName
+    }
+
+    /// Typing over a picked place's name unpicks it.
+    mutating func destinationEdited(pickedName: String?) {
+        if let pickedName, destination != pickedName { locationID = nil }
     }
 
     var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -82,8 +149,9 @@ struct TripDraft: Equatable {
     }
 
     /// The trip Add Trip's Save inserts, or nil when the draft isn't valid.
-    func makeTrip(calendar: Calendar = .current) -> Trip? {
+    func makeTrip(estimate: TripEstimate? = nil, calendar: Calendar = .current) -> Trip? {
         guard isValid(calendar: calendar), let total = estimatedTotal else { return nil }
+        let source: Trip.EstimateSource = isUsingEstimate(estimate) ? .perDiem : .manual
         return Trip(
             name: trimmedName,
             destination: trimmedDestination,
@@ -91,8 +159,13 @@ struct TripDraft: Equatable {
             endDate: endDate,
             travelers: travelers,
             estimatedTotal: total,
-            estimateSource: Trip.EstimateSource.manual.rawValue,
+            estimateSource: source.rawValue,
             notes: notes,
+            locationID: estimate == nil ? nil : locationID,
+            travelStyle: travelStyle,
+            roomsOverride: roomsOverride,
+            flightsTotal: flightsTotal,
+            estimate: estimate,
             calendar: calendar
         )
     }
@@ -100,7 +173,7 @@ struct TripDraft: Equatable {
     /// Writes the draft onto `trip`. Returns false, changing nothing, when the
     /// draft isn't valid.
     @discardableResult
-    func apply(to trip: Trip, calendar: Calendar = .current) -> Bool {
+    func apply(to trip: Trip, estimate: TripEstimate? = nil, calendar: Calendar = .current) -> Bool {
         guard isValid(calendar: calendar), let total = estimatedTotal else { return false }
         let start = calendar.startOfDay(for: startDate)
         trip.name = trimmedName
@@ -108,11 +181,28 @@ struct TripDraft: Equatable {
         trip.startDate = start
         trip.endDate = max(calendar.startOfDay(for: endDate), start)
         trip.travelers = travelers
-        if total != trip.estimatedTotal {
-            trip.estimatedTotal = total
-            trip.estimateSource = Trip.EstimateSource.manual.rawValue
-        }
+        trip.travelStyle = travelStyle.rawValue
+        trip.roomsOverride = roomsOverride
+        trip.flightsTotal = flightsTotal
         trip.notes = notes
+
+        if let estimate {
+            trip.estimateSource = (isUsingEstimate(estimate) ? Trip.EstimateSource.perDiem : .manual).rawValue
+            trip.locationID = locationID
+            trip.savedEstimate = estimate
+        } else if locationID != nil, locationID == trip.locationID {
+            // The picked place is no longer in the bundled data, so nothing
+            // can be re-estimated. Keep the saved breakdown, and keep the total
+            // a per diem one (in USD) unless the user changed it.
+            if AmountInput.cents(amountText) != Int((trip.estimatedTotal * 100).rounded()) {
+                trip.estimateSource = Trip.EstimateSource.manual.rawValue
+            }
+        } else {
+            trip.estimateSource = Trip.EstimateSource.manual.rawValue
+            trip.locationID = nil
+            trip.savedEstimate = nil
+        }
+        trip.estimatedTotal = total
         return true
     }
 }
