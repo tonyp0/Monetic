@@ -219,11 +219,82 @@ final class TripsUITests: XCTestCase {
         XCTAssertTrue(app.tabBars.buttons["tripsTab"].isSelected)
     }
 
+    func testJoiningATripFromALink() throws {
+        // A friend's plan, built the way the app encodes it: compact JSON,
+        // base64url, in monetic://trip?d=…
+        let calendar = Calendar.current
+        let day = DateFormatter()
+        day.locale = Locale(identifier: "en_US_POSIX")
+        day.dateFormat = "yyyy-MM-dd"
+        let start = calendar.date(byAdding: .day, value: 30, to: calendar.startOfDay(for: Date()))!
+        let end = calendar.date(byAdding: .day, value: 3, to: start)!
+        let json = """
+        {"v":1,"id":"6B1F3C2A-0D4E-4A5B-9C8D-7E6F5A4B3C2D","n":"Ski Weekend","d":"Breckenridge, CO",\
+        "s":"\(day.string(from: start))","e":"\(day.string(from: end))","t":4,"y":"standard",\
+        "a":160000,"c":"USD","o":"manual","g":40000}
+        """
+        let encoded = Data(json.utf8).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+        relaunch(openingURL: "monetic://trip?d=\(encoded)")
+
+        // The link waits for onboarding, then asks.
+        finishOnboarding(expectingJoinSheet: true)
+        let name = app.staticTexts["joinTripName"]
+        XCTAssertTrue(name.waitForExistence(timeout: 10), "join sheet didn't appear")
+        XCTAssertEqual(name.label, "Ski Weekend")
+        XCTAssertEqual(app.staticTexts["joinTripTotal"].label, "$1,600.00")
+        XCTAssertEqual(app.textFields["amountField"].value as? String, "400.00", "your share starts at an even split")
+
+        // Pay a bit more than an even share, then join.
+        let share = app.textFields["amountField"]
+        share.tap()
+        share.press(forDuration: 1.2)
+        if app.menuItems["Select All"].waitForExistence(timeout: 2) { app.menuItems["Select All"].tap() }
+        share.typeText(XCUIKeyboardKey.delete.rawValue)
+        share.typeText("450")
+        let join = app.buttons["joinTripButton"]
+        if !join.isHittable { app.swipeUp() }
+        join.tap()
+
+        // It opens on the Trips tab, marked as planned with friends, savings at zero.
+        let progress = app.staticTexts["savingsProgressText"]
+        XCTAssertTrue(progress.waitForExistence(timeout: 5), "joined trip didn't open")
+        XCTAssertEqual(progress.label, "$0.00 saved of $450.00")
+        XCTAssertTrue(app.descendants(matching: .any)["plannedWithFriends"].exists)
+        XCTAssertTrue(app.tabBars.buttons["tripsTab"].isSelected)
+
+        app.navigationBars.buttons.firstMatch.tap()
+        let row = app.buttons["tripRow_Ski Weekend"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "joined trip isn't in the list")
+        XCTAssertTrue(row.label.contains("$1,600.00"))
+        XCTAssertTrue(row.label.contains("in 30 days"))
+    }
+
+    func testBrokenLinkShowsAMessage() throws {
+        relaunch(openingURL: "monetic://trip?d=bm90IGpzb24")   // "not json"
+        finishOnboarding(expectingJoinSheet: true)
+        let alert = app.alerts["This trip link doesn't work"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 10), "no message for a broken link")
+        alert.buttons["OK"].tap()
+        XCTAssertTrue(app.staticTexts["budgetTotal"].waitForExistence(timeout: 5), "app should carry on")
+        app.tabBars.buttons["tripsTab"].tap()
+        XCTAssertTrue(app.buttons["planTripButton"].waitForExistence(timeout: 5), "nothing should be imported")
+    }
+
     // MARK: - Steps
 
     /// Completes onboarding and the first-month budget prompt, checking on the
     /// way that onboarding covers the tab bar.
-    private func finishOnboarding() {
+    /// Relaunches with `-UITestingOpenURL`, which debug builds handle like
+    /// a tapped link.
+    private func relaunch(openingURL url: String) {
+        app.terminate()
+        app.launchArguments += ["-UITestingOpenURL", url]
+        app.launch()
+    }
+
+    private func finishOnboarding(expectingJoinSheet: Bool = false) {
         let getStarted = app.buttons["getStartedButton"]
         XCTAssertTrue(getStarted.waitForExistence(timeout: 10), "onboarding didn't appear")
         let tripsTab = app.tabBars.buttons["tripsTab"]
@@ -240,6 +311,8 @@ final class TripsUITests: XCTestCase {
         budgetField.typeText("500")
         XCTAssertTrue(app.staticTexts["500"].waitForExistence(timeout: 5))
         saveBudget.tap()
+        // A pending trip link opens over the dashboard as soon as it's ready.
+        guard !expectingJoinSheet else { return }
         XCTAssertTrue(app.staticTexts["budgetTotal"].waitForExistence(timeout: 10), "dashboard didn't appear")
     }
 

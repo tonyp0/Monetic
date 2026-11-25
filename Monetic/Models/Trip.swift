@@ -46,6 +46,19 @@ final class Trip: Identifiable {
     @Relationship(deleteRule: .cascade, inverse: \SavingsContribution.trip)
     var contributions: [SavingsContribution] = []
 
+    // Sharing (prompt 4).
+    /// The plan's identity across phones: everyone who joins from the same
+    /// link gets the same one. Set when the organizer first shares, or when
+    /// a trip is joined from a link.
+    var shareID: UUID? = nil
+    /// When the organizer last opened the share sheet.
+    var sharedAt: Date? = nil
+    /// When this trip was joined from a friend's link; nil for your own trips.
+    var joinedAt: Date? = nil
+
+    /// Shared out or joined in: planned with friends.
+    var isGroupTrip: Bool { shareID != nil }
+
     /// Where `estimatedTotal` came from. Stored as its raw string, like
     /// `Transaction.recurringFrequency`, so new sources don't need a migration.
     enum EstimateSource: String {

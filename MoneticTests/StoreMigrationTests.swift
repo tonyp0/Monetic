@@ -150,6 +150,12 @@ struct StoreMigrationTests {
         #expect(trip.contributions.isEmpty)
         #expect(try context.fetchCount(FetchDescriptor<SavingsContribution>()) == 0)
 
+        // New in prompt 4: sharing, defaulted to a solo trip.
+        #expect(trip.shareID == nil)
+        #expect(trip.sharedAt == nil)
+        #expect(trip.joinedAt == nil)
+        #expect(!trip.isGroupTrip)
+
         // And the migrated trip takes an estimate and savings.
         trip.travelStyle = TravelStyle.budget.rawValue
         trip.flightsTotal = 800

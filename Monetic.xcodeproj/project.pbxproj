@@ -66,6 +66,10 @@
 		25EB6C4FBF107F98416DB410 /* SavingsPlanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E478C222242FE29F88E146E /* SavingsPlanTests.swift */; };
 		831D9B5A81E5757F843F9D27 /* SavingsContributionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BED5521B20950688CE8691 /* SavingsContributionTests.swift */; };
 		F1E65A4328B738C6AAA8C48D /* SavingsReminderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E413A0087262FF05C06DECB5 /* SavingsReminderTests.swift */; };
+		C47CE66A72E3F4935A66BF9B /* TripShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 060F0EA76D513D5B5DDF25B1 /* TripShare.swift */; };
+		48BD5E8DC7E397592A268970 /* TripShareImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21D40F74060891C1337BCF8 /* TripShareImport.swift */; };
+		27109850D0C1FBCAD999C39E /* JoinTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A17EA3EB37360F1B3DF687 /* JoinTripView.swift */; };
+		688CC74DD79FAF60F89B986C /* TripShareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DB19876770AB97BC4EEB86 /* TripShareTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -148,6 +152,11 @@
 		1E478C222242FE29F88E146E /* SavingsPlanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsPlanTests.swift; sourceTree = "<group>"; };
 		52BED5521B20950688CE8691 /* SavingsContributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsContributionTests.swift; sourceTree = "<group>"; };
 		E413A0087262FF05C06DECB5 /* SavingsReminderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsReminderTests.swift; sourceTree = "<group>"; };
+		060F0EA76D513D5B5DDF25B1 /* TripShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripShare.swift; sourceTree = "<group>"; };
+		A21D40F74060891C1337BCF8 /* TripShareImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripShareImport.swift; sourceTree = "<group>"; };
+		03A17EA3EB37360F1B3DF687 /* JoinTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinTripView.swift; sourceTree = "<group>"; };
+		B19F0DDFDA5D982CEE2270D1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		11DB19876770AB97BC4EEB86 /* TripShareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripShareTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -194,6 +203,7 @@
 				1E478C222242FE29F88E146E /* SavingsPlanTests.swift */,
 				52BED5521B20950688CE8691 /* SavingsContributionTests.swift */,
 				E413A0087262FF05C06DECB5 /* SavingsReminderTests.swift */,
+				11DB19876770AB97BC4EEB86 /* TripShareTests.swift */,
 			);
 			path = MoneticTests;
 			sourceTree = "<group>";
@@ -231,6 +241,7 @@
 				B100000B /* Assets.xcassets */,
 				B1000013 /* PrivacyInfo.xcprivacy */,
 				E8BEA597F258BFAEDBC62958 /* Trips */,
+				B19F0DDFDA5D982CEE2270D1 /* Info.plist */,
 			);
 			path = Monetic;
 			sourceTree = "<group>";
@@ -282,6 +293,7 @@
 				B398099139619AB9BCDEA376 /* SavingsPlanSettingsView.swift */,
 				956270A7FC68D00497B69321 /* ContributionsListView.swift */,
 				DCB27D4F63788F72252E9160 /* UpcomingTripCard.swift */,
+				03A17EA3EB37360F1B3DF687 /* JoinTripView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -335,6 +347,8 @@
 				DA22E495CFA6CE445CAECE76 /* SavingsPlan.swift */,
 				038F1A26547DAF231D63CE2A /* SavingsDrafts.swift */,
 				5163B3961C161801985C4BBD /* SavingsReminders.swift */,
+				060F0EA76D513D5B5DDF25B1 /* TripShare.swift */,
+				A21D40F74060891C1337BCF8 /* TripShareImport.swift */,
 			);
 			path = Trips;
 			sourceTree = "<group>";
@@ -478,6 +492,7 @@
 				25EB6C4FBF107F98416DB410 /* SavingsPlanTests.swift in Sources */,
 				831D9B5A81E5757F843F9D27 /* SavingsContributionTests.swift in Sources */,
 				F1E65A4328B738C6AAA8C48D /* SavingsReminderTests.swift in Sources */,
+				688CC74DD79FAF60F89B986C /* TripShareTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -532,6 +547,9 @@
 				D66841AF7B8F6C25D089963C /* SavingsPlanSettingsView.swift in Sources */,
 				406AC5287818F561AD7A2C18 /* ContributionsListView.swift in Sources */,
 				4511DCBCDC3A45FD4F6829DD /* UpcomingTripCard.swift in Sources */,
+				C47CE66A72E3F4935A66BF9B /* TripShare.swift in Sources */,
+				48BD5E8DC7E397592A268970 /* TripShareImport.swift in Sources */,
+				27109850D0C1FBCAD999C39E /* JoinTripView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -754,6 +772,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Monetic/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -782,6 +801,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Monetic/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

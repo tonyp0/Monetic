@@ -34,6 +34,8 @@ struct TripDetailView: View {
                         notesCard
                     }
 
+                    friendsCard
+
                     TripSavingsCard(
                         trip: trip,
                         plan: trip.savingsPlan(asOf: Date(), monthlyBudget: monthlyBudget),
@@ -160,6 +162,62 @@ struct TripDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .brandCard()
+    }
+
+    // MARK: Friends
+
+    /// Invite friends with a link, and say plainly what a shared trip is
+    /// (and isn't): there's no sync, so nobody else's progress shows here.
+    private var friendsCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if trip.isGroupTrip {
+                HStack(spacing: 8) {
+                    Image(systemName: "person.2.fill")
+                        .foregroundStyle(Brand.accent)
+                        .accessibilityHidden(true)
+                    Text("Planned with friends")
+                        .font(Brand.display(15, .semibold))
+                        .foregroundStyle(Brand.textPrimary)
+                    Spacer()
+                    Text(trip.travelers == 1 ? "1 traveler" : "\(trip.travelers) travelers")
+                        .font(Brand.display(13, .medium))
+                        .foregroundStyle(Brand.textSecondary)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("plannedWithFriends")
+
+                Text(trip.joinedAt != nil
+                     ? "You joined this plan from a friend's link. Everyone saves on their own phone; Monetic doesn't share anyone's progress."
+                     : "Everyone who joins saves on their own phone; Monetic doesn't share anyone's progress.")
+                    .font(.caption)
+                    .foregroundStyle(Brand.textTertiary)
+            } else {
+                Text("Going with friends? Send them the plan. They'll get the dates, the estimate and their share, never your savings.")
+                    .font(.subheadline)
+                    .foregroundStyle(Brand.textSecondary)
+            }
+
+            ShareLink(
+                item: TripShare.url(for: trip),
+                subject: Text(trip.name),
+                message: Text(TripShare.inviteMessage(for: trip))
+            ) {
+                Label(trip.isGroupTrip ? "Invite more friends" : "Invite friends", systemImage: "square.and.arrow.up")
+            }
+            .buttonStyle(SoftButtonStyle())
+            .simultaneousGesture(TapGesture().onEnded { markShared() })
+            .accessibilityIdentifier("inviteFriendsButton")
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .brandCard()
+    }
+
+    /// Fixes the plan's share ID the first time it's shared, so every link
+    /// for this trip, now or later, points at the same plan.
+    private func markShared() {
+        if trip.shareID == nil { trip.shareID = trip.id }
+        trip.sharedAt = Date()
+        try? modelContext.save()
     }
 
     // MARK: Delete
