@@ -62,6 +62,8 @@ struct EditTripView: View {
         // Saved explicitly, like EditTransactionView, so the edit is committed
         // before the sheet dismisses.
         try? modelContext.save()
+        // New dates or a new goal change the savings dates and amounts.
+        SavingsReminderCoordinator.shared.syncAll(in: modelContext)
         dismiss()
     }
 }

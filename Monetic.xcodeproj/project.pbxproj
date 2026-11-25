@@ -54,6 +54,18 @@
 		B3E4500F51BA68D6AEDCE966 /* CostDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B78FBCB56C0FE46F49D4B04 /* CostDataStoreTests.swift */; };
 		B8EF314DAAA9BB5CA180E047 /* TripEstimatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C8EF72D43B368497BFF03A2 /* TripEstimatorTests.swift */; };
 		AFBCDA1188298D6EF0280C20 /* cost-data-fixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 19B8E6C06F7D28EF3313DBD2 /* cost-data-fixture.json */; };
+		513909937B5EE00FDCB54BFA /* SavingsPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA22E495CFA6CE445CAECE76 /* SavingsPlan.swift */; };
+		AC256AEA25668C02F72F6338 /* SavingsDrafts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 038F1A26547DAF231D63CE2A /* SavingsDrafts.swift */; };
+		E0A03AFEF13D34E7FD09826E /* SavingsReminders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5163B3961C161801985C4BBD /* SavingsReminders.swift */; };
+		D4CBF36D03E80217D56FE62A /* SavingsContribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43DA1A2A74B42F05A8813B7B /* SavingsContribution.swift */; };
+		16FA372EC2D7785D7FE0D19C /* TripSavingsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECCC92B6AED32CD89DAA5951 /* TripSavingsCard.swift */; };
+		C45C693FCAA9BF6A010D4C82 /* AddContributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C226A34FE74E417D35EF7B /* AddContributionView.swift */; };
+		D66841AF7B8F6C25D089963C /* SavingsPlanSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B398099139619AB9BCDEA376 /* SavingsPlanSettingsView.swift */; };
+		406AC5287818F561AD7A2C18 /* ContributionsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956270A7FC68D00497B69321 /* ContributionsListView.swift */; };
+		4511DCBCDC3A45FD4F6829DD /* UpcomingTripCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB27D4F63788F72252E9160 /* UpcomingTripCard.swift */; };
+		25EB6C4FBF107F98416DB410 /* SavingsPlanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E478C222242FE29F88E146E /* SavingsPlanTests.swift */; };
+		831D9B5A81E5757F843F9D27 /* SavingsContributionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BED5521B20950688CE8691 /* SavingsContributionTests.swift */; };
+		F1E65A4328B738C6AAA8C48D /* SavingsReminderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E413A0087262FF05C06DECB5 /* SavingsReminderTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,6 +136,18 @@
 		9B78FBCB56C0FE46F49D4B04 /* CostDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostDataStoreTests.swift; sourceTree = "<group>"; };
 		8C8EF72D43B368497BFF03A2 /* TripEstimatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripEstimatorTests.swift; sourceTree = "<group>"; };
 		19B8E6C06F7D28EF3313DBD2 /* cost-data-fixture.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cost-data-fixture.json; sourceTree = "<group>"; };
+		DA22E495CFA6CE445CAECE76 /* SavingsPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsPlan.swift; sourceTree = "<group>"; };
+		038F1A26547DAF231D63CE2A /* SavingsDrafts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsDrafts.swift; sourceTree = "<group>"; };
+		5163B3961C161801985C4BBD /* SavingsReminders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsReminders.swift; sourceTree = "<group>"; };
+		43DA1A2A74B42F05A8813B7B /* SavingsContribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsContribution.swift; sourceTree = "<group>"; };
+		ECCC92B6AED32CD89DAA5951 /* TripSavingsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripSavingsCard.swift; sourceTree = "<group>"; };
+		69C226A34FE74E417D35EF7B /* AddContributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContributionView.swift; sourceTree = "<group>"; };
+		B398099139619AB9BCDEA376 /* SavingsPlanSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsPlanSettingsView.swift; sourceTree = "<group>"; };
+		956270A7FC68D00497B69321 /* ContributionsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributionsListView.swift; sourceTree = "<group>"; };
+		DCB27D4F63788F72252E9160 /* UpcomingTripCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpcomingTripCard.swift; sourceTree = "<group>"; };
+		1E478C222242FE29F88E146E /* SavingsPlanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsPlanTests.swift; sourceTree = "<group>"; };
+		52BED5521B20950688CE8691 /* SavingsContributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsContributionTests.swift; sourceTree = "<group>"; };
+		E413A0087262FF05C06DECB5 /* SavingsReminderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsReminderTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +191,9 @@
 				456FC8D81601CF345D21E141 /* StoreMigrationTests.swift */,
 				9B78FBCB56C0FE46F49D4B04 /* CostDataStoreTests.swift */,
 				8C8EF72D43B368497BFF03A2 /* TripEstimatorTests.swift */,
+				1E478C222242FE29F88E146E /* SavingsPlanTests.swift */,
+				52BED5521B20950688CE8691 /* SavingsContributionTests.swift */,
+				E413A0087262FF05C06DECB5 /* SavingsReminderTests.swift */,
 			);
 			path = MoneticTests;
 			sourceTree = "<group>";
@@ -203,6 +230,7 @@
 				B32674D49DCE844A0B0F3365 /* Resources */,
 				B100000B /* Assets.xcassets */,
 				B1000013 /* PrivacyInfo.xcprivacy */,
+				E8BEA597F258BFAEDBC62958 /* Trips */,
 			);
 			path = Monetic;
 			sourceTree = "<group>";
@@ -224,6 +252,7 @@
 				B1000003 /* Transaction.swift */,
 				0F36CFD2D109014BBDC50987 /* Trip.swift */,
 				A026AF795A76505B6C67AB48 /* TripDraft.swift */,
+				43DA1A2A74B42F05A8813B7B /* SavingsContribution.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -248,6 +277,11 @@
 				C27535FEE0CFC3D1FEE7203D /* EditTripView.swift */,
 				B455F70FCC4DF60960A3E6E2 /* TripDetailView.swift */,
 				F4B19EFEDB2326F593E8AE91 /* TripBreakdownCard.swift */,
+				ECCC92B6AED32CD89DAA5951 /* TripSavingsCard.swift */,
+				69C226A34FE74E417D35EF7B /* AddContributionView.swift */,
+				B398099139619AB9BCDEA376 /* SavingsPlanSettingsView.swift */,
+				956270A7FC68D00497B69321 /* ContributionsListView.swift */,
+				DCB27D4F63788F72252E9160 /* UpcomingTripCard.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -293,6 +327,16 @@
 				19B8E6C06F7D28EF3313DBD2 /* cost-data-fixture.json */,
 			);
 			path = Fixtures;
+			sourceTree = "<group>";
+		};
+		E8BEA597F258BFAEDBC62958 /* Trips */ = {
+			isa = PBXGroup;
+			children = (
+				DA22E495CFA6CE445CAECE76 /* SavingsPlan.swift */,
+				038F1A26547DAF231D63CE2A /* SavingsDrafts.swift */,
+				5163B3961C161801985C4BBD /* SavingsReminders.swift */,
+			);
+			path = Trips;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -431,6 +475,9 @@
 				8ACF4EADF13BE353D23A458A /* StoreMigrationTests.swift in Sources */,
 				B3E4500F51BA68D6AEDCE966 /* CostDataStoreTests.swift in Sources */,
 				B8EF314DAAA9BB5CA180E047 /* TripEstimatorTests.swift in Sources */,
+				25EB6C4FBF107F98416DB410 /* SavingsPlanTests.swift in Sources */,
+				831D9B5A81E5757F843F9D27 /* SavingsContributionTests.swift in Sources */,
+				F1E65A4328B738C6AAA8C48D /* SavingsReminderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -476,6 +523,15 @@
 				B053842E8E5A9B4C2BC9650C /* CostDataStore.swift in Sources */,
 				D4043E16D85866647BD0898B /* TripEstimator.swift in Sources */,
 				5D3AA372CAF04EA84EB0FBDA /* TripBreakdownCard.swift in Sources */,
+				513909937B5EE00FDCB54BFA /* SavingsPlan.swift in Sources */,
+				AC256AEA25668C02F72F6338 /* SavingsDrafts.swift in Sources */,
+				E0A03AFEF13D34E7FD09826E /* SavingsReminders.swift in Sources */,
+				D4CBF36D03E80217D56FE62A /* SavingsContribution.swift in Sources */,
+				16FA372EC2D7785D7FE0D19C /* TripSavingsCard.swift in Sources */,
+				C45C693FCAA9BF6A010D4C82 /* AddContributionView.swift in Sources */,
+				D66841AF7B8F6C25D089963C /* SavingsPlanSettingsView.swift in Sources */,
+				406AC5287818F561AD7A2C18 /* ContributionsListView.swift in Sources */,
+				4511DCBCDC3A45FD4F6829DD /* UpcomingTripCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -67,15 +67,13 @@ final class TripsUITests: XCTestCase {
         XCTAssertTrue(row.label.contains("$2,400.00"), "row label: \(row.label)")
         XCTAssertFalse(app.buttons["planTripButton"].exists, "empty state should be gone")
 
-        // MARK: Detail shows the totals and the savings placeholder
+        // MARK: Detail shows the totals and the savings plan
         row.tap()
         let total = app.staticTexts["tripTotal"]
         XCTAssertTrue(total.waitForExistence(timeout: 5))
         XCTAssertEqual(total.label, "$2,400.00")
         XCTAssertTrue(app.staticTexts["tripDetailCountdown"].label.contains("in \(daysAhead) days"))
-        XCTAssertTrue(app.otherElements["savingsPlanPlaceholder"].exists
-                      || app.staticTexts["savingsPlanPlaceholder"].exists,
-                      "savings plan placeholder missing")
+        XCTAssertTrue(app.descendants(matching: .any)["savingsCard"].exists, "savings plan missing")
 
         // MARK: Delete from the detail view, with confirmation
         let deleteButton = app.buttons["deleteTripButton"]
@@ -155,6 +153,72 @@ final class TripsUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["breakdownRow_flights"].exists)
     }
 
+    func testSavingForATripUpdatesRingAndDashboard() throws {
+        finishOnboarding()
+
+        // MARK: A $600 trip 40 days out: six weekly savings days, $100 each
+        app.tabBars.buttons["tripsTab"].tap()
+        let addTrip = app.buttons["addTripButton"]
+        XCTAssertTrue(addTrip.waitForExistence(timeout: 5))
+        addTrip.tap()
+        let nameField = app.textFields["tripNameField"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText("Lake Weekend")
+        let destinationField = app.textFields["tripDestinationField"]
+        destinationField.tap()
+        destinationField.typeText("Somewhere quiet")
+        let calendar = Calendar.current
+        let departure = calendar.date(byAdding: .day, value: 40, to: calendar.startOfDay(for: Date()))!
+        pickDate(departure, in: app.datePickers["tripStartDatePicker"], sheetTitle: "New Trip")
+        let amountField = app.textFields["amountField"]
+        amountField.tap()
+        amountField.typeText("600")
+        app.buttons["saveTripButton"].tap()
+
+        let row = app.buttons["tripRow_Lake Weekend"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        XCTAssertTrue(row.label.contains("On track"), "row should show the status chip: \(row.label)")
+        row.tap()
+
+        let progress = app.staticTexts["savingsProgressText"]
+        XCTAssertTrue(progress.waitForExistence(timeout: 5))
+        XCTAssertEqual(progress.label, "$0.00 saved of $600.00")
+        XCTAssertEqual(app.staticTexts["savingsPerPeriod"].label, "Save $100.00 a week")
+        XCTAssertEqual(app.staticTexts["savingsCountdown"].label, "40 days to go")
+        XCTAssertEqual(app.staticTexts["savingsPercent"].label, "0%")
+
+        // MARK: Put $150 aside
+        addSavings("150")
+        waitForLabel(of: progress, toContain: "$150.00 saved of $600.00")
+        XCTAssertEqual(app.staticTexts["savingsPercent"].label, "25%")
+        XCTAssertEqual(app.staticTexts["savingsPerPeriod"].label, "Save $75.00 a week")
+        XCTAssertEqual(app.staticTexts["savingsStatus"].firstMatch.label, "Ahead")
+        XCTAssertTrue(app.descendants(matching: .any)["contributionRow"].firstMatch.exists)
+
+        // MARK: The Budget dashboard shows the trip, and its numbers don't move
+        app.tabBars.buttons["budgetTab"].tap()
+        let tripSavings = app.staticTexts["dashboardTripSavings"]
+        XCTAssertTrue(tripSavings.waitForExistence(timeout: 5), "dashboard trip card missing")
+        XCTAssertEqual(app.staticTexts["dashboardTripName"].label, "Lake Weekend")
+        XCTAssertEqual(tripSavings.label, "Save $75.00 this week · $150.00 of $600.00")
+        XCTAssertEqual(app.staticTexts["dashboardTripCountdown"].label.uppercased(), "NEXT TRIP · 40 DAYS TO GO")
+        XCTAssertEqual(app.staticTexts["budgetTotal"].label, "$500.00")
+        XCTAssertEqual(app.staticTexts["spentTotal"].label, "$0.00", "savings aren't spending")
+
+        // MARK: Add from the dashboard
+        app.buttons["dashboardAddSavingsButton"].tap()
+        addSavingsInSheet("50")
+        waitForLabel(of: tripSavings, toContain: "$200.00 of $600.00")
+        XCTAssertEqual(app.staticTexts["spentTotal"].label, "$0.00")
+
+        // MARK: Tapping the card opens the trip on the Trips tab
+        app.staticTexts["dashboardTripName"].tap()
+        XCTAssertTrue(progress.waitForExistence(timeout: 5), "trip didn't open")
+        XCTAssertEqual(progress.label, "$200.00 saved of $600.00")
+        XCTAssertTrue(app.tabBars.buttons["tripsTab"].isSelected)
+    }
+
     // MARK: - Steps
 
     /// Completes onboarding and the first-month budget prompt, checking on the
@@ -219,6 +283,26 @@ final class TripsUITests: XCTestCase {
                 .tap()
         }
         XCTAssertTrue(waitForNonExistence(of: nextMonth), "calendar didn't close", file: file, line: line)
+    }
+
+    /// Taps Add to Savings on the trip screen and saves `amount`.
+    private func addSavings(_ amount: String) {
+        let add = app.buttons["addSavingsButton"]
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        if !add.isHittable { app.swipeUp() }
+        add.tap()
+        addSavingsInSheet(amount)
+    }
+
+    private func addSavingsInSheet(_ amount: String) {
+        let field = app.textFields["amountField"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5), "Add to Savings didn't open")
+        field.tap()
+        field.typeText(amount)
+        let save = app.buttons["saveContributionButton"]
+        XCTAssertTrue(save.isEnabled)
+        save.tap()
+        XCTAssertTrue(waitForNonExistence(of: save), "sheet didn't close")
     }
 
     // MARK: - Waiting

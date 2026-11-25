@@ -6,8 +6,12 @@ struct TripDetailView: View {
     @Environment(\.dismiss) private var dismiss
     let trip: Trip
 
+    @AppStorage("monthlyBudget") private var monthlyBudget: Double = 0
     @State private var showingEdit = false
     @State private var showingDeleteConfirm = false
+    @State private var showingAddSavings = false
+    @State private var showingPlanSettings = false
+    @State private var editingContribution: SavingsContribution?
 
     var body: some View {
         ZStack {
@@ -30,7 +34,14 @@ struct TripDetailView: View {
                         notesCard
                     }
 
-                    savingsPlanPlaceholder
+                    TripSavingsCard(
+                        trip: trip,
+                        plan: trip.savingsPlan(asOf: Date(), monthlyBudget: monthlyBudget),
+                        onAdd: { showingAddSavings = true },
+                        onEditPlan: { showingPlanSettings = true },
+                        onEditTrip: { showingEdit = true },
+                        onEditContribution: { editingContribution = $0 }
+                    )
 
                     Button(role: .destructive) {
                         showingDeleteConfirm = true
@@ -64,6 +75,15 @@ struct TripDetailView: View {
         }
         .sheet(isPresented: $showingEdit) {
             EditTripView(trip: trip)
+        }
+        .sheet(isPresented: $showingAddSavings) {
+            AddContributionView(trip: trip)
+        }
+        .sheet(isPresented: $showingPlanSettings) {
+            SavingsPlanSettingsView(trip: trip)
+        }
+        .sheet(item: $editingContribution) { contribution in
+            AddContributionView(trip: trip, contribution: contribution)
         }
         .confirmationDialog("Delete this trip?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { delete() }
@@ -142,32 +162,12 @@ struct TripDetailView: View {
         .brandCard()
     }
 
-    // MARK: Savings plan (placeholder)
-
-    // PLACEHOLDER — prompt 3 (savings plan and countdown) replaces this
-    // section with contributions, a monthly target and on-track status.
-    private var savingsPlanPlaceholder: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            BrandSectionHeader(title: "Savings plan") {
-                BrandTag(text: "Coming soon")
-            }
-
-            Text("Soon you'll be able to set money aside for this trip and see how much to save each month to be ready in time.")
-                .font(.subheadline)
-                .foregroundStyle(Brand.textSecondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .brandCard()
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("savingsPlanPlaceholder")
-        .padding(.top, 6)
-    }
-
     // MARK: Delete
 
     private func delete() {
         modelContext.delete(trip)
         try? modelContext.save()
+        SavingsReminderCoordinator.shared.syncAll(in: modelContext)
         dismiss()
     }
 }

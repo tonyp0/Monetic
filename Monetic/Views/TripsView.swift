@@ -10,6 +10,8 @@ struct TripsView: View {
     @State private var selectedTrip: Trip?
     @State private var tripPendingDeletion: Trip?
     @State private var pastExpanded = false
+    /// Set by the Budget tab's trip card to open a trip here.
+    var tripToOpen: Binding<UUID?> = .constant(nil)
 
     var body: some View {
         let sections = TripList.sections(trips)
@@ -81,6 +83,8 @@ struct TripsView: View {
             .navigationDestination(item: $selectedTrip) { trip in
                 TripDetailView(trip: trip)
             }
+            .onAppear(perform: openRequestedTrip)
+            .onChange(of: tripToOpen.wrappedValue) { _, _ in openRequestedTrip() }
             .sheet(isPresented: $showingAddTrip) {
                 AddTripView()
             }
@@ -140,10 +144,20 @@ struct TripsView: View {
         .padding(.bottom, 2)
     }
 
+    private func openRequestedTrip() {
+        guard let id = tripToOpen.wrappedValue else { return }
+        tripToOpen.wrappedValue = nil
+        if let trip = trips.first(where: { $0.id == id }) {
+            selectedTrip = trip
+        }
+    }
+
     private func delete(_ trip: Trip) {
         if selectedTrip?.id == trip.id { selectedTrip = nil }
         modelContext.delete(trip)
         try? modelContext.save()
+        // Deleting a trip cancels its reminders.
+        SavingsReminderCoordinator.shared.syncAll(in: modelContext)
         tripPendingDeletion = nil
     }
 }
@@ -155,6 +169,7 @@ struct TripRow: View {
     let asOf: Date
 
     private var status: Trip.Status { trip.status(asOf: asOf) }
+    private var plan: SavingsPlan { trip.savingsPlan(asOf: asOf) }
 
     var body: some View {
         HStack(spacing: 13) {
@@ -183,6 +198,16 @@ struct TripRow: View {
                     .font(.caption)
                     .foregroundStyle(Brand.textTertiary)
                     .lineLimit(1)
+
+                if status == .upcoming {
+                    let plan = self.plan
+                    HStack(spacing: 8) {
+                        BrandProgressBar(percentage: plan.progress, tint: plan.status == .funded ? Brand.positive : Brand.accent, height: 4)
+                        SavingsStatusTag(status: plan.status)
+                            .fixedSize()
+                    }
+                    .padding(.top, 4)
+                }
             }
 
             Spacer(minLength: 8)

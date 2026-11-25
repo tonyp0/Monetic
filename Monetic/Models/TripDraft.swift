@@ -175,6 +175,7 @@ struct TripDraft: Equatable {
     @discardableResult
     func apply(to trip: Trip, estimate: TripEstimate? = nil, calendar: Calendar = .current) -> Bool {
         guard isValid(calendar: calendar), let total = estimatedTotal else { return false }
+        let goalFollowsShare = trip.savingsGoalFollowsShare
         let start = calendar.startOfDay(for: startDate)
         trip.name = trimmedName
         trip.destination = trimmedDestination
@@ -203,6 +204,9 @@ struct TripDraft: Equatable {
             trip.savedEstimate = nil
         }
         trip.estimatedTotal = total
+        if goalFollowsShare {
+            trip.savingsGoal = Trip.defaultSavingsGoal(total: total, travelers: travelers)
+        }
         return true
     }
 }

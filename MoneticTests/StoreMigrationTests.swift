@@ -17,7 +17,7 @@ struct StoreMigrationTests {
     @Test("The app's schema includes trips alongside the budget models")
     func currentSchemaHasTrips() {
         let names = Set(MoneticApp.schema.entities.map(\.name))
-        #expect(names == ["BudgetCategory", "Transaction", "Trip"])
+        #expect(names == ["BudgetCategory", "Transaction", "Trip", "SavingsContribution"])
     }
 
     @Test("An on-disk store without trips opens with its data intact")
@@ -95,7 +95,7 @@ struct StoreMigrationTests {
         #expect(try context.fetchCount(FetchDescriptor<Transaction>()) == 2)
         #expect(try context.fetch(FetchDescriptor<Trip>()).map(\.name) == ["Spring Break"])
     }
-    @Test("A store saved by the first Trips release opens with estimator fields defaulted")
+    @Test("A store saved by the first Trips release opens with estimator and savings fields defaulted")
     func promptOneTripsMigrate() throws {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("StoreMigrationTests-\(UUID().uuidString)", isDirectory: true)
@@ -140,11 +140,25 @@ struct StoreMigrationTests {
         #expect(trip.savedEstimate == nil)
         #expect(try context.fetchCount(FetchDescriptor<BudgetCategory>()) == 1)
 
-        // And the migrated trip takes an estimate.
+        // New in prompt 3: savings, also defaulted.
+        #expect(trip.savingsGoal == 0)
+        #expect(trip.effectiveSavingsGoal == 600, "one traveler's share")
+        #expect(trip.savingsStartDate == nil)
+        #expect(trip.savingsStart() == Calendar.current.startOfDay(for: march))
+        #expect(trip.cadence == .weekly)
+        #expect(!trip.remindersEnabled)
+        #expect(trip.contributions.isEmpty)
+        #expect(try context.fetchCount(FetchDescriptor<SavingsContribution>()) == 0)
+
+        // And the migrated trip takes an estimate and savings.
         trip.travelStyle = TravelStyle.budget.rawValue
         trip.flightsTotal = 800
         try context.save()
-        #expect(try ModelContext(container).fetch(FetchDescriptor<Trip>()).first?.flightsTotal == 800)
+        context.insert(SavingsContribution(amount: 150, date: march, trip: trip, createdAt: march))
+        try context.save()
+        let reopened = try #require(try ModelContext(container).fetch(FetchDescriptor<Trip>()).first)
+        #expect(reopened.flightsTotal == 800)
+        #expect(reopened.totalSaved == 150)
     }
 }
 

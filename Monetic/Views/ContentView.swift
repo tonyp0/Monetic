@@ -4,6 +4,8 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \BudgetCategory.sortOrder) private var categories: [BudgetCategory]
+    @Query private var trips: [Trip]
+    @State private var savingsTrip: Trip?
     @State private var selectedCategory: BudgetCategory?
     @State private var showingAddCategory = false
     @State private var showingAddTransaction = false
@@ -17,7 +19,12 @@ struct ContentView: View {
     @AppStorage("repeatMonthlyBudget") private var repeatMonthlyBudget: Bool = false
     @AppStorage("lastMonthlyBudget") private var lastMonthlyBudget: Double = 0
 
-    init() {}
+    /// Opens a trip on the Trips tab.
+    var onOpenTrip: (UUID) -> Void = { _ in }
+
+    init(onOpenTrip: @escaping (UUID) -> Void = { _ in }) {
+        self.onOpenTrip = onOpenTrip
+    }
 
     var body: some View {
         // Computed once per render and threaded through instead of letting
@@ -54,6 +61,19 @@ struct ContentView: View {
                         )
                         .padding(.top, 4)
                         .padding(.bottom, 10)
+
+                        // Trip savings live apart from the budget: this card
+                        // reads them, and nothing above it does.
+                        if let next = UpcomingTripCard.pick(from: trips, asOf: Date()) {
+                            UpcomingTripCard(
+                                trip: next.trip,
+                                plan: next.trip.savingsPlan(asOf: Date(), monthlyBudget: monthlyBudget),
+                                moreCount: next.more,
+                                onOpen: { onOpenTrip(next.trip.id) },
+                                onAdd: { savingsTrip = next.trip }
+                            )
+                            .padding(.bottom, 10)
+                        }
 
                         if hasSpending {
                             chartsSection(spendingByCategory: categorySpending)
@@ -155,6 +175,9 @@ struct ContentView: View {
             }
             .sheet(item: $selectedCategory) { category in
                 CategoryDetailView(category: category)
+            }
+            .sheet(item: $savingsTrip) { trip in
+                AddContributionView(trip: trip)
             }
             .fullScreenCover(isPresented: Binding(
                 get: { !hasCompletedOnboarding },

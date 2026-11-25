@@ -42,7 +42,8 @@ struct MoneticApp: App {
     static let schema = Schema([
         BudgetCategory.self,
         Transaction.self,
-        Trip.self
+        Trip.self,
+        SavingsContribution.self
     ])
 
     private static func loadStore() -> Result<ModelContainer, Error> {

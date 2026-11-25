@@ -186,8 +186,13 @@ struct SoftButtonStyle: ButtonStyle {
 /// gradient; once the budget is close or blown it switches to a solid status
 /// colour so the warning can't be mistaken for decoration.
 struct BudgetRing<Center: View>: View {
+    /// `.budget` warns near and past the limit; `.goal` is for saving toward
+    /// a target, where getting close is good news.
+    enum Tone { case budget, goal }
+
     let percentage: Double
     var lineWidth: CGFloat = 14
+    var tone: Tone = .budget
     @ViewBuilder var center: Center
 
     private var clamped: Double { min(max(percentage, 0), 1) }
@@ -211,6 +216,9 @@ struct BudgetRing<Center: View>: View {
     }
 
     private var ringStyle: AnyShapeStyle {
+        if tone == .goal {
+            return percentage >= 1 ? AnyShapeStyle(Brand.positive) : AnyShapeStyle(Brand.ringGradient)
+        }
         if isOver { return AnyShapeStyle(Brand.danger) }
         if isNearLimit { return AnyShapeStyle(Brand.warning) }
         return AnyShapeStyle(Brand.ringGradient)

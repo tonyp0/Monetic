@@ -31,6 +31,21 @@ final class Trip: Identifiable {
     /// The `TripEstimate` saved with the trip, JSON-encoded.
     var estimateBreakdown: Data? = nil
 
+    // Savings (prompt 3), also defaulted for migration.
+    /// What the user is saving: their share of the trip by default. 0 on
+    /// trips saved before savings existed, which then use their share.
+    var savingsGoal: Double = 0
+    /// The day saving started. nil on older trips, which use the day they
+    /// were created.
+    var savingsStartDate: Date? = nil
+    /// `ContributionCadence` raw value.
+    var contributionCadence: String = ContributionCadence.weekly.rawValue
+    /// Local reminders on each contribution date. Off until the user turns
+    /// them on.
+    var remindersEnabled: Bool = false
+    @Relationship(deleteRule: .cascade, inverse: \SavingsContribution.trip)
+    var contributions: [SavingsContribution] = []
+
     /// Where `estimatedTotal` came from. Stored as its raw string, like
     /// `Transaction.recurringFrequency`, so new sources don't need a migration.
     enum EstimateSource: String {
@@ -79,6 +94,8 @@ final class Trip: Identifiable {
         self.roomsOverride = roomsOverride
         self.flightsTotal = flightsTotal
         self.estimateBreakdown = estimate.flatMap { try? JSONEncoder().encode($0) }
+        self.savingsGoal = Self.defaultSavingsGoal(total: estimatedTotal, travelers: self.travelers)
+        self.savingsStartDate = calendar.startOfDay(for: createdAt)
     }
 
     /// The breakdown saved with the trip, if it was estimated.
@@ -118,6 +135,55 @@ final class Trip: Identifiable {
     /// The estimate split evenly across travelers.
     var perPersonTotal: Double {
         estimatedTotal / Double(max(travelers, 1))
+    }
+
+    // MARK: Savings
+
+    /// One traveler's share, rounded up to the cent so the shares cover the total.
+    static func defaultSavingsGoal(total: Double, travelers: Int) -> Double {
+        (total * 100 / Double(max(travelers, 1))).rounded(.up) / 100
+    }
+
+    /// True while the goal is still the automatic share, so it should follow
+    /// changes to the total or the number of travelers.
+    var savingsGoalFollowsShare: Bool {
+        savingsGoal <= 0
+            || abs(savingsGoal - Self.defaultSavingsGoal(total: estimatedTotal, travelers: travelers)) < 0.005
+    }
+
+    var effectiveSavingsGoal: Double {
+        savingsGoal > 0 ? savingsGoal : Self.defaultSavingsGoal(total: estimatedTotal, travelers: travelers)
+    }
+
+    var cadence: ContributionCadence {
+        ContributionCadence(rawValue: contributionCadence) ?? .weekly
+    }
+
+    func savingsStart(calendar: Calendar = .current) -> Date {
+        savingsStartDate ?? calendar.startOfDay(for: createdAt)
+    }
+
+    /// Deposits minus withdrawals, added up in cents.
+    var totalSaved: Double {
+        Double(contributions.reduce(0) { $0 + Int(($1.amount * 100).rounded()) }) / 100
+    }
+
+    /// Contributions, newest first.
+    var sortedContributions: [SavingsContribution] {
+        contributions.sorted { ($0.date, $0.createdAt) > ($1.date, $1.createdAt) }
+    }
+
+    func savingsPlan(asOf date: Date, calendar: Calendar = .current, monthlyBudget: Double = 0) -> SavingsPlan {
+        SavingsPlan.make(
+            goal: effectiveSavingsGoal,
+            saved: totalSaved,
+            startDate: savingsStart(calendar: calendar),
+            departureDate: startDate,
+            cadence: cadence,
+            asOf: date,
+            calendar: calendar,
+            monthlyBudget: monthlyBudget
+        )
     }
 }
 
