@@ -282,6 +282,61 @@ final class TripsUITests: XCTestCase {
         XCTAssertTrue(app.buttons["planTripButton"].waitForExistence(timeout: 5), "nothing should be imported")
     }
 
+    func testDescribingATripFillsTheForm() throws {
+        // A canned stand-in for the on-device model, so this runs anywhere.
+        app.terminate()
+        app.launchArguments += ["-UITestingFakeTripAssistant"]
+        app.launch()
+        finishOnboarding()
+        app.tabBars.buttons["tripsTab"].tap()
+        app.buttons["addTripButton"].tap()
+
+        let describe = app.descendants(matching: .any)["describeTripField"].firstMatch
+        XCTAssertTrue(describe.waitForExistence(timeout: 5), "describe box missing")
+        let fillButton = app.buttons["fillFromDescriptionButton"]
+
+        // A failure leaves the form alone and says so.
+        describe.tap()
+        describe.typeText("this will fail")
+        fillButton.tap()
+        XCTAssertTrue(app.staticTexts["describeTripFailed"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.textFields["tripNameField"].value as? String, "e.g. Spring Break 2027", "form changed on failure")
+
+        // A description fills the form, each field marked. Fresh sheet.
+        app.buttons["Cancel"].tap()
+        app.buttons["addTripButton"].tap()
+        XCTAssertTrue(describe.waitForExistence(timeout: 5))
+        describe.tap()
+        describe.typeText("Spring break in Cancún with 4 friends, cheap, March 14-21, flights $1,200")
+        fillButton.tap()
+        let destinationMark = app.descendants(matching: .any)["filledMark_destination"]
+        XCTAssertTrue(destinationMark.waitForExistence(timeout: 5), "form wasn't filled")
+        XCTAssertEqual(app.textFields["tripDestinationField"].value as? String, "Cancun, Mexico")
+        XCTAssertEqual(app.textFields["tripNameField"].value as? String, "Cancun trip")
+        for mark in ["name", "dates", "travelers", "style"] {
+            XCTAssertTrue(app.descendants(matching: .any)["filledMark_\(mark)"].exists, "\(mark) not marked")
+        }
+        // Nothing saves by itself; the user reviews and edits. An edited
+        // field loses its mark, the others keep theirs.
+        let name = app.textFields["tripNameField"]
+        name.tap()
+        name.typeText(" 2027")
+        XCTAssertFalse(app.descendants(matching: .any)["filledMark_name"].exists, "mark should go once edited")
+        XCTAssertTrue(app.descendants(matching: .any)["filledMark_destination"].exists)
+
+        let flightsMark = app.descendants(matching: .any)["filledMark_flights"]
+        if !flightsMark.exists { app.scrollViews.firstMatch.swipeUp() }
+        XCTAssertTrue(flightsMark.waitForExistence(timeout: 3))
+        XCTAssertEqual(flightsMark.label, "You said $1,200.00")
+
+        let save = app.buttons["saveTripButton"]
+        XCTAssertTrue(save.isEnabled, "the estimate should have filled the total")
+        save.tap()
+        let row = app.buttons["tripRow_Cancun trip 2027"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "trip wasn't saved")
+        XCTAssertTrue(row.label.contains("5 travelers") || row.label.contains("5"), row.label)
+    }
+
     // MARK: - Steps
 
     /// Completes onboarding and the first-month budget prompt, checking on the

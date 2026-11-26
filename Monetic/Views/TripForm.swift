@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// The fields shared by Add Trip and Edit Trip. Validation lives on
 /// `TripDraft`; this only lays the draft out.
@@ -7,6 +8,12 @@ struct TripForm: View {
     var focusNameOnAppear: Bool = false
     /// The bundled per diem data; nil leaves the form as a typed-in total.
     var store: CostDataStore? = CostDataStore.shared
+    /// What "Describe your trip" filled in; those fields are marked until edited.
+    var fill: TripAssistant.Fill? = nil
+
+    /// Past trips, for the "your trips ran over" hint.
+    @Query private var trips: [Trip]
+    @AppStorage("dismissedEstimateHints") private var dismissedHints = ""
 
     private enum Field: Hashable { case name, destination, flights }
     @FocusState private var focusedField: Field?
@@ -37,6 +44,7 @@ struct TripForm: View {
                     .onSubmit { focusedField = .destination }
                     .accessibilityIdentifier("tripNameField")
             }
+            .overlay(alignment: .topTrailing) { filledMark(fill?.name != nil && fill?.name == draft.name, id: "name") }
 
             destinationSection
 
@@ -48,6 +56,9 @@ struct TripForm: View {
                 roomsCard
                 flightsField
                 TripBreakdownCard(estimate: estimate)
+                if let hint = accuracyHint {
+                    hintRow(hint)
+                }
             }
 
             totalSection(estimate)
@@ -77,6 +88,9 @@ struct TripForm: View {
                     .submitLabel(.done)
                     .accessibilityIdentifier("tripDestinationField")
             }
+            .overlay(alignment: .topTrailing) {
+                filledMark(fill?.destination != nil && fill?.destination == draft.destination, id: "destination")
+            }
 
             if let picked = pickedLocation {
                 HStack(spacing: 6) {
@@ -88,7 +102,7 @@ struct TripForm: View {
                 }
                 .font(.caption)
                 .accessibilityIdentifier("pickedLocationNote")
-            } else if focusedField == .destination, !searchResults.isEmpty {
+            } else if focusedField == .destination || showFilledMatches, !searchResults.isEmpty {
                 resultsList
             } else if store != nil, !draft.trimmedDestination.isEmpty {
                 Text(searchResults.isEmpty
@@ -99,6 +113,12 @@ struct TripForm: View {
                     .accessibilityIdentifier("noLocationMatchNote")
             }
         }
+    }
+
+    /// The description named a place with several matches: list them
+    /// until the user picks one or changes the text.
+    private var showFilledMatches: Bool {
+        (fill?.destinationIsAmbiguous ?? false) && fill?.destination == draft.destination
     }
 
     private var resultsList: some View {
@@ -139,7 +159,11 @@ struct TripForm: View {
 
     private var styleCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Travel Style").brandEyebrow()
+            HStack {
+                Text("Travel Style").brandEyebrow()
+                Spacer()
+                filledMark(fill?.style != nil && fill?.style == draft.travelStyle, id: "style")
+            }
             BrandSegmented(
                 options: TravelStyle.allCases.map { ($0.rawValue, $0.label) },
                 selection: Binding(
@@ -187,6 +211,17 @@ struct TripForm: View {
     }
 
     private var flightsField: some View {
+        VStack(alignment: .trailing, spacing: 6) {
+            flightsInput
+            if let said = fill?.flightsText, said == draft.flightsText,
+               let amount = AmountInput.parse(said) {
+                BrandTag(text: "You said \(amount.formatted(.currency(code: "USD")))", tint: Brand.textSecondary)
+                    .accessibilityIdentifier("filledMark_flights")
+            }
+        }
+    }
+
+    private var flightsInput: some View {
         BrandField(
             label: "Flights (total for group)",
             footnote: "Paste a fare you found for everyone going. Leave it empty if you haven't looked yet."
@@ -262,9 +297,14 @@ struct TripForm: View {
                     .accessibilityIdentifier("tripEndDatePicker")
             }
 
-            Text(TripList.nightsText(draft.nights()))
-                .font(.caption)
-                .foregroundStyle(Brand.textTertiary)
+            HStack {
+                Text(TripList.nightsText(draft.nights()))
+                    .font(.caption)
+                    .foregroundStyle(Brand.textTertiary)
+                Spacer()
+                filledMark(fill?.startDate != nil && fill?.startDate == draft.startDate
+                           && fill?.endDate == draft.endDate, id: "dates")
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .brandCard()
@@ -276,14 +316,73 @@ struct TripForm: View {
     // MARK: Travelers
 
     private var travelersCard: some View {
-        BrandStepper(
-            title: "Travelers",
-            value: $draft.travelers,
-            range: TripDraft.travelerRange,
-            unit: ("traveler", "travelers")
-        )
-        .accessibilityIdentifier("tripTravelersStepper")
+        VStack(alignment: .leading, spacing: 8) {
+            BrandStepper(
+                title: "Travelers",
+                value: $draft.travelers,
+                range: TripDraft.travelerRange,
+                unit: ("traveler", "travelers")
+            )
+            .accessibilityIdentifier("tripTravelersStepper")
+            filledMark(fill?.travelers != nil && fill?.travelers == draft.travelers, id: "travelers")
+        }
         .brandCard()
+    }
+
+    // MARK: How past estimates did
+
+    /// Shown, never applied: the estimate itself doesn't change.
+    private var accuracyHint: EstimateAccuracy.Hint? {
+        let hint = EstimateAccuracy.hint(for: draft.travelStyle, samples: trips.compactMap(\.accuracySample))
+        guard let hint, !dismissedHints.split(separator: ",").contains(Substring(hint.id)) else { return nil }
+        return hint
+    }
+
+    private func hintRow(_ hint: EstimateAccuracy.Hint) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "chart.line.uptrend.xyaxis")
+                .foregroundStyle(Brand.accent)
+                .accessibilityHidden(true)
+            Text(hint.text)
+                .font(.caption)
+                .foregroundStyle(Brand.textSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("estimateAccuracyHint")
+            Button {
+                dismissedHints = (dismissedHints.isEmpty ? "" : dismissedHints + ",") + hint.id
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Brand.textTertiary)
+                    .frame(width: 32, height: 32)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Dismiss")
+            .accessibilityIdentifier("dismissEstimateHint")
+        }
+        .brandCard(padding: 12, radius: Brand.Radius.control)
+    }
+
+    // MARK: Filled from the description
+
+    /// A small tag on a field the assistant filled, so it's clear what to
+    /// check. Gone once the user changes the value.
+    @ViewBuilder
+    private func filledMark(_ isFilled: Bool, id: String) -> some View {
+        if isFilled {
+            HStack(spacing: 4) {
+                Image(systemName: "sparkles").accessibilityHidden(true)
+                Text("From your description")
+            }
+            .font(Brand.display(11, .semibold))
+            .foregroundStyle(Brand.accent)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(Capsule().fill(Brand.accent.opacity(0.14)))
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("filledMark_\(id)")
+        }
     }
 
     // MARK: Notes

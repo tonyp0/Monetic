@@ -12,6 +12,7 @@ struct TripDetailView: View {
     @State private var showingAddSavings = false
     @State private var showingPlanSettings = false
     @State private var editingContribution: SavingsContribution?
+    @State private var showingLogSpending = false
 
     var body: some View {
         ZStack {
@@ -28,6 +29,10 @@ struct TripDetailView: View {
                                 ? nil : trip.estimatedTotal,
                             editedCurrencyCode: trip.totalCurrencyCode
                         )
+                    }
+
+                    if trip.status() == .past || trip.actuals != nil {
+                        TripActualsCard(trip: trip) { showingLogSpending = true }
                     }
 
                     if !trip.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -83,6 +88,9 @@ struct TripDetailView: View {
         }
         .sheet(isPresented: $showingPlanSettings) {
             SavingsPlanSettingsView(trip: trip)
+        }
+        .sheet(isPresented: $showingLogSpending) {
+            LogSpendingView(trip: trip)
         }
         .sheet(item: $editingContribution) { contribution in
             AddContributionView(trip: trip, contribution: contribution)

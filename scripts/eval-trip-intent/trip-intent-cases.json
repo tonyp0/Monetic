@@ -1,0 +1,382 @@
+{
+ "today": "2026-11-25",
+ "tripNights": 7,
+ "cases": [
+  {
+   "text": "Spring break in Cancún with 4 friends, cheap, March 14–21",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-MEXICO-CANCUN"
+    },
+    "start": "2027-03-14",
+    "end": "2027-03-21",
+    "travelers": 5,
+    "style": "budget",
+    "flights": null
+   }
+  },
+  {
+   "text": "Paris for a week starting June 3 2027, just me, staying somewhere nice",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-FRANCE-PARIS"
+    },
+    "start": "2027-06-03",
+    "end": "2027-06-10",
+    "travelers": 1,
+    "style": "comfort",
+    "flights": null
+   }
+  },
+  {
+   "text": "Austin, TX Jan 8 to Jan 11 with 2 coworkers, flights $450",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-TX-AUSTIN"
+    },
+    "start": "2027-01-08",
+    "end": "2027-01-11",
+    "travelers": 3,
+    "flights": 450
+   }
+  },
+  {
+   "text": "New Orleans for Mardi Gras, Feb 12-16, me and 3 friends, on a budget",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-LA-NEW-ORLEANS"
+    },
+    "start": "2027-02-12",
+    "end": "2027-02-16",
+    "travelers": 4,
+    "style": "budget",
+    "flights": null
+   }
+  },
+  {
+   "text": "Road trip to Nashville December 18 through 21, 2 of us",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-TN-NASHVILLE"
+    },
+    "start": "2026-12-18",
+    "end": "2026-12-21",
+    "travelers": 2,
+    "flights": null
+   }
+  },
+  {
+   "text": "Barcelona with my roommate, April 2 – April 9, mid-range hotels, flights were $1,380 for both",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-SPAIN-BARCELONA"
+    },
+    "start": "2027-04-02",
+    "end": "2027-04-09",
+    "travelers": 2,
+    "style": "standard",
+    "flights": 1380
+   }
+  },
+  {
+   "text": "Ski trip to Breckenridge Jan 15-18, six of us, splurging a bit",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-CO-SILVERTHORNE-BRECKENRIDGE"
+    },
+    "start": "2027-01-15",
+    "end": "2027-01-18",
+    "travelers": 6,
+    "style": "comfort",
+    "flights": null
+   }
+  },
+  {
+   "text": "Rome in July",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-ITALY-ROME"
+    },
+    "start": "2027-07-01",
+    "flights": null
+   }
+  },
+  {
+   "text": "Chicago Dec 28 to Jan 2 with my family of 4",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-IL-CHICAGO"
+    },
+    "start": "2026-12-28",
+    "end": "2027-01-02",
+    "travelers": 4,
+    "flights": null
+   }
+  },
+  {
+   "text": "Vegas bachelor party, 8 guys, March 5-8, cheap as possible",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-NV-LAS-VEGAS"
+    },
+    "start": "2027-03-05",
+    "end": "2027-03-08",
+    "travelers": 8,
+    "style": "budget",
+    "flights": null
+   }
+  },
+  {
+   "text": "Toronto May 20–24, solo, flights $320",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-CANADA-TORONTO"
+    },
+    "start": "2027-05-20",
+    "end": "2027-05-24",
+    "travelers": 1,
+    "flights": 320
+   }
+  },
+  {
+   "text": "Mexico City over spring break, March 13 to 20, with 3 friends",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-MEXICO-MEXICO-CITY-D-F"
+    },
+    "start": "2027-03-13",
+    "end": "2027-03-20",
+    "travelers": 4,
+    "flights": null
+   }
+  },
+  {
+   "text": "Lisbon, 2 people, Sept 10–17, nice hotel",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-PORTUGAL-LISBON"
+    },
+    "start": "2027-09-10",
+    "end": "2027-09-17",
+    "travelers": 2,
+    "style": "comfort",
+    "flights": null
+   }
+  },
+  {
+   "text": "Seattle for a conference Feb 1-4",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-WA-SEATTLE"
+    },
+    "start": "2027-02-01",
+    "end": "2027-02-04",
+    "flights": null
+   }
+  },
+  {
+   "text": "Boston, April 16 to 19, me and my parents",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-MA-BOSTON-CAMBRIDGE"
+    },
+    "start": "2027-04-16",
+    "end": "2027-04-19",
+    "travelers": 3,
+    "flights": null
+   }
+  },
+  {
+   "text": "Puerto Vallarta for 5 nights starting Jan 3, 4 of us, budget",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-MEXICO-PUERTO-VALLARTA"
+    },
+    "start": "2027-01-03",
+    "end": "2027-01-08",
+    "travelers": 4,
+    "style": "budget",
+    "flights": null
+   }
+  },
+  {
+   "text": "Dublin St Patrick's Day trip, March 15-19, three friends and me, flights 2,100 total",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-IRELAND-DUBLIN"
+    },
+    "start": "2027-03-15",
+    "end": "2027-03-19",
+    "travelers": 4,
+    "flights": 2100
+   }
+  },
+  {
+   "text": "Amsterdam June 12-15 2027 with my girlfriend, comfortable",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-NETHERLANDS-AMSTERDAM"
+    },
+    "start": "2027-06-12",
+    "end": "2027-06-15",
+    "travelers": 2,
+    "style": "comfort",
+    "flights": null
+   }
+  },
+  {
+   "text": "Reykjavik Feb 20–25, just me, cheap hostels",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-ICELAND-REYKJAVIK"
+    },
+    "start": "2027-02-20",
+    "end": "2027-02-25",
+    "travelers": 1,
+    "style": "budget",
+    "flights": null
+   }
+  },
+  {
+   "text": "Savannah girls' weekend, 5 of us, April 23-25",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-GA-SAVANNAH"
+    },
+    "start": "2027-04-23",
+    "end": "2027-04-25",
+    "travelers": 5,
+    "flights": null
+   }
+  },
+  {
+   "text": "Asheville Oct 8 to Oct 11 2027, 2 travelers, mid-range",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-NC-ASHEVILLE"
+    },
+    "start": "2027-10-08",
+    "end": "2027-10-11",
+    "travelers": 2,
+    "style": "standard",
+    "flights": null
+   }
+  },
+  {
+   "text": "Portland, Oregon in August, 3 people",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-OR-PORTLAND"
+    },
+    "start": "2027-08-01",
+    "travelers": 3,
+    "flights": null
+   }
+  },
+  {
+   "text": "Panama City Beach spring break, March 6-13, 10 of us, cheap",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-FL-PANAMA-CITY"
+    },
+    "start": "2027-03-06",
+    "end": "2027-03-13",
+    "travelers": 10,
+    "style": "budget",
+    "flights": null
+   }
+  },
+  {
+   "text": "London theatre weekend Jan 22-24 with my mum",
+   "expected": {
+    "destination": {
+     "locationID": "DOS-UNITED-KINGDOM-LONDON"
+    },
+    "start": "2027-01-22",
+    "end": "2027-01-24",
+    "travelers": 2,
+    "flights": null
+   }
+  },
+  {
+   "text": "Tokyo for two weeks in April with my brother",
+   "expected": {
+    "destination": {
+     "text": "Tokyo"
+    },
+    "start": "2027-04-01",
+    "travelers": 2,
+    "flights": null
+   }
+  },
+  {
+   "text": "Honolulu Dec 26 - Jan 4, family of 5, flights $3,250",
+   "expected": {
+    "destination": {
+     "text": "Honolulu"
+    },
+    "start": "2026-12-26",
+    "end": "2027-01-04",
+    "travelers": 5,
+    "flights": 3250
+   }
+  },
+  {
+   "text": "Orlando with the kids, Nov 27 to Nov 30, 4 of us",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-FL-ORLANDO"
+    },
+    "start": "2026-11-27",
+    "end": "2026-11-30",
+    "travelers": 4,
+    "flights": null
+   }
+  },
+  {
+   "text": "San Diego, Oct 2-5, solo trip, flights around $300",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-CA-SAN-DIEGO"
+    },
+    "start": "2027-10-02",
+    "end": "2027-10-05",
+    "travelers": 1,
+    "flights": 300
+   }
+  },
+  {
+   "text": "Denver this weekend, Nov 28-29, me and a friend",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-CO-DENVER-AURORA"
+    },
+    "start": "2026-11-28",
+    "end": "2026-11-29",
+    "travelers": 2,
+    "flights": null
+   }
+  },
+  {
+   "text": "Miami Music Week March 24-29 with 3 friends, splurge",
+   "expected": {
+    "destination": {
+     "locationID": "GSA-FL-MIAMI"
+    },
+    "start": "2027-03-24",
+    "end": "2027-03-29",
+    "travelers": 4,
+    "style": "comfort",
+    "flights": null
+   }
+  },
+  {
+   "text": "I want to go somewhere warm in February",
+   "expected": {
+    "start": "2027-02-01",
+    "flights": null,
+    "destination": null
+   }
+  }
+ ]
+}

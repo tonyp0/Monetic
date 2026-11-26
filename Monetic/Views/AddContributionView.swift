@@ -121,9 +121,7 @@ struct AddContributionView: View {
     private func save() {
         if let contribution {
             draft.apply(to: contribution)
-        } else if let new = draft.makeContribution(for: trip, createdAt: Date()) {
-            modelContext.insert(new)
-        } else {
+        } else if draft.insertContribution(for: trip, in: modelContext, createdAt: Date()) == nil {
             return
         }
         try? modelContext.save()

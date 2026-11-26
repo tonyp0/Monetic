@@ -56,6 +56,10 @@ final class Trip: Identifiable {
     /// When this trip was joined from a friend's link; nil for your own trips.
     var joinedAt: Date? = nil
 
+    // Actual spending (prompt 5): the `TripActuals` logged after the trip,
+    // JSON-encoded. nil until the user logs it.
+    var actualSpending: Data? = nil
+
     /// Shared out or joined in: planned with friends.
     var isGroupTrip: Bool { shareID != nil }
 

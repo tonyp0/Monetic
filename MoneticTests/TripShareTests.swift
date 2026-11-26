@@ -322,9 +322,12 @@ struct TripShareTests {
                                             calendar: calendar)
         context.insert(trip)
         try context.save()
-        context.insert(SavingsContribution(amount: 120, date: date(2027, 1, 3), notes: "Mine", trip: trip,
-                                           createdAt: date(2027, 1, 3)))
-        context.insert(SavingsContribution(amount: -20, date: date(2027, 1, 4), trip: trip, createdAt: date(2027, 1, 4)))
+        // Added the way Add to Savings does, while the trip has unsaved
+        // edits too: that combination lost the links on iOS 18.
+        let deposit = ContributionDraft(amountText: "120", date: date(2027, 1, 3), notes: "Mine")
+        deposit.insertContribution(for: trip, in: context, createdAt: date(2027, 1, 3), calendar: calendar)
+        let withdrawal = ContributionDraft(amountText: "20", isWithdrawal: true, date: date(2027, 1, 4))
+        withdrawal.insertContribution(for: trip, in: context, createdAt: date(2027, 1, 4), calendar: calendar)
         trip.notes = "My notes"
         trip.remindersEnabled = true
         try context.save()

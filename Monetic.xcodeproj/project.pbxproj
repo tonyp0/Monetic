@@ -70,6 +70,14 @@
 		48BD5E8DC7E397592A268970 /* TripShareImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21D40F74060891C1337BCF8 /* TripShareImport.swift */; };
 		27109850D0C1FBCAD999C39E /* JoinTripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A17EA3EB37360F1B3DF687 /* JoinTripView.swift */; };
 		688CC74DD79FAF60F89B986C /* TripShareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DB19876770AB97BC4EEB86 /* TripShareTests.swift */; };
+		09886FE31C1C0CEBBE524087 /* TripIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91B72D6B3D3B0ED74132FED /* TripIntent.swift */; };
+		CB883A121E2E2A974F68FD82 /* TripAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05A2EEB04D0D510149B8457 /* TripAssistant.swift */; };
+		9A2308511C3A70524459B968 /* EstimateAccuracy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45F68A92FF909851AFC810B /* EstimateAccuracy.swift */; };
+		AEE8246E507FF477F5D21329 /* TripActualsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0A3448B78EA0DA952AAE6F /* TripActualsViews.swift */; };
+		DC5EF5D11D97D25F68B3CD7E /* TripAssistantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 350DA5BEB47CA25437234239 /* TripAssistantTests.swift */; };
+		9EB230632B9301EF6D1F27D0 /* EstimateAccuracyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FA119A2C0D3CE1DFC2544A /* EstimateAccuracyTests.swift */; };
+		6BC84310E3D1376C75EFE657 /* TripIntentEvalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AEBD5BBF40E2198A64C68B /* TripIntentEvalTests.swift */; };
+		321C0566A66823FAEEA51485 /* trip-intent-cases.json in Resources */ = {isa = PBXBuildFile; fileRef = 93CBB9C8330578670F9F1871 /* trip-intent-cases.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -157,6 +165,14 @@
 		03A17EA3EB37360F1B3DF687 /* JoinTripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinTripView.swift; sourceTree = "<group>"; };
 		B19F0DDFDA5D982CEE2270D1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		11DB19876770AB97BC4EEB86 /* TripShareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripShareTests.swift; sourceTree = "<group>"; };
+		E91B72D6B3D3B0ED74132FED /* TripIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripIntent.swift; sourceTree = "<group>"; };
+		B05A2EEB04D0D510149B8457 /* TripAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripAssistant.swift; sourceTree = "<group>"; };
+		D45F68A92FF909851AFC810B /* EstimateAccuracy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimateAccuracy.swift; sourceTree = "<group>"; };
+		3A0A3448B78EA0DA952AAE6F /* TripActualsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripActualsViews.swift; sourceTree = "<group>"; };
+		350DA5BEB47CA25437234239 /* TripAssistantTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripAssistantTests.swift; sourceTree = "<group>"; };
+		97FA119A2C0D3CE1DFC2544A /* EstimateAccuracyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimateAccuracyTests.swift; sourceTree = "<group>"; };
+		A6AEBD5BBF40E2198A64C68B /* TripIntentEvalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripIntentEvalTests.swift; sourceTree = "<group>"; };
+		93CBB9C8330578670F9F1871 /* trip-intent-cases.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = trip-intent-cases.json; path = scripts/eval-trip-intent/trip-intent-cases.json; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +220,10 @@
 				52BED5521B20950688CE8691 /* SavingsContributionTests.swift */,
 				E413A0087262FF05C06DECB5 /* SavingsReminderTests.swift */,
 				11DB19876770AB97BC4EEB86 /* TripShareTests.swift */,
+				350DA5BEB47CA25437234239 /* TripAssistantTests.swift */,
+				97FA119A2C0D3CE1DFC2544A /* EstimateAccuracyTests.swift */,
+				A6AEBD5BBF40E2198A64C68B /* TripIntentEvalTests.swift */,
+				93CBB9C8330578670F9F1871 /* trip-intent-cases.json */,
 			);
 			path = MoneticTests;
 			sourceTree = "<group>";
@@ -294,6 +314,7 @@
 				956270A7FC68D00497B69321 /* ContributionsListView.swift */,
 				DCB27D4F63788F72252E9160 /* UpcomingTripCard.swift */,
 				03A17EA3EB37360F1B3DF687 /* JoinTripView.swift */,
+				3A0A3448B78EA0DA952AAE6F /* TripActualsViews.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -321,6 +342,7 @@
 			children = (
 				9DDF9EA7EC223E465F838992 /* CostDataStore.swift */,
 				BD92C8D5BCA897B4AC84607F /* TripEstimator.swift */,
+				D45F68A92FF909851AFC810B /* EstimateAccuracy.swift */,
 			);
 			path = Estimating;
 			sourceTree = "<group>";
@@ -349,6 +371,8 @@
 				5163B3961C161801985C4BBD /* SavingsReminders.swift */,
 				060F0EA76D513D5B5DDF25B1 /* TripShare.swift */,
 				A21D40F74060891C1337BCF8 /* TripShareImport.swift */,
+				E91B72D6B3D3B0ED74132FED /* TripIntent.swift */,
+				B05A2EEB04D0D510149B8457 /* TripAssistant.swift */,
 			);
 			path = Trips;
 			sourceTree = "<group>";
@@ -450,6 +474,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AFBCDA1188298D6EF0280C20 /* cost-data-fixture.json in Resources */,
+				321C0566A66823FAEEA51485 /* trip-intent-cases.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -493,6 +518,9 @@
 				831D9B5A81E5757F843F9D27 /* SavingsContributionTests.swift in Sources */,
 				F1E65A4328B738C6AAA8C48D /* SavingsReminderTests.swift in Sources */,
 				688CC74DD79FAF60F89B986C /* TripShareTests.swift in Sources */,
+				DC5EF5D11D97D25F68B3CD7E /* TripAssistantTests.swift in Sources */,
+				9EB230632B9301EF6D1F27D0 /* EstimateAccuracyTests.swift in Sources */,
+				6BC84310E3D1376C75EFE657 /* TripIntentEvalTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -550,6 +578,10 @@
 				C47CE66A72E3F4935A66BF9B /* TripShare.swift in Sources */,
 				48BD5E8DC7E397592A268970 /* TripShareImport.swift in Sources */,
 				27109850D0C1FBCAD999C39E /* JoinTripView.swift in Sources */,
+				09886FE31C1C0CEBBE524087 /* TripIntent.swift in Sources */,
+				CB883A121E2E2A974F68FD82 /* TripAssistant.swift in Sources */,
+				9A2308511C3A70524459B968 /* EstimateAccuracy.swift in Sources */,
+				AEE8246E507FF477F5D21329 /* TripActualsViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

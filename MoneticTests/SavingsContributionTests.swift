@@ -164,7 +164,8 @@ struct SavingsContributionTests {
 
         draft.date = today
         draft.notes = "  ATM  "
-        let made = try #require(draft.makeContribution(for: trip, createdAt: today))
+        let made = try #require(draft.insertContribution(for: trip, in: context, createdAt: today))
+        #expect(made.trip?.id == trip.id)
         #expect(made.amount == -25)
         #expect(made.notes == "ATM")
         #expect(made.date == Calendar.current.startOfDay(for: today))

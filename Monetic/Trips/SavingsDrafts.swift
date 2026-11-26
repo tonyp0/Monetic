@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 // MARK: - Contribution draft
 
@@ -55,10 +56,18 @@ struct ContributionDraft: Equatable {
         return "This has to be at least \(minimum), or your withdrawals would take out more than you saved."
     }
 
-    func makeContribution(for trip: Trip, createdAt: Date, calendar: Calendar = .current) -> SavingsContribution? {
+    /// Inserts the contribution into `context` and links it to `trip`, in that
+    /// order: on iOS 17/18, SwiftData drops a link set before insert when the
+    /// trip has unsaved changes in the same save.
+    @discardableResult
+    func insertContribution(for trip: Trip, in context: ModelContext, createdAt: Date,
+                            calendar: Calendar = .current) -> SavingsContribution? {
         guard let amount = signedAmount else { return nil }
-        return SavingsContribution(amount: amount, date: date, notes: trimmedNotes, trip: trip,
-                                   createdAt: createdAt, calendar: calendar)
+        let contribution = SavingsContribution(amount: amount, date: date, notes: trimmedNotes,
+                                               createdAt: createdAt, calendar: calendar)
+        context.insert(contribution)
+        contribution.trip = trip
+        return contribution
     }
 
     @discardableResult

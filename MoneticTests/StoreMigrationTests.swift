@@ -156,6 +156,11 @@ struct StoreMigrationTests {
         #expect(trip.joinedAt == nil)
         #expect(!trip.isGroupTrip)
 
+        // New in prompt 5: nothing logged yet.
+        #expect(trip.actualSpending == nil)
+        #expect(trip.actuals == nil)
+        #expect(trip.accuracySample == nil)
+
         // And the migrated trip takes an estimate and savings.
         trip.travelStyle = TravelStyle.budget.rawValue
         trip.flightsTotal = 800
