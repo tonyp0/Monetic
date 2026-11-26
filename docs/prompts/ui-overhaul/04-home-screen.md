@@ -6,6 +6,11 @@ Rebuild the main screen around one clear sentence, one bar and one list.
 
 Read `docs/prompts/ui-overhaul/DESIGN-BRIEF.md` first. This step restructures the home screen. The trend chart is step 5; leave it in place, just restyled to fit.
 
+## Context from the step-0 screenshots
+
+- The app now has a **tab bar** (Budget and Trips, from the Trips feature, in a `RootView` or similar). The home screen lives inside the Budget tab. Read how it's wired before changing anything, and don't change the Trips tab here.
+- In the "before" shots, scrolled content shows through behind the top bar (chart bars and donut run under the wordmark and Edit button), and the floating tab bar covers the last group rows and the chart legend. Both must be fixed in this step.
+
 ## Read first
 
 - `Monetic/Views/ContentView.swift`: `ContentView` (a `List` with `.brandListRow()`), `BudgetHeroCard`, `GroupCard`, `NoGroupsCard`, the toolbar, the sheets and `checkMonthRollover()`.
@@ -26,8 +31,9 @@ Read `docs/prompts/ui-overhaul/DESIGN-BRIEF.md` first. This step restructures th
    - Keep the native chevron and the tap → category detail sheet. Keep swipe-to-delete and Edit-mode reorder working.
    - Order rows as the user arranged them (don't sort by amount).
 4. **Spending trend**: leave `SpendingChartsView` below the groups for now, but **remove the donut entirely** (the split bar replaces it) and remove the collapsible "Spending Overview" header. Step 5 rebuilds the remaining chart.
-5. **Add expense**: a floating **"Add expense"** button pinned bottom-centre over the list (`PrimaryButtonStyle`, capsule, soft neutral shadow). It replaces the toolbar `+`, so it carries that button's `addTransactionButton` identifier. Add bottom content inset so the last row isn't hidden behind it.
-6. **Empty state** (no groups): restyle `NoGroupsCard` as a centred message plus one button ("Add your first group"), with no card.
+5. **Add expense**: a floating **"Add expense"** button pinned bottom-centre over the list (`PrimaryButtonStyle`, capsule, soft neutral shadow). It replaces the toolbar `+`, so it carries that button's `addTransactionButton` identifier. Position it **above the tab bar** (not overlapping it), and add bottom content inset (`.safeAreaInset(edge: .bottom)` or `.contentMargins`) so the last row and anything below it can scroll fully clear of both the button and the tab bar.
+6. **Top bar**: use the standard navigation bar scroll-edge behaviour (`.toolbarBackground` with `Brand.background` once content scrolls under it), so scrolled content never shows through behind the title or toolbar buttons. Check this in shots `04` and `05`.
+7. **Empty state** (no groups): restyle `NoGroupsCard` as a centred message plus one button ("Add your first group"), with no card.
 
 ## Notes
 

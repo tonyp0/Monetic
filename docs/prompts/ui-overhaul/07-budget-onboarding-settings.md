@@ -22,7 +22,7 @@ Read `docs/prompts/ui-overhaul/DESIGN-BRIEF.md` first. This step covers `SetBudg
 ## Onboarding
 
 - Screen 1: the logo mark (the one place the gradient appears), then "Monetic" in `.largeTitle`, and one line: "See where your money goes, and make it last all month." Then the "Get Started" primary button (same text and identifier).
-- Screen 2 (choose starter groups): a two-column grid of selectable tiles (`CategoryTile` plus name) with checkmarks, showing "You can change these any time." Restyle within the existing flow; don't add or remove steps unless the current flow already has them.
+- Screen 2 (choose starter groups): a two-column grid of selectable tiles (`CategoryTile` plus name) with checkmarks, showing "You can change these any time." Every starter group must be reachable: in the step-0 shots the button area overlapped the 7th row and Travel and Work were hidden with no sign the list scrolls. Keep the button in a bottom `safeAreaInset` so the grid scrolls clear of it, and make sure the last row is visibly cut off at the fold or otherwise clearly scrollable. Restyle within the existing flow; don't add or remove steps unless the current flow already has them.
 - Add a simple page indicator if there's more than one screen.
 
 ## Settings
@@ -38,6 +38,8 @@ Read `docs/prompts/ui-overhaul/DESIGN-BRIEF.md` first. This step covers `SetBudg
 - Plain `Cancel` and `.semibold` `Save` (`saveGroupButton`). Delete group (Edit only) at the bottom as a `danger` text button with a confirmation that says how many expenses will be deleted with it.
 
 ## Also
+
+- Restyle any **Trips** screens that exist so far (tab bar included) with the same tokens and components. Don't change their behaviour or layout structure, and leave Trips features that aren't built yet alone. Add them to the screenshot tour if they aren't in it.
 
 - Restyle `StoreUnavailableView` in `MoneticApp.swift` to match.
 - By the end of this step, nothing in `Monetic/Views` should use a deprecated `Brand` API. Remove the deprecated aliases, `brandEyebrow`, `BudgetRing`, the `GradientButtonStyle` typealias and any other dead component code, and confirm the build has **zero** deprecation warnings from our own code.

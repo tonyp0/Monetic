@@ -112,5 +112,5 @@ Each hue also gets a **tint** (the hue at about 14% opacity over `surface`) for 
 4. **The Xcode project doesn't use synchronized folders.** Any new `.swift` file must be added to the right target in `Monetic.xcodeproj/project.pbxproj`. Prove it by building.
 5. **Home stays a `List`** so swipe-to-delete and drag-to-reorder keep working.
 6. **Stay in scope.** Only change what the current step asks for. Note anything else you spot in the final summary instead of fixing it.
-7. **Verify before finishing**: build, run `scripts/test.sh` (unit tests) and `scripts/test.sh ui`, run the screenshot tour from step 0, and look at the light and dark screenshots yourself. Report anything that looks off.
+7. **Verify before finishing**: build, run `scripts/test.sh` (unit tests) and `scripts/test.sh ui`, run `scripts/screenshots.sh <step label>` (the tour from step 0; if automatic simulator selection fails, pass `DESTINATION='id=<simulator UDID>'`; if a launch fails with a "preflight checks (Busy)" error, shut down and reboot the simulator cleanly and rerun), and look at the light and dark screenshots yourself. Report anything that looks off.
 8. Finish with a short summary: what changed, which screenshots to look at, any test changes, and anything deferred.
