@@ -428,24 +428,27 @@ struct AmountEntryCard: View {
     @Binding var amount: String
     var focus: FocusState<Bool>.Binding
     var label: String = "Amount"
+    /// The currency the amount is in: the selected one unless the caller
+    /// knows better (a per diem estimate is always USD).
+    var currencyCode: String = Currency.code
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(label).brandEyebrow()
 
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(Currency.symbol)
+                Text(Currency.symbol(for: currencyCode))
                     .font(Brand.number(26, .medium))
                     .foregroundStyle(Brand.textSecondary)
 
-                TextField("0.00", text: $amount)
+                TextField(AmountInput.text(cents: 0, code: currencyCode), text: $amount)
                     .accessibilityIdentifier("amountField")
                     .font(Brand.number(40))
                     .foregroundStyle(Brand.textPrimary)
                     .keyboardType(.decimalPad)
                     .focused(focus)
                     .onChange(of: amount) { _, newValue in
-                        amount = AmountInput.sanitize(newValue)
+                        amount = AmountInput.sanitize(newValue, code: currencyCode)
                     }
             }
         }

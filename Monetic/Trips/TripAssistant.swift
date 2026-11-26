@@ -167,7 +167,7 @@ enum TripAssistant {
 
         if let flights = intent.quotedFlightTotal, flights > 0, flights <= maxQuotedFlights,
            mentions(flights, in: text) {
-            draft.flightsText = AmountInput.text(cents: Int((flights * 100).rounded()))
+            draft.flightsText = AmountInput.text(cents: Int((flights * 100).rounded()), code: "USD")
             fill.flightsText = draft.flightsText
         }
 

@@ -60,15 +60,15 @@ struct TripDraft: Equatable {
             startDate: trip.startDate,
             endDate: trip.endDate,
             travelers: trip.travelers,
-            amountText: String(format: "%.2f", trip.estimatedTotal),
+            amountText: AmountInput.text(cents: Int((trip.estimatedTotal * 100).rounded()), code: trip.totalCurrencyCode),
             notes: trip.notes
         )
         locationID = trip.locationID
         travelStyle = trip.style
         roomsOverride = trip.roomsOverride
-        flightsText = trip.flightsTotal.map { AmountInput.text(cents: Int(($0 * 100).rounded())) } ?? ""
+        flightsText = trip.flightsTotal.map { AmountInput.text(cents: Int(($0 * 100).rounded()), code: "USD") } ?? ""
         if trip.estimateSource == Trip.EstimateSource.perDiem.rawValue, let estimate {
-            amountText = AmountInput.text(cents: estimate.totalCents)
+            amountText = AmountInput.text(cents: estimate.totalCents, code: "USD")
         }
     }
 
@@ -104,12 +104,12 @@ struct TripDraft: Equatable {
         guard let new else { return }
         let blank = amountText.trimmingCharacters(in: .whitespaces).isEmpty
         if blank || (old.map { AmountInput.cents(amountText) == $0.totalCents } ?? false) {
-            amountText = AmountInput.text(cents: new.totalCents)
+            amountText = AmountInput.text(cents: new.totalCents, code: "USD")
         }
     }
 
     mutating func useEstimate(_ estimate: TripEstimate) {
-        amountText = AmountInput.text(cents: estimate.totalCents)
+        amountText = AmountInput.text(cents: estimate.totalCents, code: "USD")
     }
 
     mutating func select(_ location: CostLocation) {

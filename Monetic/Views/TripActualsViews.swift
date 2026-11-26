@@ -8,9 +8,9 @@ import SwiftData
 struct ActualsDraft: Equatable {
     var texts: [TripEstimate.Kind: String] = [:]
 
-    init(actuals: TripActuals? = nil) {
+    init(actuals: TripActuals? = nil, code: String = Currency.code) {
         for item in actuals?.lineItems ?? [] {
-            texts[item.kind] = AmountInput.text(cents: item.cents)
+            texts[item.kind] = AmountInput.text(cents: item.cents, code: code)
         }
     }
 
@@ -43,7 +43,7 @@ struct LogSpendingView: View {
 
     init(trip: Trip) {
         self.trip = trip
-        _draft = State(initialValue: ActualsDraft(actuals: trip.actuals))
+        _draft = State(initialValue: ActualsDraft(actuals: trip.actuals, code: actualsCurrency(for: trip)))
     }
 
     private var code: String { actualsCurrency(for: trip) }
@@ -106,7 +106,7 @@ struct LogSpendingView: View {
                     .foregroundStyle(Brand.textSecondary)
                 TextField("Not tracked", text: Binding(
                     get: { draft.texts[kind] ?? "" },
-                    set: { draft.texts[kind] = AmountInput.sanitize($0) }
+                    set: { draft.texts[kind] = AmountInput.sanitize($0, code: code) }
                 ))
                 .font(Brand.display(16, .medium))
                 .keyboardType(.decimalPad)

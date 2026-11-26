@@ -137,3 +137,106 @@ struct CurrencyTests {
         }
     }
 }
+
+/// More currencies: the list, decimal places, and amount entry per currency.
+/// Names and order use a fixed locale; the device region never matters.
+@Suite("Currency options")
+struct CurrencyOptionsTests {
+    private let en = Locale(identifier: "en_US")
+    private let sep = TestSupport.decimalSeparator
+
+    @Test("Options include the usual currencies, once each, and no three-decimal ones")
+    func options() {
+        let options = Currency.options(locale: en, device: "USD")
+        for code in ["USD", "EUR", "MXN", "JPY", "GBP", "INR", "KRW"] {
+            #expect(options.contains(code), "\(code)")
+        }
+        #expect(Set(options).count == options.count, "duplicates")
+        for code in ["KWD", "BHD", "OMR", "JOD", "TND"] {
+            #expect(!options.contains(code), "\(code) has three decimal places")
+        }
+        #expect(options.allSatisfy { Currency.fractionDigits(for: $0) <= 2 })
+        #expect(options.count > 100)
+    }
+
+    @Test("Common currencies come first, then the rest by name")
+    func order() {
+        let options = Currency.options(locale: en, device: "USD")
+        #expect(Array(options.prefix(8)) == ["USD", "EUR", "GBP", "CAD", "AUD", "MXN", "JPY", "INR"])
+        let names = options.dropFirst(8).map { Currency.name(for: $0, locale: en) }
+        #expect(zip(names, names.dropFirst()).allSatisfy {
+            $0.compare($1, options: [.caseInsensitive, .diacriticInsensitive], locale: en) != .orderedDescending
+        })
+    }
+
+    @Test("The device's own currency joins the common group")
+    func deviceInCommon() {
+        let options = Currency.options(locale: en, device: "BRL")
+        #expect(options[8] == "BRL")
+        #expect(options.filter { $0 == "BRL" }.count == 1)
+        #expect(Currency.commonOptions(device: "EUR") == Currency.common)
+    }
+
+    @Test("Decimal places come from the currency", arguments: [("JPY", 0), ("KRW", 0), ("USD", 2), ("EUR", 2), ("KWD", 3)])
+    func fractionDigits(_ code: String, _ digits: Int) {
+        #expect(Currency.fractionDigits(for: code) == digits)
+    }
+
+    @Test("A stored code that isn't offered falls back to Device Default")
+    func unsupportedStoredCode() {
+        #expect(Currency.resolve(stored: "MXN", device: "EUR") == "MXN")
+        #expect(Currency.resolve(stored: "KWD", device: "EUR") == "EUR")
+        #expect(Currency.resolve(stored: "XYZ", device: "EUR") == "EUR")
+        #expect(Currency.resolve(stored: "", device: "EUR") == "EUR")
+        #expect(Currency.resolve(stored: nil, device: nil) == "USD")
+        #expect(!Currency.isSelectable("XYZ"))
+    }
+
+    @Test("A three-decimal device currency means US dollars")
+    func threeDecimalDevice() {
+        #expect(Currency.resolve(stored: nil, device: "KWD") == "USD")
+        #expect(Currency.deviceCode("BHD") == "USD")
+        #expect(Currency.deviceCode("JPY") == "JPY")
+    }
+
+    @Test("Search matches name or code")
+    func search() {
+        #expect(Currency.matches("MXN", query: "mexican", locale: en))
+        #expect(Currency.matches("MXN", query: "mxn", locale: en))
+        #expect(Currency.matches("MXN", query: "", locale: en))
+        #expect(!Currency.matches("MXN", query: "euro", locale: en))
+        #expect(Currency.name(for: "MXN", locale: en) == "Mexican Peso")
+    }
+
+    // MARK: Amount entry
+
+    @Test("Yen: no decimals typed, none shown, hundredths unchanged")
+    func yenEntry() {
+        #expect(AmountInput.sanitize("1500\(sep)5", code: "JPY") == "1500")
+        #expect(AmountInput.sanitize("1500\(sep)", code: "JPY") == "1500")
+        #expect(AmountInput.sanitize("¥1,5a00", code: "JPY") == (sep == "," ? "1" : "1500"))
+        #expect(AmountInput.text(cents: 150_000, code: "JPY") == "1500")
+        #expect(AmountInput.text(cents: 150_050, code: "JPY") == "1501")
+        #expect(AmountInput.text(cents: 0, code: "KRW") == "0")
+        #expect(AmountInput.cents("1500") == 150_000)
+    }
+
+    @Test("Re-sanitizing prefilled text never multiplies it", arguments: ["USD", "EUR", "GBP", "JPY", "KRW", "MXN"])
+    func prefillRoundTrip(_ code: String) {
+        for cents in [0, 1, 99, 150_000, 123_456] {
+            let text = AmountInput.text(cents: cents, code: code)
+            #expect(AmountInput.sanitize(text, code: code) == text)
+            let back = AmountInput.cents(text) ?? -1
+            #expect(abs(back - cents) < (Currency.fractionDigits(for: code) == 0 ? 100 : 1), "\(code) \(cents)")
+        }
+        // A two-decimal value typed before switching to yen: "1500.00" → 1500, not 150000.
+        #expect(AmountInput.cents(AmountInput.sanitize("1500\(sep)00", code: "JPY")) == 150_000)
+    }
+
+    @Test("Dollars and euros keep two decimals, exactly as before", arguments: ["USD", "EUR", "GBP"])
+    func twoDecimals(_ code: String) {
+        #expect(AmountInput.sanitize("12\(sep)345", code: code) == "12\(sep)34")
+        #expect(AmountInput.text(cents: 150_000, code: code) == "1500\(sep)00")
+        #expect(AmountInput.text(cents: -205, code: code) == "-2\(sep)05")
+    }
+}

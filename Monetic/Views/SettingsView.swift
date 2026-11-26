@@ -7,8 +7,7 @@ struct SettingsView: View {
     @AppStorage("monthlyBudget") private var monthlyBudget: Double = 0
     @AppStorage("budgetSetMonth") private var budgetSetMonth: String = ""
     @AppStorage("lastMonthlyBudget") private var lastMonthlyBudget: Double = 0
-    // new property
-    @AppStorage("selectedCurrencyCode") private var selectedCurrencyCode: String = ""
+    @AppStorage(Currency.storageKey) private var selectedCurrencyCode: String = ""
 
     var body: some View {
         NavigationStack {
@@ -69,28 +68,57 @@ struct SettingsView: View {
     private var currencyCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Currency").brandEyebrow()
-            
-            
-            Picker("Currency", selection: $selectedCurrencyCode) {
-                Text("Device Default").tag("")
-                Text("USD").tag("USD")
-                Text("EUR").tag("EUR")
-                Text("GBP").tag("GBP")
-                Text("JPY").tag("JPY")
+
+            NavigationLink {
+                CurrencyPickerView(selection: currencySelection)
+            } label: {
+                HStack(spacing: 10) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(currencySelection.wrappedValue.isEmpty ? "Device Default" : Currency.name(for: Currency.code))
+                            .font(Brand.display(15, .medium))
+                            .foregroundStyle(Brand.textPrimary)
+                        Text("\(Currency.isSelectable(selectedCurrencyCode) ? "" : "\(Currency.name(for: Currency.code)) · ")\(Currency.code) · \(Currency.symbol)")
+                            .font(.caption)
+                            .foregroundStyle(Brand.textSecondary)
+                    }
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Brand.textTertiary)
+                        .accessibilityHidden(true)
+                }
+                .contentShape(Rectangle())
             }
-                      .pickerStyle(.menu)
-                      .tint(Brand.accent)
-            
-            Text(selectedCurrencyCode.isEmpty
-                ? "Amounts follow your device's region."
-                : "Amounts are shown in \(selectedCurrencyCode).")
-                .font(.caption)
-                .foregroundStyle(Brand.textTertiary)
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Currency, \(currencySelection.wrappedValue.isEmpty ? "Device Default, " : "")\(Currency.name(for: Currency.code))")
+            .accessibilityIdentifier("currencyRow")
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(currencySelection.wrappedValue.isEmpty
+                    ? "Amounts follow your device's region."
+                    : "Amounts are shown in \(Currency.code).")
+                if currencySelection.wrappedValue.isEmpty && Currency.deviceCodeIsUnsupported {
+                    Text("Your region's currency uses three decimal places, which Monetic can't store, so it uses US dollars.")
+                }
+                Text("Changing currency doesn't convert amounts you've already entered.")
+            }
+            .font(.caption)
+            .foregroundStyle(Brand.textTertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .brandCard()
     }
     
+
+    /// The stored choice, or "" (Device Default) when it holds a code that's
+    /// no longer offered.
+    private var currencySelection: Binding<String> {
+        Binding(
+            get: { Currency.isSelectable(selectedCurrencyCode) ? selectedCurrencyCode : "" },
+            set: { selectedCurrencyCode = $0 }
+        )
+    }
 
     // MARK: Budget
 

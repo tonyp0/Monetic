@@ -21,7 +21,8 @@ struct ContributionDraft: Equatable {
     /// The current values of a saved contribution, for editing.
     init(contribution: SavingsContribution) {
         self.init(
-            amountText: AmountInput.text(cents: abs(Int((contribution.amount * 100).rounded()))),
+            amountText: AmountInput.text(cents: abs(Int((contribution.amount * 100).rounded())),
+                                        code: contribution.trip?.totalCurrencyCode ?? Currency.code),
             isWithdrawal: contribution.isWithdrawal,
             date: contribution.date,
             notes: contribution.notes
@@ -92,7 +93,7 @@ struct SavingsPlanDraft: Equatable {
     var remindersEnabled: Bool
 
     init(trip: Trip, calendar: Calendar = .current) {
-        goalText = AmountInput.text(cents: Int((trip.effectiveSavingsGoal * 100).rounded()))
+        goalText = AmountInput.text(cents: Int((trip.effectiveSavingsGoal * 100).rounded()), code: trip.totalCurrencyCode)
         cadence = trip.cadence
         startDate = trip.savingsStart(calendar: calendar)
         remindersEnabled = trip.remindersEnabled

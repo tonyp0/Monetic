@@ -28,7 +28,7 @@ struct SavingsPlanSettingsView: View {
                 ScrollView {
                     VStack(spacing: Brand.Space.stack) {
                         VStack(alignment: .leading, spacing: 8) {
-                            AmountEntryCard(amount: $draft.goalText, focus: $amountFocused, label: "Savings goal")
+                            AmountEntryCard(amount: $draft.goalText, focus: $amountFocused, label: "Savings goal", currencyCode: code)
                             HStack {
                                 Text(trip.travelers == 1
                                      ? "The trip's total is \(share.formatted(.currency(code: code)))."
@@ -38,7 +38,7 @@ struct SavingsPlanSettingsView: View {
                                 if AmountInput.cents(draft.goalText) != Int((share * 100).rounded()) {
                                     Spacer()
                                     Button("Use share") {
-                                        draft.goalText = AmountInput.text(cents: Int((share * 100).rounded()))
+                                        draft.goalText = AmountInput.text(cents: Int((share * 100).rounded()), code: code)
                                     }
                                     .font(Brand.display(13, .semibold))
                                     .foregroundStyle(Brand.accent)

@@ -20,7 +20,7 @@ struct JoinTripView: View {
         self.existing = existing
         self.onConfirm = onConfirm
         let goal = existing.map(\.effectiveSavingsGoal) ?? share.perPersonShare
-        _goalText = State(initialValue: AmountInput.text(cents: Int((goal * 100).rounded())))
+        _goalText = State(initialValue: AmountInput.text(cents: Int((goal * 100).rounded()), code: share.currencyCode))
     }
 
     private var code: String { share.currencyCode }
@@ -36,7 +36,7 @@ struct JoinTripView: View {
                         planCard
 
                         VStack(alignment: .leading, spacing: 8) {
-                            AmountEntryCard(amount: $goalText, focus: $amountFocused, label: "Your share to save")
+                            AmountEntryCard(amount: $goalText, focus: $amountFocused, label: "Your share to save", currencyCode: code)
                             Text(share.travelers == 1
                                  ? "The plan is for one traveler. Change it if you're paying a different amount."
                                  : "The plan splits \(share.total.formatted(.currency(code: code))) \(share.travelers) ways: \(share.perPersonShare.formatted(.currency(code: code))) each. Change it if you're paying a different amount.")

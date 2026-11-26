@@ -70,6 +70,60 @@ final class AddExpenseUITests: XCTestCase {
         waitForLabel(of: spentTotal, toEqual: "$12.34")
     }
 
+    /// Picking a currency only relabels amounts. Every launch passes
+    /// -UITesting, which resets the stored currency (MoneticApp), so the next
+    /// test starts back on Device Default.
+    func testPickingMexicanPesoRelabelsExpenses() throws {
+        let getStarted = app.buttons["getStartedButton"]
+        XCTAssertTrue(getStarted.waitForExistence(timeout: 10))
+        getStarted.tap()
+        let saveBudget = app.buttons["saveBudgetButton"]
+        XCTAssertTrue(saveBudget.waitForExistence(timeout: 10))
+        app.staticTexts["0"].firstMatch.tap()
+        app.textFields["budgetAmountField"].typeText("500")
+        saveBudget.tap()
+
+        // MARK: Settings → Currency → search → Mexican Peso
+        let settings = app.buttons["settingsButton"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 10))
+        settings.tap()
+        let currencyRow = app.buttons["currencyRow"]
+        XCTAssertTrue(currencyRow.waitForExistence(timeout: 5))
+        XCTAssertTrue(currencyRow.label.contains("Device Default"))
+        currencyRow.tap()
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("mexican")
+        let peso = app.buttons["currencyRow_MXN"]
+        XCTAssertTrue(peso.waitForExistence(timeout: 5), "search didn't find the peso")
+        XCTAssertEqual(peso.label, "Mexican Peso")
+        peso.tap()
+        XCTAssertTrue(currencyRow.waitForExistence(timeout: 5))
+        XCTAssertTrue(currencyRow.label.contains("Mexican Peso"), currencyRow.label)
+        XCTAssertTrue(app.staticTexts["Changing currency doesn't convert amounts you've already entered."].exists)
+        app.buttons["Done"].tap()
+
+        // MARK: The budget keeps its number with the new label
+        let budgetTotal = app.staticTexts["budgetTotal"]
+        XCTAssertTrue(budgetTotal.waitForExistence(timeout: 5))
+        waitForLabel(of: budgetTotal, toEqual: "MX$500.00")
+
+        // MARK: A new expense shows in pesos
+        app.staticTexts["Food & Dining"].tap()
+        let addExpense = app.buttons["addExpenseButton"]
+        XCTAssertTrue(addExpense.waitForExistence(timeout: 5))
+        addExpense.tap()
+        let amountField = app.textFields["amountField"]
+        XCTAssertTrue(amountField.waitForExistence(timeout: 5))
+        amountField.tap()
+        amountField.typeText("12.34")
+        app.buttons["saveExpenseButton"].tap()
+        let groupSpent = app.staticTexts["groupMonthlySpent"]
+        XCTAssertTrue(groupSpent.waitForExistence(timeout: 5))
+        waitForLabel(of: groupSpent, toEqual: "MX$12.34")
+    }
+
     /// Waits for SwiftUI to re-render a value instead of sleeping.
     private func waitForLabel(of element: XCUIElement, toEqual expected: String,
                               file: StaticString = #filePath, line: UInt = #line) {

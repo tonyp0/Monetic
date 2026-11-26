@@ -245,7 +245,7 @@ struct TripForm: View {
                     .keyboardType(.decimalPad)
                     .focused($focusedField, equals: .flights)
                     .onChange(of: draft.flightsText) { _, newValue in
-                        draft.flightsText = AmountInput.sanitize(newValue)
+                        draft.flightsText = AmountInput.sanitize(newValue, code: "USD")
                     }
                     .accessibilityIdentifier("flightsField")
             }
@@ -257,8 +257,11 @@ struct TripForm: View {
     @ViewBuilder
     private func totalSection(_ estimate: TripEstimate?) -> some View {
         VStack(alignment: .leading, spacing: 8) {
+            // A total that follows the estimate is in USD; one typed over
+            // it is a manual total in the user's currency.
             AmountEntryCard(amount: $draft.amountText, focus: $amountFocused,
-                            label: estimate == nil ? "Estimated Total" : "Trip Total")
+                            label: estimate == nil ? "Estimated Total" : "Trip Total",
+                            currencyCode: draft.isUsingEstimate(estimate) ? "USD" : Currency.code)
 
             if let estimate {
                 if draft.isUsingEstimate(estimate) {

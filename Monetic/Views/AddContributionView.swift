@@ -44,7 +44,8 @@ struct AddContributionView: View {
                         .accessibilityIdentifier("contributionKindPicker")
 
                         AmountEntryCard(amount: $draft.amountText, focus: $amountFocused,
-                                        label: draft.isWithdrawal ? "Amount taken out" : "Amount put aside")
+                                        label: draft.isWithdrawal ? "Amount taken out" : "Amount put aside",
+                                        currencyCode: code)
 
                         if let problem = draft.problem(savedExcludingThis: savedExcludingThis, currencyCode: code) {
                             Text(problem)

@@ -287,6 +287,9 @@ struct ContentView: View {
 // MARK: - Budget Hero
 
 struct BudgetHeroCard: View {
+    /// Read through `currency` so the card redraws when Settings changes it.
+    @AppStorage(Currency.storageKey) private var storedCurrency = ""
+    private var currency: String { Currency.code(stored: storedCurrency) }
     let monthlyBudget: Double
     let totalSpent: Double
     let remaining: Double
@@ -328,7 +331,7 @@ struct BudgetHeroCard: View {
             VStack(spacing: 3) {
                 Text(isOver ? "Over by" : "Remaining").brandEyebrow()
 
-                Text(abs(remaining), format: .currency(code: Currency.code))
+                Text(abs(remaining), format: .currency(code: currency))
                     .font(Brand.number(34))
                     .foregroundStyle(isOver ? Brand.danger : Brand.textPrimary)
                     .minimumScaleFactor(0.5)
@@ -359,7 +362,7 @@ struct BudgetHeroCard: View {
     private func stat(label: String, value: Double, tint: Color) -> some View {
         VStack(spacing: 4) {
             Text(label).brandEyebrow()
-            Text(value, format: .currency(code: Currency.code))
+            Text(value, format: .currency(code: currency))
                 .accessibilityIdentifier("\(label.lowercased())Total")
                 .font(Brand.number(17, .semibold))
                 .foregroundStyle(tint)
@@ -391,6 +394,9 @@ struct BudgetHeroCard: View {
 // MARK: - Group Card
 
 struct GroupCard: View {
+    /// Read through `currency` so the card redraws when Settings changes it.
+    @AppStorage(Currency.storageKey) private var storedCurrency = ""
+    private var currency: String { Currency.code(stored: storedCurrency) }
     let category: BudgetCategory
     // Computed once by the caller and passed in — `category.monthlySpending()`
     // rescans every transaction, so each row calling it independently turns an
@@ -412,7 +418,7 @@ struct GroupCard: View {
                     .lineLimit(1)
 
                 if hasLimit {
-                    Text("of \(category.monthlyBudget, format: .currency(code: Currency.code))")
+                    Text("of \(category.monthlyBudget, format: .currency(code: currency))")
                         .font(.caption)
                         .foregroundStyle(isOver ? Brand.danger : Brand.textTertiary)
 
@@ -430,7 +436,7 @@ struct GroupCard: View {
 
             Spacer(minLength: 8)
 
-            Text(spent, format: .currency(code: Currency.code))
+            Text(spent, format: .currency(code: currency))
                 .font(Brand.number(16, .semibold))
                 .foregroundStyle(isOver ? Brand.danger : (spent > 0 ? Brand.textPrimary : Brand.textTertiary))
 
