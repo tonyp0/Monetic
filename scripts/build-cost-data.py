@@ -18,6 +18,12 @@ Every number in the output comes from one of these publications:
   posts have one row per season, given as month/day and sometimes wrapping
   past December 31.
 
+* Monetic's seasonal lodging index (data/seasonality/approved.json): for a
+  few single-season destinations, 12 monthly hotel-price percentages that
+  Claude drafted with cited sources and a named person approved. Only
+  approved entries are read; drafts never reach the app. See
+  scripts/research-seasonality/README.md.
+
 Rows with a zero lodging or M&IE rate (a handful of State posts where lodging
 is provided) are skipped: they don't describe what a visitor would pay.
 """
@@ -33,6 +39,8 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts" / "research-seasonality"))
+import seasonality  # noqa: E402  (shared validation rules)
 RAW = ROOT / "data" / "raw"
 OUTPUT = ROOT / "Monetic" / "Resources" / "cost-data.json"
 
@@ -332,6 +340,18 @@ def main():
             del location["aliases"]
     locations.sort(key=lambda loc: loc["id"])
 
+    try:
+        approved = seasonality.load_approved({loc["id"]: loc for loc in locations})
+    except seasonality.SeasonalityError as error:
+        fail(f"data/seasonality/approved.json: {error}")
+    by_id = {loc["id"]: loc for loc in locations}
+    for entry in approved:
+        by_id[entry["id"]]["seasonalIndex"] = {
+            "lodgingPercentByMonth": entry["lodgingPercentByMonth"],
+            "reviewedAt": entry["reviewedAt"],
+            "sources": entry["sources"],
+        }
+
     data = {
         "meta": {
             "currency": "USD",
@@ -359,12 +379,24 @@ def main():
         },
         "locations": locations,
     }
+    # Only listed once something is approved, so an empty approved.json
+    # leaves the file byte-identical to a build without the index.
+    if approved:
+        data["meta"]["sources"].append({
+            "id": "seasonality",
+            "name": "Seasonal hotel-price index (lodging only), for single-season destinations",
+            "publisher": "Monetic: researched with Claude (web search, cited per month), approved by a named reviewer",
+            "effective": max(e["reviewedAt"] for e in approved),
+            "url": "data/seasonality/approved.json",
+            "page": "scripts/research-seasonality/README.md",
+        })
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     text = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     OUTPUT.write_text(text, encoding="utf-8")
     by_source = {s: sum(1 for l in locations if l["source"] == s) for s in ("gsa", "dos")}
     print(f"wrote {OUTPUT.relative_to(ROOT)}: {len(locations)} locations "
-          f"({by_source['gsa']} GSA, {by_source['dos']} State), {len(text.encode())} bytes")
+          f"({by_source['gsa']} GSA, {by_source['dos']} State), {len(approved)} with a seasonal index, "
+          f"{len(text.encode())} bytes")
 
 
 if __name__ == "__main__":

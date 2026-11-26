@@ -27,6 +27,16 @@ struct TripForm: View {
         draft.estimate(location: pickedLocation)
     }
 
+    /// How hotel prices at the picked place compare in the trip's month: the
+    /// month of the middle night, so a trip over a month's end goes by
+    /// where most of it falls.
+    private var seasonalHint: String? {
+        guard let index = pickedLocation?.activeSeasonalIndex else { return nil }
+        let calendar = Calendar.current
+        let middle = calendar.date(byAdding: .day, value: draft.nights() / 2, to: draft.startDate) ?? draft.startDate
+        return TripEstimator.seasonalHint(index, month: calendar.component(.month, from: middle))
+    }
+
     private var searchResults: [CostLocation] {
         guard let store, pickedLocation == nil else { return [] }
         return store.search(draft.destination, limit: 5)
@@ -304,6 +314,13 @@ struct TripForm: View {
                 Spacer()
                 filledMark(fill?.startDate != nil && fill?.startDate == draft.startDate
                            && fill?.endDate == draft.endDate, id: "dates")
+            }
+
+            if let hint = seasonalHint {
+                Text(hint)
+                    .font(.caption)
+                    .foregroundStyle(Brand.textSecondary)
+                    .accessibilityIdentifier("seasonalHint")
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

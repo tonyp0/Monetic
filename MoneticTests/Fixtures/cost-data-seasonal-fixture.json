@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "currency": "USD",
+    "generatedAt": "2000-01-01",
+    "note": "TEST DATA ONLY. Hand-written rates and seasonal indexes for unit tests; not researched, not reviewed, not real prices.",
+    "sources": [
+      { "id": "gsa", "name": "Test GSA source", "publisher": "Test publisher", "effective": "2000-01-01", "url": "https://example.invalid/gsa", "page": "https://example.invalid/gsa" },
+      { "id": "dos", "name": "Test State source", "publisher": "Test publisher", "effective": "2000-01-01", "url": "https://example.invalid/dos", "page": "https://example.invalid/dos" },
+      { "id": "seasonality", "name": "Test seasonal index", "publisher": "Test publisher", "effective": "2000-01-01", "url": "https://example.invalid/seasonality", "page": "https://example.invalid/seasonality" }
+    ]
+  },
+  "locations": [
+    { "id": "TEST-BEACH", "name": "Beach Town", "country": "Mexico", "source": "dos", "effective": "2024-08-01",
+      "seasons": [ { "start": "01-01", "end": "12-31", "lodgingPerNight": 200, "mealsPerDay": 100 } ],
+      "seasonalIndex": { "lodgingPercentByMonth": [120, 130, 135, 110, 90, 85, 95, 95, 80, 85, 85, 90], "reviewedAt": "2000-01-01",
+                         "sources": ["https://example.invalid/beach-hotels", "https://example.invalid/beach-tourism"] } },
+    { "id": "TEST-BEACH-NO-INDEX", "name": "Beach Town Without Index", "country": "Mexico", "source": "dos", "effective": "2024-08-01",
+      "seasons": [ { "start": "01-01", "end": "12-31", "lodgingPerNight": 200, "mealsPerDay": 100 } ] },
+    { "id": "TEST-FLAT", "name": "Flat Town", "country": "Mexico", "source": "dos", "effective": "2024-08-01",
+      "seasons": [ { "start": "01-01", "end": "12-31", "lodgingPerNight": 200, "mealsPerDay": 100 } ],
+      "seasonalIndex": { "lodgingPercentByMonth": [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100], "reviewedAt": "2000-01-01",
+                         "sources": ["https://example.invalid/flat"] } },
+    { "id": "TEST-ODD", "name": "Odd Town", "country": "Mexico", "source": "dos", "effective": "2024-08-01",
+      "seasons": [ { "start": "01-01", "end": "12-31", "lodgingPerNight": 33, "mealsPerDay": 10 } ],
+      "seasonalIndex": { "lodgingPercentByMonth": [118, 110, 100, 100, 100, 100, 100, 100, 100, 100, 90, 82], "reviewedAt": "2000-01-01",
+                         "sources": ["https://example.invalid/odd"] } },
+    { "id": "TEST-SKI-INDEXED", "name": "Indexed Ski Town", "country": "United States", "region": "CO", "regionName": "Colorado", "source": "gsa", "effective": "2026-10-01",
+      "seasons": [
+        { "start": "04-01", "end": "11-30", "lodgingPerNight": 150, "mealsPerDay": 80 },
+        { "start": "12-01", "end": "03-31", "lodgingPerNight": 300, "mealsPerDay": 90 }
+      ],
+      "seasonalIndex": { "lodgingPercentByMonth": [150, 150, 150, 80, 80, 80, 80, 80, 80, 80, 80, 110], "reviewedAt": "2000-01-01",
+                         "sources": ["https://example.invalid/ski"] } },
+    { "id": "TEST-SKI-PLAIN", "name": "Plain Ski Town", "country": "United States", "region": "CO", "regionName": "Colorado", "source": "gsa", "effective": "2026-10-01",
+      "seasons": [
+        { "start": "04-01", "end": "11-30", "lodgingPerNight": 150, "mealsPerDay": 80 },
+        { "start": "12-01", "end": "03-31", "lodgingPerNight": 300, "mealsPerDay": 90 }
+      ] }
+  ]
+}

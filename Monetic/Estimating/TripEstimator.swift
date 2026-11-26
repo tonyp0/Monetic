@@ -118,6 +118,17 @@ struct TripEstimate: Codable, Equatable {
     let sourceID: String
     let effective: String
 
+    // The seasonal lodging index, when one was applied (saved estimates from
+    // before it existed decode with the defaults).
+    /// Lodging minus what it would be without the index: positive in peak
+    /// season, negative in low season, 0 when no index applies.
+    var seasonalLodgingDeltaCents: Int = 0
+    /// The months the trip's nights fall in (1 = January), in trip order;
+    /// empty when no index was applied.
+    var seasonalMonths: [Int] = []
+    /// Where the index's numbers came from.
+    var seasonalSources: [String] = []
+
     var total: Double { Double(totalCents) / 100 }
     /// The largest share, so "each" never understates what someone pays.
     var perPerson: Double { Double(perPersonCents.max() ?? 0) / 100 }
@@ -136,6 +147,29 @@ struct TripEstimate: Codable, Equatable {
         let base = cents / count
         let remainder = cents % count
         return (0..<count).map { $0 < remainder ? base + 1 : base }
+    }
+}
+
+extension TripEstimate {
+    // Written out so estimates saved before the seasonal fields decode with
+    // their defaults instead of failing.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        lineItems = try c.decode([LineItem].self, forKey: .lineItems)
+        totalCents = try c.decode(Int.self, forKey: .totalCents)
+        perPersonCents = try c.decode([Int].self, forKey: .perPersonCents)
+        travelers = try c.decode(Int.self, forKey: .travelers)
+        nights = try c.decode(Int.self, forKey: .nights)
+        rooms = try c.decode(Int.self, forKey: .rooms)
+        style = try c.decode(TravelStyle.self, forKey: .style)
+        includesFlights = try c.decode(Bool.self, forKey: .includesFlights)
+        locationID = try c.decode(String.self, forKey: .locationID)
+        locationName = try c.decode(String.self, forKey: .locationName)
+        sourceID = try c.decode(String.self, forKey: .sourceID)
+        effective = try c.decode(String.self, forKey: .effective)
+        seasonalLodgingDeltaCents = try c.decodeIfPresent(Int.self, forKey: .seasonalLodgingDeltaCents) ?? 0
+        seasonalMonths = try c.decodeIfPresent([Int].self, forKey: .seasonalMonths) ?? []
+        seasonalSources = try c.decodeIfPresent([String].self, forKey: .seasonalSources) ?? []
     }
 }
 
@@ -182,11 +216,26 @@ enum TripEstimator {
             return location.season(on: day, calendar: calendar)
         }
 
-        // Whole dollars × whole percent = exact cents.
-        var lodging = 0
+        // Whole dollars × whole percent = exact cents. The seasonal index
+        // multiplies by one more whole percent, so lodging is summed in
+        // hundredths of a cent and rounded half up to whole cents once for
+        // the whole line, never per night. With no index every night is at
+        // 100%, which divides back to exactly the unadjusted cents.
+        let index = location.activeSeasonalIndex
+        var lodgingHundredths = 0, unadjustedLodging = 0
+        var months: [Int] = []
         for night in 0..<nights {
-            lodging += (rates(onDay: night)?.lodgingPerNight ?? 0) * a.lodgingPercent * rooms
+            let cents = (rates(onDay: night)?.lodgingPerNight ?? 0) * a.lodgingPercent * rooms
+            unadjustedLodging += cents
+            guard let index, let day = calendar.date(byAdding: .day, value: night, to: firstDay) else {
+                lodgingHundredths += cents * 100
+                continue
+            }
+            let month = calendar.component(.month, from: day)   // Feb 29 is February
+            lodgingHundredths += cents * index.percent(month: month)
+            if !months.contains(month) { months.append(month) }
         }
+        let lodging = (lodgingHundredths + 50) / 100   // never negative, so this is half up
 
         var food = 0, transport = 0, activities = 0
         for day in 0...nights {
@@ -221,7 +270,10 @@ enum TripEstimator {
             locationID: location.id,
             locationName: location.displayName,
             sourceID: location.source,
-            effective: location.effective
+            effective: location.effective,
+            seasonalLodgingDeltaCents: lodging - unadjustedLodging,
+            seasonalMonths: months,
+            seasonalSources: months.isEmpty ? [] : index?.sources ?? []
         )
     }
 
@@ -234,6 +286,40 @@ enum TripEstimator {
         case "dos": publisher = "U.S. Department of State"
         default:    publisher = "U.S. government"
         }
-        return "Based on U.S. government per diem rates (\(publisher), effective \(CostDataStore.displayDay(estimate.effective)))."
+        let line = "Based on U.S. government per diem rates (\(publisher), effective \(CostDataStore.displayDay(estimate.effective)))."
+        guard !estimate.seasonalMonths.isEmpty else { return line }
+        return line + " Lodging adjusted for the time of year with Monetic's reviewed seasonal index."
+    }
+
+    /// "March", "March and April", "December to February".
+    static func monthsText(_ months: [Int]) -> String {
+        let names = months.compactMap { (1...12).contains($0) ? monthNames[$0 - 1] : nil }
+        switch names.count {
+        case 0: return ""
+        case 1: return names[0]
+        case 2: return "\(names[0]) and \(names[1])"
+        default: return "\(names[0]) to \(names[names.count - 1])"
+        }
+    }
+
+    /// Month names in the user's language, January first.
+    static var monthNames: [String] { DateFormatter().standaloneMonthSymbols }
+
+    /// The line under the trip dates when the place has a seasonal index:
+    /// "Hotels here run about 35% above average in March. Cheapest month:
+    /// September." `month` is when most of the trip falls (1 = January).
+    static func seasonalHint(_ index: CostLocation.SeasonalIndex, month: Int) -> String {
+        let percent = index.percent(month: month)
+        let name = monthNames[month - 1]
+        let level: String
+        switch percent {
+        case 101...: level = "about \(percent - 100)% above average in \(name)"
+        case ..<100: level = "about \(100 - percent)% below average in \(name)"
+        default:     level = "about average in \(name)"
+        }
+        let cheapest = index.cheapestMonth == month
+            ? "That's the cheapest month."
+            : "Cheapest month: \(monthNames[index.cheapestMonth - 1])."
+        return "Hotels here run \(level). \(cheapest)"
     }
 }

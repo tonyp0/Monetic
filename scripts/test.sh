@@ -55,6 +55,11 @@ case "${1:-unit}" in
     *)    echo "Usage: scripts/test.sh [unit|ui|all]"; exit 2 ;;
 esac
 
+# The seasonal index rules: standard library only, no network or API key.
+if [ "${1:-unit}" != ui ]; then
+    python3 scripts/research-seasonality/test_validation.py
+fi
+
 echo "Testing on: $DESTINATION"
 # shellcheck disable=SC2086 # $only is intentionally unquoted so it can be empty
 xcodebuild test \

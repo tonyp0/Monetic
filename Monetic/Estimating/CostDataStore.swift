@@ -39,6 +39,36 @@ struct CostLocation: Decodable, Identifiable, Hashable {
     let effective: String
     /// Covers every day of the year exactly once; a season may wrap past Dec 31.
     let seasons: [Season]
+    /// Reviewed hotel-price seasonality for a few popular places whose per
+    /// diem has one year-round rate. nil for everywhere else.
+    let seasonalIndex: SeasonalIndex?
+
+    /// How hotel prices move through the year, as a percentage of the annual
+    /// average for each month (January first). Researched offline with AI,
+    /// approved by a named person, and shipped only with its sources; the
+    /// build checks there are 12 values, each 60–200, averaging 100.
+    struct SeasonalIndex: Decodable, Hashable {
+        let lodgingPercentByMonth: [Int]
+        let reviewedAt: String
+        let sources: [String]
+
+        /// The month's percentage, 1 = January. 100 for anything out of range.
+        func percent(month: Int) -> Int {
+            (1...12).contains(month) && lodgingPercentByMonth.count == 12 ? lodgingPercentByMonth[month - 1] : 100
+        }
+
+        /// The lowest- and highest-priced months (1 = January); ties go to
+        /// the earlier month.
+        var cheapestMonth: Int { (1...12).min { (percent(month: $0), $0) < (percent(month: $1), $1) }! }
+        var priciestMonth: Int { (1...12).max { (percent(month: $0), -$0) < (percent(month: $1), -$1) }! }
+    }
+
+    /// The index the estimator uses: only for single-season places, since
+    /// seasonal per diem rates already price the time of year and adjusting
+    /// them again would count the season twice.
+    var activeSeasonalIndex: SeasonalIndex? {
+        seasons.count == 1 && seasonalIndex?.lodgingPercentByMonth.count == 12 ? seasonalIndex : nil
+    }
 
     struct Season: Decodable, Hashable {
         let start: MonthDay
@@ -52,7 +82,7 @@ struct CostLocation: Decodable, Identifiable, Hashable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, country, region, regionName, aliases, source, effective, seasons
+        case id, name, country, region, regionName, aliases, source, effective, seasons, seasonalIndex
     }
 
     init(from decoder: Decoder) throws {
@@ -66,6 +96,7 @@ struct CostLocation: Decodable, Identifiable, Hashable {
         source = try c.decode(String.self, forKey: .source)
         effective = try c.decode(String.self, forKey: .effective)
         seasons = try c.decode([Season].self, forKey: .seasons)
+        seasonalIndex = try c.decodeIfPresent(SeasonalIndex.self, forKey: .seasonalIndex)
     }
 
     /// "Cancun, Mexico", "Austin, TX".

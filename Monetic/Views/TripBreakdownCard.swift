@@ -23,6 +23,9 @@ struct TripBreakdownCard: View {
 
             ForEach(estimate.lineItems) { item in
                 row(item)
+                if item.kind == .lodging, estimate.seasonalLodgingDeltaCents != 0 {
+                    seasonalNote
+                }
             }
 
             if !estimate.includesFlights {
@@ -77,6 +80,41 @@ struct TripBreakdownCard: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("breakdownRow_\(item.kind.rawValue)")
+    }
+
+    /// "Includes +$312.00 for peak season (March)", who made the index, and
+    /// its sources as links.
+    private var seasonalNote: some View {
+        let delta = estimate.seasonalLodgingDeltaCents
+        let amount = (Double(abs(delta)) / 100).formatted(.currency(code: usd))
+        let months = TripEstimator.monthsText(estimate.seasonalMonths)
+        let season = delta > 0 ? "peak season" : "low season"
+        let when = months.isEmpty ? "" : " (\(months))"
+        let spoken = delta > 0
+            ? "Peak season\(months.isEmpty ? "" : " in \(months)") adds \(amount) to lodging."
+            : "Low season\(months.isEmpty ? "" : " in \(months)") saves \(amount) on lodging."
+        return VStack(alignment: .leading, spacing: 4) {
+            Text("Includes \(delta > 0 ? "+" : "−")\(amount) for \(season)\(when)")
+                .font(Brand.display(13, .medium))
+                .foregroundStyle(delta > 0 ? Brand.warning : Brand.positive)
+                .accessibilityLabel(spoken)
+                .accessibilityIdentifier("seasonalDelta")
+            Text("Seasonal adjustment researched with AI and reviewed by Monetic")
+                .font(.caption)
+                .foregroundStyle(Brand.textTertiary)
+            ForEach(estimate.seasonalSources, id: \.self) { source in
+                if let url = URL(string: source), url.scheme == "https", let host = url.host {
+                    // Host and path: two pages on one site stay distinguishable.
+                    Link(destination: url) {
+                        Text(host + url.path).lineLimit(1).truncationMode(.middle)
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Brand.accent)
+                    .accessibilityLabel("Source: \(host)")
+                }
+            }
+        }
+        .accessibilityElement(children: .contain)
     }
 
     private var totals: some View {

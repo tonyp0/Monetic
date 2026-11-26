@@ -3,3 +3,5 @@ xcuserdata/
 DerivedData/
 *.mov
 data/raw/
+data/seasonality/drafts/
+__pycache__/

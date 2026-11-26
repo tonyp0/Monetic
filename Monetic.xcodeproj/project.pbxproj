@@ -78,6 +78,8 @@
 		9EB230632B9301EF6D1F27D0 /* EstimateAccuracyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FA119A2C0D3CE1DFC2544A /* EstimateAccuracyTests.swift */; };
 		6BC84310E3D1376C75EFE657 /* TripIntentEvalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AEBD5BBF40E2198A64C68B /* TripIntentEvalTests.swift */; };
 		321C0566A66823FAEEA51485 /* trip-intent-cases.json in Resources */ = {isa = PBXBuildFile; fileRef = 93CBB9C8330578670F9F1871 /* trip-intent-cases.json */; };
+		57F2534A8CED9035966DDB06 /* SeasonalIndexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E99D1C898008CF9F33744D5 /* SeasonalIndexTests.swift */; };
+		6885AEECFD2C4026097116C4 /* cost-data-seasonal-fixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 0D3617310FF16962C98C311B /* cost-data-seasonal-fixture.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -173,6 +175,8 @@
 		97FA119A2C0D3CE1DFC2544A /* EstimateAccuracyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstimateAccuracyTests.swift; sourceTree = "<group>"; };
 		A6AEBD5BBF40E2198A64C68B /* TripIntentEvalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripIntentEvalTests.swift; sourceTree = "<group>"; };
 		93CBB9C8330578670F9F1871 /* trip-intent-cases.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = trip-intent-cases.json; path = scripts/eval-trip-intent/trip-intent-cases.json; sourceTree = SOURCE_ROOT; };
+		4E99D1C898008CF9F33744D5 /* SeasonalIndexTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeasonalIndexTests.swift; sourceTree = "<group>"; };
+		0D3617310FF16962C98C311B /* cost-data-seasonal-fixture.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cost-data-seasonal-fixture.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,6 +207,7 @@
 		9098CDAA41A5920CC9AE7B17 /* MoneticTests */ = {
 			isa = PBXGroup;
 			children = (
+				4E99D1C898008CF9F33744D5 /* SeasonalIndexTests.swift */,
 				A225B31C447944908D3C6DD9 /* TestSupport.swift */,
 				CF3D02007B15D6151668BC95 /* CategoryTransactionTests.swift */,
 				1A85E5CD02AEB19F6373EB69 /* BudgetCategoryTests.swift */,
@@ -358,6 +363,7 @@
 		01B783E5B87E0DAF97340768 /* Fixtures */ = {
 			isa = PBXGroup;
 			children = (
+				0D3617310FF16962C98C311B /* cost-data-seasonal-fixture.json */,
 				19B8E6C06F7D28EF3313DBD2 /* cost-data-fixture.json */,
 			);
 			path = Fixtures;
@@ -473,6 +479,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6885AEECFD2C4026097116C4 /* cost-data-seasonal-fixture.json in Resources */,
 				AFBCDA1188298D6EF0280C20 /* cost-data-fixture.json in Resources */,
 				321C0566A66823FAEEA51485 /* trip-intent-cases.json in Resources */,
 			);
@@ -502,6 +509,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				57F2534A8CED9035966DDB06 /* SeasonalIndexTests.swift in Sources */,
 				15583F9A7067B825C30CBDD1 /* TestSupport.swift in Sources */,
 				F54281937AB4C8925B585B99 /* CategoryTransactionTests.swift in Sources */,
 				0CDCCA2A722795AF98260184 /* BudgetCategoryTests.swift in Sources */,
