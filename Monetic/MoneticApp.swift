@@ -52,10 +52,16 @@ struct MoneticApp: App {
         #if DEBUG
         // Automated tests launch with -UITesting so every run starts from an
         // empty, throwaway store and first-launch settings, never real data.
-        if ProcessInfo.processInfo.arguments.contains("-UITesting") {
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-UITesting") {
             resetSettingsForTesting()
             let inMemory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-            return Result { try ModelContainer(for: schema, configurations: [inMemory]) }
+            let result = Result { try ModelContainer(for: schema, configurations: [inMemory]) }
+            // Screenshot runs start from a lived-in month instead of onboarding.
+            if arguments.contains("-SeedDemoData"), case .success(let container) = result {
+                DemoData.seed(into: container.mainContext)
+            }
+            return result
         }
         #endif
 

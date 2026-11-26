@@ -25,6 +25,7 @@
 		A1000010 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000010 /* OnboardingView.swift */; };
 		A1000011 /* EditCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000011 /* EditCategoryView.swift */; };
 		A1000012 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000012 /* Formatting.swift */; };
+		A1000098 /* DemoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000098 /* DemoData.swift */; };
 		A1000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B1000013 /* PrivacyInfo.xcprivacy */; };
 		A1000014 /* Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000014 /* Brand.swift */; };
 		A1000015 /* CategoryPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000015 /* CategoryPalette.swift */; };
@@ -47,6 +48,7 @@
 		D7CFE34E8B6496319EFF9730 /* TripPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B835BBF1C9FE7A7CD90DA331 /* TripPersistenceTests.swift */; };
 		8ACF4EADF13BE353D23A458A /* StoreMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 456FC8D81601CF345D21E141 /* StoreMigrationTests.swift */; };
 		3BAC82D7EC907C4C89C37E26 /* TripsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F78FA0505F424D39478A4F9 /* TripsUITests.swift */; };
+		A1000099 /* ScreenTourUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000099 /* ScreenTourUITests.swift */; };
 		B053842E8E5A9B4C2BC9650C /* CostDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDF9EA7EC223E465F838992 /* CostDataStore.swift */; };
 		D4043E16D85866647BD0898B /* TripEstimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD92C8D5BCA897B4AC84607F /* TripEstimator.swift */; };
 		1C1FEA43A4722FF36226D379 /* cost-data.json in Resources */ = {isa = PBXBuildFile; fileRef = 2232F73F158ABE51B35F235B /* cost-data.json */; };
@@ -123,6 +125,7 @@
 		B1000010 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B1000011 /* EditCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryView.swift; sourceTree = "<group>"; };
 		B1000012 /* Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatting.swift; sourceTree = "<group>"; };
+		B1000098 /* DemoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoData.swift; sourceTree = "<group>"; };
 		B1000013 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		B1000014 /* Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Brand.swift; sourceTree = "<group>"; };
 		B1000015 /* CategoryPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryPalette.swift; sourceTree = "<group>"; };
@@ -144,6 +147,7 @@
 		B835BBF1C9FE7A7CD90DA331 /* TripPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripPersistenceTests.swift; sourceTree = "<group>"; };
 		456FC8D81601CF345D21E141 /* StoreMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreMigrationTests.swift; sourceTree = "<group>"; };
 		3F78FA0505F424D39478A4F9 /* TripsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripsUITests.swift; sourceTree = "<group>"; };
+		B1000099 /* ScreenTourUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTourUITests.swift; sourceTree = "<group>"; };
 		9DDF9EA7EC223E465F838992 /* CostDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostDataStore.swift; sourceTree = "<group>"; };
 		BD92C8D5BCA897B4AC84607F /* TripEstimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripEstimator.swift; sourceTree = "<group>"; };
 		2232F73F158ABE51B35F235B /* cost-data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cost-data.json; sourceTree = "<group>"; };
@@ -241,6 +245,7 @@
 				D4C9D277B56DC435FFF10111 /* MoneticDemoUITests.swift */,
 				D1425DA44AC9043141F3CD3C /* AddExpenseUITests.swift */,
 				3F78FA0505F424D39478A4F9 /* TripsUITests.swift */,
+				B1000099 /* ScreenTourUITests.swift */,
 			);
 			path = MoneticUITests;
 			sourceTree = "<group>";
@@ -331,6 +336,7 @@
 			isa = PBXGroup;
 			children = (
 				B1000012 /* Formatting.swift */,
+				B1000098 /* DemoData.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -542,6 +548,7 @@
 				E0BCC8B273864A5B8E9EA023 /* MoneticDemoUITests.swift in Sources */,
 				C69E37659C3E78D3D5FB5EA0 /* AddExpenseUITests.swift in Sources */,
 				3BAC82D7EC907C4C89C37E26 /* TripsUITests.swift in Sources */,
+				A1000099 /* ScreenTourUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -564,6 +571,7 @@
 				A1000010 /* OnboardingView.swift in Sources */,
 				A1000011 /* EditCategoryView.swift in Sources */,
 				A1000012 /* Formatting.swift in Sources */,
+				A1000098 /* DemoData.swift in Sources */,
 				A1000014 /* Brand.swift in Sources */,
 				A1000015 /* CategoryPalette.swift in Sources */,
 				A1000016 /* BrandComponents.swift in Sources */,
