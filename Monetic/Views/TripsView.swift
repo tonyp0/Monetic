@@ -70,11 +70,11 @@ struct TripsView: View {
                         .font(Brand.display(17, .bold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Button(action: { showingAddTrip = true }) {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 20))
-                            .foregroundStyle(Brand.accent)
+                            .foregroundStyle(Brand.accentText)
                     }
                     .accessibilityLabel("Add Trip")
                     .accessibilityIdentifier("addTripButton")
@@ -101,7 +101,7 @@ struct TripsView: View {
                 Button("Cancel", role: .cancel) {}
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     private func row(for trip: Trip, asOf now: Date) -> some View {
@@ -179,7 +179,7 @@ struct TripRow: View {
                 .overlay(
                     Image(systemName: status == .past ? "checkmark" : "airplane")
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(status == .past ? Brand.textTertiary : Brand.accent)
+                        .foregroundStyle(status == .past ? Brand.textTertiary : Brand.accentText)
                 )
                 .accessibilityHidden(true)
 
@@ -245,7 +245,7 @@ struct TripRow: View {
 
     private var countdownTint: Color {
         switch status {
-        case .upcoming:   return Brand.accent
+        case .upcoming:   return Brand.accentText
         case .inProgress: return Brand.positive
         case .past:       return Brand.textTertiary
         }

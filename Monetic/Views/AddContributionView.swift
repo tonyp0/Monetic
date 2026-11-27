@@ -56,17 +56,16 @@ struct AddContributionView: View {
                         }
 
                         HStack {
-                            Text("Date").brandEyebrow()
+                            Text("Date").brandLabel()
                             Spacer()
                             DatePicker("Date", selection: $draft.date, in: ...Date(), displayedComponents: .date)
                                 .labelsHidden()
-                                .tint(Brand.accent)
+                                .tint(Brand.accentText)
                                 .accessibilityIdentifier("contributionDatePicker")
                         }
                         .brandCard()
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Notes").brandEyebrow()
                             TextField("Birthday money, side gig…", text: $draft.notes, axis: .vertical)
                                 .font(.subheadline)
                                 .lineLimit(1...3)
@@ -102,21 +101,21 @@ struct AddContributionView: View {
                         .font(Brand.display(16, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                PlainToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(Brand.textSecondary)
+                        .foregroundStyle(Brand.accentText)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Button("Save", action: save)
-                        .font(Brand.display(15, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Brand.accentText)
                         .disabled(!draft.isValid(savedExcludingThis: savedExcludingThis, asOf: Date()))
                         .accessibilityIdentifier("saveContributionButton")
                 }
             }
             .onAppear { if contribution == nil { amountFocused = true } }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     private func save() {

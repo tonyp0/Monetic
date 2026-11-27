@@ -7,7 +7,7 @@ struct SavingsStatusTag: View {
     let status: SavingsPlan.Status
 
     var body: some View {
-        BrandTag(text: status.label, tint: tint)
+        StatusChip(title: status.label, color: tint)
             .accessibilityIdentifier("savingsStatus")
     }
 
@@ -38,7 +38,7 @@ struct TripSavingsCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
-                Text("Savings plan").brandEyebrow()
+                Text("Savings plan").brandLabel()
                 Spacer()
                 SavingsStatusTag(status: plan.status)
                 Button(action: onEditPlan) {
@@ -54,7 +54,7 @@ struct TripSavingsCard: View {
             }
 
             HStack(spacing: 18) {
-                BudgetRing(percentage: plan.progress, lineWidth: 11, tone: .goal) {
+                ProgressRing(percentage: plan.progress, lineWidth: 11, tone: .goal) {
                     Text("\(Int((min(plan.progress, 9.99) * 100).rounded()))%")
                         .font(Brand.number(20, .bold))
                         .foregroundStyle(Brand.textPrimary)
@@ -71,7 +71,7 @@ struct TripSavingsCard: View {
 
                     Text(plan.perPeriodText(currencyCode: code))
                         .font(Brand.display(14, .medium))
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("savingsPerPeriod")
 
@@ -105,7 +105,7 @@ struct TripSavingsCard: View {
             Button(action: onAdd) {
                 Label("Add to savings", systemImage: "plus")
             }
-            .buttonStyle(GradientButtonStyle())
+            .buttonStyle(PrimaryButtonStyle())
             .accessibilityIdentifier("addSavingsButton")
 
             if !trip.contributions.isEmpty {
@@ -168,14 +168,14 @@ struct TripSavingsCard: View {
         let recent = Array(trip.sortedContributions.prefix(3))
         return VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text("Recent").brandEyebrow()
+                Text("Recent").brandLabel()
                 Spacer()
                 NavigationLink {
                     ContributionsListView(trip: trip)
                 } label: {
                     Text(trip.contributions.count > recent.count ? "See all \(trip.contributions.count)" : "Manage")
                         .font(Brand.display(13, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                 }
                 .accessibilityIdentifier("seeAllContributionsButton")
             }

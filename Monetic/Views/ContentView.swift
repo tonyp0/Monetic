@@ -88,7 +88,7 @@ struct ContentView: View {
                                     Text("Add")
                                         .font(Brand.display(13, .semibold))
                                 }
-                                .foregroundStyle(Brand.accent)
+                                .foregroundStyle(Brand.accentText)
                                 .padding(.horizontal, 11)
                                 .padding(.vertical, 6)
                                 .background(
@@ -136,25 +136,26 @@ struct ContentView: View {
                 ToolbarItem(placement: .principal) {
                     MoneticWordmark()
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                PlainToolbarItem(placement: .topBarLeading) {
                     Button(action: { showingSettings = true }) {
                         Image(systemName: "gearshape")
-                            .foregroundStyle(Brand.textSecondary)
+                            .foregroundStyle(Brand.accentText)
                     }
                     .accessibilityIdentifier("settingsButton")
                 }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    EditButton()
-                        .font(Brand.display(15, .medium))
-                    Button(action: { showingAddTransaction = true }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Brand.accent)
+                PlainToolbarItem(placement: .topBarTrailing) {
+                    HStack(spacing: Brand.Space.l) {
+                        EditButton()
+                        Button(action: { showingAddTransaction = true }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 20))
+                                .foregroundStyle(Brand.accentText)
+                        }
+                        .accessibilityIdentifier("addTransactionButton")
                     }
-                    .accessibilityIdentifier("addTransactionButton")
                 }
             }
-            .tint(Brand.accent)
+            .tint(Brand.accentText)
             .sheet(isPresented: $showingSetBudget) {
                 SetBudgetView(
                     monthlyBudget: $monthlyBudget,
@@ -304,7 +305,7 @@ struct BudgetHeroCard: View {
     var body: some View {
         VStack(spacing: 20) {
             HStack {
-                Text(MonthKey.displayName()).brandEyebrow()
+                Text(MonthKey.displayName()).brandLabel()
                 Spacer()
                 if monthlyBudget > 0 {
                     Button(action: onSetBudget) {
@@ -330,9 +331,9 @@ struct BudgetHeroCard: View {
     }
 
     private var ring: some View {
-        BudgetRing(percentage: ratio, lineWidth: 15) {
+        ProgressRing(percentage: ratio, lineWidth: 15, tone: .budget) {
             VStack(spacing: 3) {
-                Text(isOver ? "Over by" : "Remaining").brandEyebrow()
+                if isOver { Text("Over by").brandLabel() }
 
                 Text(abs(remaining), format: .currency(code: currency))
                     .font(Brand.number(34))
@@ -375,7 +376,7 @@ struct BudgetHeroCard: View {
 
     private func stat(label: String, value: Double, tint: Color) -> some View {
         VStack(spacing: 4) {
-            Text(label).brandEyebrow()
+            Text(label).brandLabel()
             Text(value, format: .currency(code: currency))
                 .accessibilityIdentifier("\(label.lowercased())Total")
                 .font(Brand.number(17, .semibold))
@@ -398,7 +399,7 @@ struct BudgetHeroCard: View {
                 .multilineTextAlignment(.center)
 
             Button("Set Monthly Budget", action: onSetBudget)
-                .buttonStyle(GradientButtonStyle())
+                .buttonStyle(PrimaryButtonStyle())
                 .padding(.top, 2)
         }
         .padding(.vertical, 8)
@@ -484,7 +485,7 @@ struct NoGroupsCard: View {
                 .overlay(
                     Image(systemName: "square.grid.2x2")
                         .font(.system(size: 22, weight: .medium))
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                 )
 
             Text("No groups yet")
@@ -497,7 +498,7 @@ struct NoGroupsCard: View {
                 .multilineTextAlignment(.center)
 
             Button("Add Your First Group", action: onAdd)
-                .buttonStyle(GradientButtonStyle())
+                .buttonStyle(PrimaryButtonStyle())
                 .padding(.top, 4)
         }
         .frame(maxWidth: .infinity)

@@ -16,7 +16,7 @@ struct TripBreakdownCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("Estimate").brandEyebrow()
+                Text("Estimate").brandLabel()
                 Spacer()
                 BrandTag(text: estimate.style.label)
             }
@@ -109,7 +109,7 @@ struct TripBreakdownCard: View {
                         Text(host + url.path).lineLimit(1).truncationMode(.middle)
                     }
                     .font(.caption)
-                    .foregroundStyle(Brand.accent)
+                    .foregroundStyle(Brand.accentText)
                     .accessibilityLabel("Source: \(host)")
                 }
             }

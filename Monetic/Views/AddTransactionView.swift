@@ -54,14 +54,14 @@ struct AddTransactionView: View {
                         .font(Brand.display(16, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                PlainToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(Brand.textSecondary)
+                        .foregroundStyle(Brand.accentText)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Button("Save") { save() }
-                        .font(Brand.display(15, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Brand.accentText)
                         .disabled(!isValid)
                         .accessibilityIdentifier("saveExpenseButton")
                 }
@@ -73,14 +73,14 @@ struct AddTransactionView: View {
                 }
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     // MARK: Group
 
     private var groupCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Group").brandEyebrow()
+            Text("Group").brandLabel()
 
             if let preset = presetCategory {
                 // Locked to the category this was opened from
@@ -148,17 +148,16 @@ struct AddTransactionView: View {
     private var detailsCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Date").brandEyebrow()
+                Text("Date").brandLabel()
                 Spacer()
                 DatePicker("", selection: $date, displayedComponents: .date)
                     .labelsHidden()
-                    .tint(Brand.accent)
+                    .tint(Brand.accentText)
             }
 
             Rectangle().fill(Brand.hairline).frame(height: 1)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Note").brandEyebrow()
                 TextField("What was this for?", text: $notes, axis: .vertical)
                     .font(.subheadline)
                     .lineLimit(1...3)

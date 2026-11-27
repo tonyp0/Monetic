@@ -26,7 +26,7 @@ struct AddCategoryView: View {
                     VStack(spacing: 26) {
                         emojiPreview
 
-                        BrandField(label: "Group Name") {
+                        BrandField(label: "Group name") {
                             TextField("e.g. Groceries, Rent, Fun Money", text: $name)
                                 .font(Brand.display(16, .medium))
                                 .focused($nameFocused)
@@ -44,14 +44,14 @@ struct AddCategoryView: View {
                         .font(Brand.display(16, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                PlainToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(Brand.textSecondary)
+                        .foregroundStyle(Brand.accentText)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Button("Add") { save() }
-                        .font(Brand.display(15, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Brand.accentText)
                         .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                         .accessibilityIdentifier("saveGroupButton")
                 }
@@ -61,7 +61,7 @@ struct AddCategoryView: View {
             }
             .onAppear { nameFocused = true }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     /// Previewed in the hue the group will actually be assigned, so the choice
@@ -139,7 +139,7 @@ struct EmojiPickerSheet: View {
                         ForEach(sections, id: \.title) { section in
                             VStack(alignment: .leading, spacing: 10) {
                                 Text(section.title)
-                                    .brandEyebrow()
+                                    .brandLabel()
                                     .padding(.horizontal, Brand.Space.gutter)
 
                                 LazyVGrid(columns: columns, spacing: 8) {
@@ -162,13 +162,13 @@ struct EmojiPickerSheet: View {
                         .font(Brand.display(16, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(Brand.textSecondary)
+                        .foregroundStyle(Brand.accentText)
                 }
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     private func emojiButton(_ emoji: String) -> some View {
@@ -200,7 +200,7 @@ private struct EmojiCellBackground: View {
                 .fill(Brand.surface)
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .strokeBorder(
-                    isSelected ? AnyShapeStyle(Brand.gradientDiagonal) : AnyShapeStyle(Brand.hairline),
+                    isSelected ? Brand.accent : Brand.hairline,
                     lineWidth: isSelected ? 2 : 1
                 )
         }

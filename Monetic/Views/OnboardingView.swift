@@ -53,7 +53,7 @@ struct OnboardingView: View {
             BrandLogoMark(size: 72)
 
             VStack(spacing: 7) {
-                MoneticWordmark(size: 19)
+                MoneticWordmark()
 
                 Text("Pick the groups you want to start with.\nYou can change these any time.")
                     .font(.subheadline)
@@ -90,11 +90,11 @@ struct OnboardingView: View {
 
                     if isSelected {
                         Circle()
-                            .fill(Brand.gradientDiagonal)
+                            .fill(Brand.accent)
                             .frame(width: 22, height: 22)
                         Image(systemName: "checkmark")
                             .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Brand.onAccent)
                     }
                 }
             }
@@ -120,7 +120,7 @@ struct OnboardingView: View {
             Button(action: saveAndContinue) {
                 Text(selected.isEmpty ? "Skip for Now" : "Get Started")
             }
-            .buttonStyle(GradientButtonStyle())
+            .buttonStyle(PrimaryButtonStyle())
             .accessibilityIdentifier("getStartedButton")
 
             Text(selected.isEmpty

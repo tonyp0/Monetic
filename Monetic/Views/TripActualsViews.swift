@@ -78,20 +78,20 @@ struct LogSpendingView: View {
                         .font(Brand.display(16, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                PlainToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(Brand.textSecondary)
+                        .foregroundStyle(Brand.accentText)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Button("Save") { save() }
-                        .font(Brand.display(15, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Brand.accentText)
                         .disabled(draft.actuals(loggedAt: Date()) == nil)
                         .accessibilityIdentifier("saveSpendingButton")
                 }
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     private func field(_ kind: TripEstimate.Kind) -> some View {
@@ -136,12 +136,12 @@ struct TripActualsCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Estimate vs actual").brandEyebrow()
+                Text("Estimate vs actual").brandLabel()
                 Spacer()
                 if trip.actuals != nil {
                     Button("Edit", action: onLog)
                         .font(Brand.display(13, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                         .buttonStyle(.plain)
                         .accessibilityIdentifier("editSpendingButton")
                 }

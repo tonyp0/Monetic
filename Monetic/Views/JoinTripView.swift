@@ -51,7 +51,7 @@ struct JoinTripView: View {
                         privacyNote
 
                         Button(existing == nil ? "Join trip" : "Update plan") { confirm() }
-                            .buttonStyle(GradientButtonStyle())
+                            .buttonStyle(PrimaryButtonStyle())
                             .disabled(goal == nil)
                             .accessibilityIdentifier("joinTripButton")
                     }
@@ -69,14 +69,14 @@ struct JoinTripView: View {
                         .font(Brand.display(16, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                PlainToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(Brand.textSecondary)
+                        .foregroundStyle(Brand.accentText)
                         .accessibilityIdentifier("cancelJoinButton")
                 }
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     private var planCard: some View {
@@ -87,7 +87,7 @@ struct JoinTripView: View {
                     .accessibilityHidden(true)
                 Text("A friend's trip plan")
             }
-            .brandEyebrow()
+            .brandLabel()
 
             Text(share.name)
                 .font(Brand.display(22, .bold))

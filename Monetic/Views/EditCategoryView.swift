@@ -43,13 +43,13 @@ struct EditCategoryView: View {
                         .buttonStyle(.plain)
 
                         VStack(spacing: 18) {
-                            BrandField(label: "Group Name") {
+                            BrandField(label: "Group name") {
                                 TextField("Group name", text: $name)
                                     .font(Brand.display(16, .medium))
                             }
 
                             BrandField(
-                                label: "Monthly Limit",
+                                label: "Monthly limit",
                                 footnote: "Leave empty for no limit. Groups over their limit are highlighted on the home screen."
                             ) {
                                 HStack(alignment: .firstTextBaseline, spacing: 5) {
@@ -79,14 +79,14 @@ struct EditCategoryView: View {
                         .font(Brand.display(16, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                PlainToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(Brand.textSecondary)
+                        .foregroundStyle(Brand.accentText)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Button("Save") { save() }
-                        .font(Brand.display(15, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Brand.accentText)
                         .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
@@ -94,7 +94,7 @@ struct EditCategoryView: View {
                 EmojiPickerSheet(selectedEmoji: $selectedEmoji)
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     private func save() {

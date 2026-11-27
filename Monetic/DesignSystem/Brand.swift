@@ -33,52 +33,26 @@ private func adaptive(light: UInt32, dark: UInt32, opacity: Double = 1) -> Color
 // MARK: - Brand
 
 /// The single source of truth for Monetic's visual language: a "pocket
-/// notebook" of warm paper, dark ink and one confident accent colour.
+/// notebook" of warm paper, dark ink and one confident accent colour (a sunny
+/// amber).
+///
+/// Amber rule: `accent` for fills and graphics, `accentText` for text and
+/// icons, `onAccent` for labels on an amber fill.
 /// Values come from `docs/prompts/ui-overhaul/DESIGN-BRIEF.md`; both modes are
 /// first-class, and `BrandContrastTests` guards their readability.
 enum Brand {
 
-    // MARK: Logo hues
-
-    /// Logo and app icon only. Not for buttons, text, selection or charts.
-    static let cyan    = Color(hex: 0x22A7F5)
-    /// Logo and app icon only.
-    static let blue    = Color(hex: 0x1B6EF3)
-    /// Logo and app icon only.
-    static let violet  = Color(hex: 0x7B2FF7)
-    /// Logo and app icon only.
-    static let magenta = Color(hex: 0xC026D3)
-
     // MARK: Accent
 
-    /// The one brand colour: primary button, links, selection.
-    static let accent   = adaptive(light: 0x2B59E0, dark: 0x7FA2FF)
-    /// Text and icons on an `accent` fill.
-    static let onAccent = adaptive(light: 0xFFFFFF, dark: 0x0E1A3D)
-
-    // MARK: Logo gradients
-
-    /// Logo and app icon only. Left-to-right, mirroring the logo's own sweep.
-    static let gradient = LinearGradient(
-        colors: [cyan, blue, violet, magenta],
-        startPoint: .leading,
-        endPoint: .trailing
-    )
-
-    /// Logo and app icon only.
-    static let gradientDiagonal = LinearGradient(
-        colors: [blue, violet, magenta],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
-
-    /// Logo and app icon only. Rotated so the sweep starts at 12 o'clock.
-    static let ringGradient = AngularGradient(
-        gradient: Gradient(colors: [cyan, blue, violet, magenta]),
-        center: .center,
-        startAngle: .degrees(-90),
-        endAngle: .degrees(270)
-    )
+    /// The amber brand colour, for fills and graphics only: the primary button,
+    /// `ProgressRing`, selected chips and segments, tab selection, chart marks
+    /// and toggles. Never for text: light amber is too pale to read (3:1).
+    static let accent     = adaptive(light: 0xC27C00, dark: 0xF2B13C)
+    /// Amber for text and icons on `background` or `surface`: links, toolbar
+    /// and plain buttons, secondary buttons. Deep enough to reach 4.5:1.
+    static let accentText = adaptive(light: 0x8F5300, dark: 0xF2B13C)
+    /// Labels on an `accent` fill: always dark, never white.
+    static let onAccent   = adaptive(light: 0x1F1400, dark: 0x1F1400)
 
     // MARK: Surfaces
 
@@ -108,11 +82,11 @@ enum Brand {
     // MARK: Status
 
     /// Under budget, on track.
-    static let positive = adaptive(light: 0x1F8A5B, dark: 0x4CC38A)
-    /// Close to budget (80% or more).
-    static let warning  = adaptive(light: 0xB26B00, dark: 0xF0B44C)
-    /// Over budget, destructive actions.
-    static let danger   = adaptive(light: 0xC8372D, dark: 0xFF7A6B)
+    static let positive = adaptive(light: 0x18784F, dark: 0x4CC38A)
+    /// Close to budget (80% or more). Burnt orange, so it never reads as the accent.
+    static let warning  = adaptive(light: 0xBA3E0C, dark: 0xFB8B5A)
+    /// Over budget, destructive actions. Crimson, kept apart from `warning`.
+    static let danger   = adaptive(light: 0xB4233A, dark: 0xFF6B81)
 
     // MARK: Metrics
 

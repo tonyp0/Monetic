@@ -59,7 +59,6 @@ struct SpendingChartsView: View {
 
     private var donutCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("By Group").brandEyebrow()
 
             Chart(activeCategories, id: \.id) { category in
                 SectorMark(
@@ -77,7 +76,6 @@ struct SpendingChartsView: View {
                 // Dead space in the middle of a donut is the natural home for
                 // the number the slices add up to.
                 VStack(spacing: 2) {
-                    Text("Total").brandEyebrow()
                     Text(totalSpent, format: .currency(code: Currency.code))
                         .font(Brand.number(22))
                         .foregroundStyle(Brand.textPrimary)
@@ -132,7 +130,7 @@ struct SpendingChartsView: View {
 
     private var dailyCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Daily Spending").brandEyebrow()
+            Text("Daily spending").brandLabel()
 
             Chart(dailySpending) { item in
                 BarMark(
@@ -140,13 +138,7 @@ struct SpendingChartsView: View {
                     y: .value("Amount", item.amount),
                     width: .fixed(6)
                 )
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Brand.magenta, Brand.blue],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
+                .foregroundStyle(Brand.accent)
                 .cornerRadius(3)
             }
             .chartXAxis {

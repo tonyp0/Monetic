@@ -58,7 +58,7 @@ struct CurrencyPickerView: View {
     private func section(_ title: String?, rows: [String]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             if let title {
-                Text(title).brandEyebrow()
+                Text(title).brandLabel()
             }
             VStack(spacing: 0) {
                 ForEach(Array(rows.enumerated()), id: \.element) { index, code in
@@ -98,7 +98,7 @@ struct CurrencyPickerView: View {
                 if selected {
                     Image(systemName: "checkmark")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                 }
             }
             .padding(.vertical, 10)

@@ -41,14 +41,14 @@ struct SavingsPlanSettingsView: View {
                                         draft.goalText = AmountInput.text(cents: Int((share * 100).rounded()), code: code)
                                     }
                                     .font(Brand.display(13, .semibold))
-                                    .foregroundStyle(Brand.accent)
+                                    .foregroundStyle(Brand.accentText)
                                     .buttonStyle(.plain)
                                 }
                             }
                         }
 
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("Save").brandEyebrow()
+                            Text("Save").brandLabel()
                             BrandSegmented(
                                 options: ContributionCadence.allCases.map { ($0.rawValue, $0.label) },
                                 selection: Binding(
@@ -62,12 +62,12 @@ struct SavingsPlanSettingsView: View {
 
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Text("Saving since").brandEyebrow()
+                                Text("Saving since").brandLabel()
                                 Spacer()
                                 DatePicker("Saving since", selection: $draft.startDate, in: ...trip.startDate,
                                            displayedComponents: .date)
                                     .labelsHidden()
-                                    .tint(Brand.accent)
+                                    .tint(Brand.accentText)
                                     .accessibilityIdentifier("savingsStartDatePicker")
                             }
                             Text("Contributions fall on this day every \(draft.cadence == .monthly ? "month" : draft.cadence == .weekly ? "week" : "2 weeks"), and on-track is measured from it.")
@@ -112,20 +112,20 @@ struct SavingsPlanSettingsView: View {
                         .font(Brand.display(16, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                PlainToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(Brand.textSecondary)
+                        .foregroundStyle(Brand.accentText)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Button("Save", action: save)
-                        .font(Brand.display(15, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Brand.accentText)
                         .disabled(!draft.isValid(departure: trip.startDate))
                         .accessibilityIdentifier("saveSavingsPlanButton")
                 }
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     /// Permission is asked for here, when the user turns reminders on, and

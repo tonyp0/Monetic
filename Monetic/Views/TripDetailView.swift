@@ -73,10 +73,9 @@ struct TripDetailView: View {
                     .foregroundStyle(Brand.textPrimary)
                     .lineLimit(1)
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            PlainToolbarItem(placement: .topBarTrailing) {
                 Button("Edit") { showingEdit = true }
-                    .font(Brand.display(15, .medium))
-                    .foregroundStyle(Brand.accent)
+                    .foregroundStyle(Brand.accentText)
                     .accessibilityIdentifier("editTripButton")
             }
         }
@@ -114,7 +113,7 @@ struct TripDetailView: View {
                         .accessibilityHidden(true)
                     Text(trip.destination)
                 }
-                .brandEyebrow()
+                .brandLabel()
 
                 Text(TripList.dateRangeText(start: trip.startDate, end: trip.endDate))
                     .font(Brand.display(20, .bold))
@@ -148,7 +147,7 @@ struct TripDetailView: View {
 
     private func stat(label: String, value: Double, identifier: String) -> some View {
         VStack(spacing: 4) {
-            Text(label).brandEyebrow()
+            Text(label).brandLabel()
             Text(value, format: .currency(code: trip.totalCurrencyCode))
                 .font(Brand.number(20, .semibold))
                 .foregroundStyle(Brand.textPrimary)
@@ -163,7 +162,7 @@ struct TripDetailView: View {
 
     private var notesCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Notes").brandEyebrow()
+            Text("Notes").brandLabel()
             Text(trip.notes)
                 .font(.subheadline)
                 .foregroundStyle(Brand.textPrimary)
@@ -181,7 +180,7 @@ struct TripDetailView: View {
             if trip.isGroupTrip {
                 HStack(spacing: 8) {
                     Image(systemName: "person.2.fill")
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                         .accessibilityHidden(true)
                     Text("Planned with friends")
                         .font(Brand.display(15, .semibold))

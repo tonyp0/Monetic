@@ -21,7 +21,7 @@ enum CategoryPalette {
         "magenta": (0x9A4A9E, 0xC77FCB), // plum
         "rose":    (0xC2477A, 0xE68AAE), // berry
         "coral":   (0xD9534A, 0xF07A6E), // tomato
-        "amber":   (0xC7880B, 0xE8B04A), // saffron
+        "amber":   (0x8C7A12, 0xC9B54A), // ochre, so a group never looks like the accent
         "mint":    (0x4F8A4A, 0x8DBA7A), // sage
         "cyan":    (0x1F8A88, 0x4DBDB8), // teal
     ]

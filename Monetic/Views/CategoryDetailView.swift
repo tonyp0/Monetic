@@ -45,11 +45,11 @@ struct CategoryDetailView: View {
                         .foregroundStyle(Brand.textPrimary)
                         .lineLimit(1)
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                PlainToolbarItem(placement: .topBarLeading) {
                     Button("Done") { dismiss() }
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button(action: { showingEditCategory = true }) {
                             Label("Edit Group", systemImage: "pencil")
@@ -68,7 +68,7 @@ struct CategoryDetailView: View {
                 Button(action: { showingAddTransaction = true }) {
                     Label("Add Expense", systemImage: "plus")
                 }
-                .buttonStyle(GradientButtonStyle())
+                .buttonStyle(PrimaryButtonStyle())
                 .accessibilityIdentifier("addExpenseButton")
                 .padding(.horizontal, Brand.Space.gutter)
                 .padding(.top, 8)
@@ -99,7 +99,7 @@ struct CategoryDetailView: View {
                 Text("This will permanently delete the group and all \(category.transactions.count) expense\(category.transactions.count == 1 ? "" : "s") inside it.")
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     // MARK: Header
@@ -122,7 +122,7 @@ struct CategoryDetailView: View {
                 Spacer(minLength: 8)
 
                 VStack(alignment: .trailing, spacing: 3) {
-                    Text("This Month").brandEyebrow()
+                    Text("This month").brandLabel()
                     Text(monthlySpent, format: .currency(code: Currency.code))
                         .accessibilityIdentifier("groupMonthlySpent")
                         .font(Brand.number(20))
@@ -236,7 +236,7 @@ struct TransactionRow: View {
                                 RoundedRectangle(cornerRadius: Brand.Radius.chip, style: .continuous)
                                     .fill(Brand.accent.opacity(0.16))
                             )
-                            .foregroundStyle(Brand.accent)
+                            .foregroundStyle(Brand.accentText)
                     }
                 }
 

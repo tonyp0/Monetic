@@ -37,21 +37,21 @@ struct SettingsView: View {
                         .font(Brand.display(16, .semibold))
                         .foregroundStyle(Brand.textPrimary)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                PlainToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .font(Brand.display(15, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Brand.accentText)
                 }
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
     // MARK: Appearance
 
     private var appearanceCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Appearance").brandEyebrow()
+            Text("Appearance").brandLabel()
 
             AppearanceSelector(selection: $appearance)
 
@@ -67,7 +67,7 @@ struct SettingsView: View {
     
     private var currencyCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Currency").brandEyebrow()
+            Text("Currency").brandLabel()
 
             NavigationLink {
                 CurrencyPickerView(selection: currencySelection)
@@ -124,7 +124,7 @@ struct SettingsView: View {
 
     private var budgetCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Budget").brandEyebrow()
+            Text("Budget").brandLabel()
 
             Toggle(isOn: $repeatMonthlyBudget) {
                 VStack(alignment: .leading, spacing: 3) {
@@ -151,11 +151,11 @@ struct SettingsView: View {
                     HStack {
                         Text("Roll Over Last Month's Budget")
                             .font(Brand.display(15, .medium))
-                            .foregroundStyle(Brand.accent)
+                            .foregroundStyle(Brand.accentText)
                         Spacer()
                         Text(lastMonthlyBudget, format: .currency(code: Currency.code))
                             .font(Brand.number(15, .semibold))
-                            .foregroundStyle(Brand.accent)
+                            .foregroundStyle(Brand.accentText)
                     }
                 }
             }
@@ -172,7 +172,7 @@ struct SettingsView: View {
 
     private var thisMonthCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("This Month").brandEyebrow()
+            Text("This month").brandLabel()
 
             row("Current Budget") {
                 Text(monthlyBudget, format: .currency(code: Currency.code))
@@ -211,7 +211,7 @@ struct SettingsView: View {
 
     private var about: some View {
         VStack(spacing: 8) {
-            MoneticWordmark(size: 13)
+            MoneticWordmark()
             if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
                 Text("Version \(version)")
                     .font(.caption2)
@@ -224,58 +224,23 @@ struct SettingsView: View {
 }
 
 // MARK: - Appearance Selector
-/// A segmented control with the brand gradient riding the selection, rather
-/// than the stock grey `.segmented` picker.
+/// System, Light or Dark, on the shared segmented control.
 struct AppearanceSelector: View {
     @Binding var selection: AppAppearance
-    @Namespace private var indicator
 
-    private let options: [(tag: AppAppearance, label: String, icon: String)] = [
-        (.system, "System", "iphone"),
-        (.light,  "Light",  "sun.max.fill"),
-        (.dark,   "Dark",   "moon.fill"),
+    private static let options: [(tag: AppAppearance, label: String)] = [
+        (.system, "System"),
+        (.light, "Light"),
+        (.dark, "Dark"),
     ]
 
     var body: some View {
-        HStack(spacing: 4) {
-            ForEach(options, id: \.tag) { option in
-                let isSelected = selection == option.tag
-
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        selection = option.tag
-                    }
-                } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: option.icon)
-                            .font(.system(size: 11, weight: .semibold))
-                        Text(option.label)
-                            .font(Brand.display(13, .semibold))
-                    }
-                    .foregroundStyle(isSelected ? Color.white : Brand.textSecondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background {
-                        if isSelected {
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(Brand.gradientDiagonal)
-                                .matchedGeometryEffect(id: "appearance", in: indicator)
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
+        BrandSegmented(options: Self.options, selection: $selection) { tag in
+            switch tag {
+            case .system: "iphone"
+            case .light:  "sun.max.fill"
+            case .dark:   "moon.fill"
             }
         }
-        .padding(4)
-        .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Brand.surfaceSunken)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(Brand.hairline, lineWidth: 1)
-        )
     }
 }
-
-

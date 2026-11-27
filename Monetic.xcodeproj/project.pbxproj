@@ -19,6 +19,7 @@
 		A1000007 /* EditTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000007 /* EditTransactionView.swift */; };
 		A1000008 /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000008 /* AddCategoryView.swift */; };
 		A100000B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B100000B /* Assets.xcassets */; };
+		A1AC0001 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = B1AC0001 /* AppIcon.icon */; };
 		A100000C /* SetBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000C /* SetBudgetView.swift */; };
 		A100000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000D /* SettingsView.swift */; };
 		A100000E /* SpendingChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000F /* SpendingChartsView.swift */; };
@@ -31,6 +32,7 @@
 		A1000015 /* CategoryPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000015 /* CategoryPalette.swift */; };
 		A1000016 /* BrandComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000016 /* BrandComponents.swift */; };
 		B0D2A13A40F3942B94A5AB92 /* FormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6323C907BE5646AE59969DD /* FormattingTests.swift */; };
+		E1E2E3E4E5E6E7E8E9EAEBEC /* BudgetBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2F3F4F5F6F7F8F9FAFBFC /* BudgetBarTests.swift */; };
 		C1C2C3C4C5C6C7C8C9CACBCC /* BrandContrastTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D2D3D4D5D6D7D8D9DADBDC /* BrandContrastTests.swift */; };
 		A1A2A3A4A5A6A7A8A9AAABAC /* AppAppearanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B2B3B4B5B6B7B8B9BABBBC /* AppAppearanceTests.swift */; };
 		C69E37659C3E78D3D5FB5EA0 /* AddExpenseUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1425DA44AC9043141F3CD3C /* AddExpenseUITests.swift */; };
@@ -120,6 +122,7 @@
 		B1000007 /* EditTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTransactionView.swift; sourceTree = "<group>"; };
 		B1000008 /* AddCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoryView.swift; sourceTree = "<group>"; };
 		B100000B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B1AC0001 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		B100000C /* SetBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetBudgetView.swift; sourceTree = "<group>"; };
 		B100000D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B100000E /* Monetic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Monetic.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -136,6 +139,7 @@
 		D1425DA44AC9043141F3CD3C /* AddExpenseUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AddExpenseUITests.swift; sourceTree = "<group>"; };
 		D4C9D277B56DC435FFF10111 /* MoneticDemoUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MoneticDemoUITests.swift; sourceTree = "<group>"; };
 		D6323C907BE5646AE59969DD /* FormattingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FormattingTests.swift; sourceTree = "<group>"; };
+		F1F2F3F4F5F6F7F8F9FAFBFC /* BudgetBarTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BudgetBarTests.swift; sourceTree = "<group>"; };
 		D1D2D3D4D5D6D7D8D9DADBDC /* BrandContrastTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BrandContrastTests.swift; sourceTree = "<group>"; };
 		B1B2B3B4B5B6B7B8B9BABBBC /* AppAppearanceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppAppearanceTests.swift; sourceTree = "<group>"; };
 		FD464F66BDAE17BDDD0A204F /* TransactionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TransactionTests.swift; sourceTree = "<group>"; };
@@ -224,6 +228,7 @@
 				FD464F66BDAE17BDDD0A204F /* TransactionTests.swift */,
 				2FA7D5F5A7997B54BA04F9A2 /* PersistenceTests.swift */,
 				D6323C907BE5646AE59969DD /* FormattingTests.swift */,
+				F1F2F3F4F5F6F7F8F9FAFBFC /* BudgetBarTests.swift */,
 				D1D2D3D4D5D6D7D8D9DADBDC /* BrandContrastTests.swift */,
 				B1B2B3B4B5B6B7B8B9BABBBC /* AppAppearanceTests.swift */,
 				74B6B7E08C0CB876E17847E6 /* MonthRolloverTests.swift */,
@@ -277,6 +282,7 @@
 				D52289913B5F805FCBEAB7F8 /* Estimating */,
 				B32674D49DCE844A0B0F3365 /* Resources */,
 				B100000B /* Assets.xcassets */,
+				B1AC0001 /* AppIcon.icon */,
 				B1000013 /* PrivacyInfo.xcprivacy */,
 				E8BEA597F258BFAEDBC62958 /* Trips */,
 				B19F0DDFDA5D982CEE2270D1 /* Info.plist */,
@@ -512,6 +518,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A100000B /* Assets.xcassets in Resources */,
+				A1AC0001 /* AppIcon.icon in Resources */,
 				A1000013 /* PrivacyInfo.xcprivacy in Resources */,
 				1C1FEA43A4722FF36226D379 /* cost-data.json in Resources */,
 			);
@@ -531,6 +538,7 @@
 				E3B6A33A0FA4AEA70038F1E2 /* TransactionTests.swift in Sources */,
 				2603B2A851891BBD269A56EA /* PersistenceTests.swift in Sources */,
 				B0D2A13A40F3942B94A5AB92 /* FormattingTests.swift in Sources */,
+				E1E2E3E4E5E6E7E8E9EAEBEC /* BudgetBarTests.swift in Sources */,
 				C1C2C3C4C5C6C7C8C9CACBCC /* BrandContrastTests.swift in Sources */,
 				A1A2A3A4A5A6A7A8A9AAABAC /* AppAppearanceTests.swift in Sources */,
 				FBC64F07E514E03AFEA1C639 /* MonthRolloverTests.swift in Sources */,

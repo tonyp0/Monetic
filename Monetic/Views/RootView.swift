@@ -58,7 +58,7 @@ struct RootView: View {
                 }
                 .tag(Tab.trips)
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
         .onOpenURL(perform: open)
         .onAppear(perform: openLaunchArgumentURL)
         .sheet(item: Binding(

@@ -14,17 +14,17 @@ struct UpcomingTripCard: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            BudgetRing(percentage: plan.progress, lineWidth: 6, tone: .goal) {
+            ProgressRing(percentage: plan.progress, lineWidth: 6, tone: .goal) {
                 Image(systemName: "airplane")
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Brand.accent)
+                    .foregroundStyle(Brand.accentText)
             }
             .frame(width: 50, height: 50)
             .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text("Next trip · \(plan.countdownText)")
-                    .brandEyebrow()
+                    .brandLabel()
                     .accessibilityIdentifier("dashboardTripCountdown")
                 Text(trip.name)
                     .font(Brand.display(16, .semibold))
@@ -48,7 +48,7 @@ struct UpcomingTripCard: View {
             Button(action: onAdd) {
                 Image(systemName: "plus")
                     .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(Brand.accent)
+                    .foregroundStyle(Brand.accentText)
                     .frame(width: 36, height: 36)
                     .background(Circle().fill(Brand.accent.opacity(0.14)))
             }

@@ -46,7 +46,7 @@ struct TripForm: View {
         let estimate = self.estimate
 
         VStack(spacing: Brand.Space.stack) {
-            BrandField(label: "Trip Name") {
+            BrandField(label: "Trip name") {
                 TextField("e.g. Spring Break 2027", text: $draft.name)
                     .font(Brand.display(16, .medium))
                     .focused($focusedField, equals: .name)
@@ -143,7 +143,7 @@ struct TripForm: View {
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "mappin.circle.fill")
-                            .foregroundStyle(Brand.accent)
+                            .foregroundStyle(Brand.accentText)
                             .accessibilityHidden(true)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(location.name)
@@ -170,7 +170,7 @@ struct TripForm: View {
     private var styleCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Travel Style").brandEyebrow()
+                Text("Travel style").brandLabel()
                 Spacer()
                 filledMark(fill?.style != nil && fill?.style == draft.travelStyle, id: "style")
             }
@@ -211,7 +211,7 @@ struct TripForm: View {
                     Spacer()
                     Button("Reset") { draft.roomsOverride = nil }
                         .font(Brand.display(13, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                         .buttonStyle(.plain)
                 }
             }
@@ -260,7 +260,7 @@ struct TripForm: View {
             // A total that follows the estimate is in USD; one typed over
             // it is a manual total in the user's currency.
             AmountEntryCard(amount: $draft.amountText, focus: $amountFocused,
-                            label: estimate == nil ? "Estimated Total" : "Trip Total",
+                            label: estimate == nil ? "Estimated total" : "Trip total",
                             currencyCode: draft.isUsingEstimate(estimate) ? "USD" : Currency.code)
 
             if let estimate {
@@ -277,7 +277,7 @@ struct TripForm: View {
                             draft.useEstimate(estimate)
                         }
                         .font(Brand.display(13, .semibold))
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                         .buttonStyle(.plain)
                         .accessibilityIdentifier("useEstimateButton")
                     }
@@ -291,22 +291,22 @@ struct TripForm: View {
     private var datesCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Leaving").brandEyebrow()
+                Text("Leaving").brandLabel()
                 Spacer()
                 DatePicker("Leaving", selection: $draft.startDate, displayedComponents: .date)
                     .labelsHidden()
-                    .tint(Brand.accent)
+                    .tint(Brand.accentText)
                     .accessibilityIdentifier("tripStartDatePicker")
             }
 
             Rectangle().fill(Brand.hairline).frame(height: 1)
 
             HStack {
-                Text("Returning").brandEyebrow()
+                Text("Returning").brandLabel()
                 Spacer()
                 DatePicker("Returning", selection: $draft.endDate, in: draft.startDate..., displayedComponents: .date)
                     .labelsHidden()
-                    .tint(Brand.accent)
+                    .tint(Brand.accentText)
                     .accessibilityIdentifier("tripEndDatePicker")
             }
 
@@ -361,7 +361,7 @@ struct TripForm: View {
     private func hintRow(_ hint: EstimateAccuracy.Hint) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "chart.line.uptrend.xyaxis")
-                .foregroundStyle(Brand.accent)
+                .foregroundStyle(Brand.accentText)
                 .accessibilityHidden(true)
             Text(hint.text)
                 .font(.caption)
@@ -396,7 +396,7 @@ struct TripForm: View {
                 Text("From your description")
             }
             .font(Brand.display(11, .semibold))
-            .foregroundStyle(Brand.accent)
+            .foregroundStyle(Brand.accentText)
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(Capsule().fill(Brand.accent.opacity(0.14)))
@@ -409,7 +409,6 @@ struct TripForm: View {
 
     private var notesCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Notes").brandEyebrow()
             TextField("Flights, where you're staying, who's going…", text: $draft.notes, axis: .vertical)
                 .font(.subheadline)
                 .lineLimit(1...4)

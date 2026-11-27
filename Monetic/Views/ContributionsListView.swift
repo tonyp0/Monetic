@@ -17,7 +17,7 @@ struct ContributionsListView: View {
 
             List {
                 HStack {
-                    Text("Saved").brandEyebrow()
+                    Text("Saved").brandLabel()
                     Spacer()
                     Text(trip.totalSaved, format: .currency(code: trip.totalCurrencyCode))
                         .font(Brand.number(17, .semibold))
@@ -67,11 +67,11 @@ struct ContributionsListView: View {
                     .font(Brand.display(16, .semibold))
                     .foregroundStyle(Brand.textPrimary)
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            PlainToolbarItem(placement: .topBarTrailing) {
                 Button { adding = true } label: {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 20))
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                 }
                 .accessibilityLabel("Add to savings")
             }

@@ -3,40 +3,10 @@ import UIKit
 
 // MARK: - Background
 
-/// The app's base layer: a near-black (or near-white) field with two soft
-/// brand glows bled into the corners. In dark mode this is what stops the
-/// screen reading as a flat default background.
+/// The app's base layer: flat warm paper (or warm ink in dark mode).
 struct BrandBackground: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    private var isDark: Bool { colorScheme == .dark }
-
     var body: some View {
-        ZStack {
-            Brand.background
-
-            GeometryReader { geo in
-                let size = max(geo.size.width, geo.size.height)
-
-                RadialGradient(
-                    colors: [Brand.blue.opacity(isDark ? 0.22 : 0.10), .clear],
-                    center: .topLeading,
-                    startRadius: 0,
-                    endRadius: size * 0.85
-                )
-
-                RadialGradient(
-                    colors: [Brand.magenta.opacity(isDark ? 0.16 : 0.07), .clear],
-                    center: .bottomTrailing,
-                    startRadius: 0,
-                    endRadius: size * 0.8
-                )
-            }
-            // Additive blending only reads correctly against near-black; on the
-            // light field it would clip straight to white.
-            .blendMode(isDark ? .plusLighter : .normal)
-        }
-        .ignoresSafeArea()
+        Brand.background.ignoresSafeArea()
     }
 }
 
@@ -55,29 +25,35 @@ private struct BrandCardModifier: ViewModifier {
                 RoundedRectangle(cornerRadius: radius, style: .continuous)
                     .fill(raised ? Brand.surfaceRaised : Brand.surface)
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .strokeBorder(Brand.hairline, lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(colorScheme == .dark ? 0.35 : 0.07), radius: 16, x: 0, y: 7)
+            // Depth comes from colour steps; a hairline only where they're too close (dark).
+            .overlay {
+                if colorScheme == .dark {
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .strokeBorder(Brand.hairline, lineWidth: 1)
+                }
+            }
     }
 }
 
 extension View {
     func brandCard(
-        padding: CGFloat = Brand.Space.card,
-        radius: CGFloat = Brand.Radius.card,
+        padding: CGFloat = Brand.Space.l,
+        radius: CGFloat = Brand.Radius.large,
         raised: Bool = false
     ) -> some View {
         modifier(BrandCardModifier(padding: padding, radius: radius, raised: raised))
     }
 
-    /// Small uppercase label with the tracking the brand uses for eyebrows.
+    /// A sentence-case label in `.subheadline` / `textSecondary`.
+    @available(*, deprecated, message: "Drop the label if context makes it obvious; otherwise use .font(.subheadline) in textSecondary")
     func brandEyebrow() -> some View {
+        brandLabel()
+    }
+
+    /// The one label style: sentence case, `.subheadline`, `textSecondary`.
+    func brandLabel() -> some View {
         self
-            .font(Brand.eyebrow)
-            .textCase(.uppercase)
-            .tracking(1.1)
+            .font(.subheadline)
             .foregroundStyle(Brand.textSecondary)
     }
 
@@ -98,58 +74,57 @@ extension View {
 
 // MARK: - Buttons
 
-/// The primary call to action. This is one of the three places the full
-/// gradient appears — keeping it rare is what makes it read as a signature.
-struct GradientButtonStyle: ButtonStyle {
+/// The primary call to action: solid accent, one per screen.
+struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        GradientBody(configuration: configuration)
+        PrimaryBody(configuration: configuration)
     }
 
     // `@Environment` is only installed on a View, never on the style itself,
     // so the label is wrapped in one to read `isEnabled` correctly. The name
     // avoids `Body`, which ButtonStyle already declares as an associated type.
-    private struct GradientBody: View {
+    private struct PrimaryBody: View {
         let configuration: ButtonStyleConfiguration
         @Environment(\.isEnabled) private var isEnabled
 
         var body: some View {
             configuration.label
-                .font(Brand.display(17, .semibold))
-                .foregroundStyle(.white)
+                .font(.headline)
+                .foregroundStyle(isEnabled ? Brand.onAccent : Brand.textTertiary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(
-                    RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous)
-                        .fill(Brand.gradient)
+                    RoundedRectangle(cornerRadius: Brand.Radius.small, style: .continuous)
+                        .fill(isEnabled ? Brand.accent : Brand.track)
                 )
-                .opacity(isEnabled ? 1 : 0.35)
-                .saturation(isEnabled ? 1 : 0.2)
-                .shadow(color: Brand.violet.opacity(isEnabled ? 0.35 : 0), radius: 16, y: 8)
-                .scaleEffect(configuration.isPressed ? 0.97 : 1)
+                .opacity(configuration.isPressed ? 0.85 : 1)
                 .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
         }
     }
 }
+
+@available(*, deprecated, renamed: "PrimaryButtonStyle")
+typealias GradientButtonStyle = PrimaryButtonStyle
 
 /// Destructive action at the foot of a screen ("Delete Trip"): same shape,
 /// tinted with the danger colour instead of filled.
 struct DestructiveButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Brand.display(15, .semibold))
+            .font(.headline)
             .foregroundStyle(Brand.danger)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
             .background(
-                RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous)
-                    .fill(Brand.danger.opacity(0.12))
+                RoundedRectangle(cornerRadius: Brand.Radius.small, style: .continuous)
+                    .fill(Brand.danger.opacity(0.10))
             )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .opacity(configuration.isPressed ? 0.7 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 
-/// Secondary action: same shape, no gradient.
+/// Quiet secondary action: amber text on a faint amber wash.
 struct SoftButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         SoftBody(configuration: configuration)
@@ -161,20 +136,15 @@ struct SoftButtonStyle: ButtonStyle {
 
         var body: some View {
             configuration.label
-                .font(Brand.display(16, .medium))
-                .foregroundStyle(Brand.textPrimary)
+                .font(.headline)
+                .foregroundStyle(Brand.accentText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 15)
                 .background(
-                    RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous)
-                        .fill(Brand.surfaceRaised)
+                    RoundedRectangle(cornerRadius: Brand.Radius.small, style: .continuous)
+                        .fill(Brand.accent.opacity(0.14))
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous)
-                        .strokeBorder(Brand.hairline, lineWidth: 1)
-                )
-                .opacity(isEnabled ? 1 : 0.4)
-                .scaleEffect(configuration.isPressed ? 0.97 : 1)
+                .opacity(isEnabled ? (configuration.isPressed ? 0.7 : 1) : 0.4)
                 .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
         }
     }
@@ -182,23 +152,126 @@ struct SoftButtonStyle: ButtonStyle {
 
 // MARK: - Progress
 
-/// The hero ring on the home screen. Healthy spending sweeps the brand
-/// gradient; once the budget is close or blown it switches to a solid status
-/// colour so the warning can't be mistaken for decoration.
-struct BudgetRing<Center: View>: View {
-    /// `.budget` warns near and past the limit; `.goal` is for saving toward
-    /// a target, where getting close is good news.
-    enum Tone { case budget, goal }
+/// The budget's progress: one horizontal bar, either a single fraction
+/// coloured by status or split into coloured segments (one per group).
+/// When spending passes the budget the bar fills in `danger`; the caller
+/// shows how far over in words.
+struct BudgetBar: View {
+    struct Segment {
+        let color: Color
+        let amount: Double
+    }
+
+    /// How much of the budget is used; above 1 means over budget.
+    let fraction: Double
+    private let segments: [Segment]
+    private let tint: Color?
+    var height: CGFloat = 10
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// A single fraction of the budget (0.62 = 62% used).
+    init(fraction: Double, height: CGFloat = 10) {
+        self.init(fraction: fraction, tint: nil, height: height)
+    }
+
+    /// Spending split by group: each segment's `amount` is measured against `total`.
+    init(segments: [Segment], total: Double, height: CGFloat = 10) {
+        let spent = segments.reduce(0) { $0 + max($1.amount, 0) }
+        self.fraction = total > 0 ? spent / total : (spent > 0 ? 2 : 0)
+        self.segments = total > 0 ? segments.filter { $0.amount > 0 } : []
+        self.tint = nil
+        self.height = height
+    }
+
+    /// For `BrandProgressBar`: a single fraction in a caller-chosen colour.
+    fileprivate init(fraction: Double, tint: Color?, height: CGFloat) {
+        self.fraction = fraction
+        self.segments = []
+        self.tint = tint
+        self.height = height
+    }
+
+    var isOver: Bool { fraction > 1 }
+
+    private var statusColor: Color {
+        if let tint { return tint }
+        if isOver { return Brand.danger }
+        return fraction >= 0.8 ? Brand.warning : Brand.positive
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule().fill(Brand.track)
+                fills(width: geo.size.width)
+            }
+        }
+        .frame(height: height)
+        .clipShape(Capsule())
+        .animation(reduceMotion ? nil : .smooth, value: fraction)
+        .accessibilityElement()
+        .accessibilityLabel("Budget")
+        .accessibilityValue("\(Int((fraction * 100).rounded()))% of budget used")
+    }
+
+    @ViewBuilder
+    private func fills(width: CGFloat) -> some View {
+        if segments.isEmpty || isOver {
+            Capsule()
+                .fill(statusColor)
+                .frame(width: fillWidth(min(max(fraction, 0), 1), in: width))
+        } else {
+            // Each group's share of the budget, separated by 2pt gaps.
+            let gap: CGFloat = 2
+            let total = segments.reduce(0) { $0 + $1.amount } / fraction
+            let usable = max(width - gap * CGFloat(segments.count - 1), 0)
+            HStack(spacing: gap) {
+                ForEach(segments.indices, id: \.self) { index in
+                    Rectangle()
+                        .fill(segments[index].color)
+                        .frame(width: usable * segments[index].amount / total)
+                }
+            }
+        }
+    }
+
+    /// Keeps a sliver visible for small amounts so the bar never reads as empty.
+    private func fillWidth(_ clamped: Double, in available: CGFloat) -> CGFloat {
+        guard clamped > 0 else { return 0 }
+        return max(available * clamped, min(height, 4))
+    }
+}
+
+/// Slim single-colour bar used inside rows, where the amount is already shown
+/// as text beside it.
+struct BrandProgressBar: View {
+    let percentage: Double
+    var tint: Color
+    var height: CGFloat = 6
+
+    var body: some View {
+        BudgetBar(fraction: percentage, tint: tint, height: height)
+            .accessibilityHidden(true)
+    }
+}
+
+/// Trip savings' signature: a solid arc on a track ring with content in the
+/// middle. Only trip savings should use it; the budget is a `BudgetBar`.
+struct ProgressRing<Center: View>: View {
+    /// `.goal` (saving toward a target) turns `positive` once it's reached.
+    /// `.budget` warns near and past the limit; it only exists until the home
+    /// screen moves to `BudgetBar`.
+    enum Tone { case goal, budget }
 
     let percentage: Double
-    var lineWidth: CGFloat = 14
-    var tone: Tone = .budget
+    var lineWidth: CGFloat = 12
+    var tone: Tone = .goal
     @ViewBuilder var center: Center
 
-    private var clamped: Double { min(max(percentage, 0), 1) }
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var isOver: Bool { percentage > 1 }
-    private var isNearLimit: Bool { percentage >= 0.8 && percentage <= 1 }
+    private var clamped: Double { min(max(percentage, 0), 1) }
 
     var body: some View {
         ZStack {
@@ -207,110 +280,85 @@ struct BudgetRing<Center: View>: View {
 
             Circle()
                 .trim(from: 0, to: max(clamped, percentage > 0 ? 0.012 : 0))
-                .stroke(ringStyle, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
-                .animation(.easeOut(duration: 0.45), value: clamped)
+                .animation(reduceMotion ? nil : .smooth, value: clamped)
 
             center
         }
     }
 
-    private var ringStyle: AnyShapeStyle {
-        if tone == .goal {
-            return percentage >= 1 ? AnyShapeStyle(Brand.positive) : AnyShapeStyle(Brand.ringGradient)
+    private var color: Color {
+        switch tone {
+        case .goal:
+            return percentage >= 1 ? Brand.positive : Brand.accent
+        case .budget:
+            if percentage > 1 { return Brand.danger }
+            return percentage >= 0.8 ? Brand.warning : Brand.accent
         }
-        if isOver { return AnyShapeStyle(Brand.danger) }
-        if isNearLimit { return AnyShapeStyle(Brand.warning) }
-        return AnyShapeStyle(Brand.ringGradient)
     }
 }
 
-/// Slim bar used inside group rows.
-struct BrandProgressBar: View {
-    let percentage: Double
-    var tint: Color
-    var height: CGFloat = 5
+@available(*, deprecated, renamed: "ProgressRing")
+typealias BudgetRing<Center: View> = ProgressRing<Center>
+
+// MARK: - Status chip
+
+/// A small sentence-case capsule: the status colour on a faint tint of itself.
+/// An `accent` chip writes its text in `accentText`, since amber text is too pale.
+struct StatusChip: View {
+    let title: String
+    /// `positive`, `warning`, `danger` or `accent`.
+    var color: Color = Brand.accent
+
+    /// The chip's text colour.
+    var textColor: Color { color == Brand.accent ? Brand.accentText : color }
 
     var body: some View {
-        GeometryReader { geo in
-            ZStack(alignment: .leading) {
-                Capsule().fill(Brand.track)
-                Capsule()
-                    .fill(tint)
-                    .frame(width: width(in: geo.size.width))
-            }
-        }
-        .frame(height: height)
-    }
-
-    /// Keeps a sliver visible for small amounts so the bar never reads as empty.
-    private func width(in available: CGFloat) -> CGFloat {
-        let clamped = min(max(percentage, 0), 1)
-        guard clamped > 0 else { return 0 }
-        return max(available * clamped, 4)
+        Text(title)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(textColor)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(color.opacity(0.14)))
     }
 }
 
 // MARK: - Brand marks
 
-/// The wordmark, in the logo's letter-spaced caps with the gradient applied.
+/// The app's name in plain ink. The gradient belongs to the logo mark only.
 struct MoneticWordmark: View {
-    var size: CGFloat = 15
-
     var body: some View {
-        Text("MONETIC")
-            .font(.system(size: size, weight: .bold, design: .rounded))
-            .tracking(size * 0.32)
-            .foregroundStyle(Brand.gradient)
-            .accessibilityLabel("Monetic")
+        Text("Monetic")
+            .font(.headline)
+            .foregroundStyle(Brand.textPrimary)
     }
 }
 
-/// Uses the real logo asset when one has been added to the asset catalogue,
-/// and falls back to a gradient tile so the app never ships a broken image.
+/// The flat amber-and-ink logo mark (vector, with a dark-mode variant).
+/// Generated by `scripts/make-brand.swift`; the asset symbol makes a missing image a build error.
 struct BrandLogoMark: View {
     var size: CGFloat = 76
 
-    private var hasAsset: Bool { UIImage(named: "BrandLogo") != nil }
-
     var body: some View {
-        Group {
-            if hasAsset {
-                Image("BrandLogo")
-                    .resizable()
-                    .scaledToFit()
-            } else {
-                RoundedRectangle(cornerRadius: size * 0.28, style: .continuous)
-                    .fill(Brand.gradientDiagonal)
-                    .overlay(
-                        Text("M")
-                            .font(.system(size: size * 0.52, weight: .heavy, design: .rounded))
-                            .foregroundStyle(.white)
-                    )
-            }
-        }
-        .frame(width: size, height: size)
-        .shadow(color: Brand.violet.opacity(0.4), radius: size * 0.22, y: size * 0.08)
-        .accessibilityHidden(true)
+        Image(.brandLogo)
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .accessibilityHidden(true)
     }
 }
 
 // MARK: - Category tile
-/// Emoji (or legacy SF Symbol) on a tinted tile in the group's brand hue.
+/// Emoji (or legacy SF Symbol) on the group's tint. 36pt in rows, 56pt in headers.
 struct CategoryTile: View {
     let icon: String
     let colorKey: String
-    var size: CGFloat = 44
-
-    private var hue: Color { CategoryPalette.color(for: colorKey) }
+    var size: CGFloat = 36
 
     var body: some View {
-        RoundedRectangle(cornerRadius: size * 0.3, style: .continuous)
-            .fill(hue.opacity(0.16))
-            .overlay(
-                RoundedRectangle(cornerRadius: size * 0.3, style: .continuous)
-                    .strokeBorder(hue.opacity(0.3), lineWidth: 1)
-            )
+        RoundedRectangle(cornerRadius: Brand.Radius.small, style: .continuous)
+            .fill(CategoryPalette.tint(for: colorKey))
             .overlay(
                 Group {
                     if icon.isEmojiIcon {
@@ -318,7 +366,7 @@ struct CategoryTile: View {
                     } else {
                         Image(systemName: icon)
                             .font(.system(size: size * 0.42, weight: .medium))
-                            .foregroundStyle(hue)
+                            .foregroundStyle(CategoryPalette.color(for: colorKey))
                     }
                 }
             )
@@ -335,7 +383,7 @@ struct BrandSectionHeader<Trailing: View>: View {
     var body: some View {
         HStack(alignment: .center) {
             Text(title)
-                .font(Brand.display(19, .bold))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(Brand.textPrimary)
             Spacer(minLength: 8)
             trailing
@@ -345,7 +393,7 @@ struct BrandSectionHeader<Trailing: View>: View {
 
 // MARK: - Field
 
-/// The bordered input used across the sheets, replacing stock `Form` rows.
+/// A labelled input on a sunken well, used across the sheets instead of `Form` rows.
 struct BrandField<Content: View>: View {
     let label: String
     var footnote: String? = nil
@@ -353,24 +401,20 @@ struct BrandField<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(label).brandEyebrow()
+            Text(label).brandLabel()
 
             content
                 .padding(.horizontal, 14)
                 .padding(.vertical, 13)
                 .background(
-                    RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous)
-                        .fill(Brand.surface)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: Brand.Radius.control, style: .continuous)
-                        .strokeBorder(Brand.hairline, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: Brand.Radius.small, style: .continuous)
+                        .fill(Brand.surfaceSunken)
                 )
 
             if let footnote {
                 Text(footnote)
-                    .font(.caption)
-                    .foregroundStyle(Brand.textTertiary)
+                    .font(.footnote)
+                    .foregroundStyle(Brand.textSecondary)
             }
         }
     }
@@ -378,72 +422,86 @@ struct BrandField<Content: View>: View {
 
 // MARK: - Segmented control
 
-/// Two-or-more option picker with the brand gradient on the selection.
-/// Used anywhere the stock `.segmented` picker would otherwise show up.
-struct BrandSegmented: View {
-    let options: [(tag: String, label: String)]
-    @Binding var selection: String
+/// Two-or-more option picker drawn like the native segmented control: a
+/// raised pill for the selection on a sunken track.
+struct BrandSegmented<Tag: Hashable>: View {
+    let options: [(tag: Tag, label: String)]
+    @Binding var selection: Tag
+    /// Optional SF Symbol shown before each label.
+    var icon: (Tag) -> String? = { _ in nil }
+
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var indicator
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 2) {
             ForEach(options, id: \.tag) { option in
                 let isSelected = selection == option.tag
 
                 Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                    withAnimation(reduceMotion ? nil : .snappy) {
                         selection = option.tag
                     }
                 } label: {
-                    Text(option.label)
-                        .font(Brand.display(14, .semibold))
-                        .foregroundStyle(isSelected ? Color.white : Brand.textSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 9)
-                        .background {
-                            if isSelected {
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .fill(Brand.gradientDiagonal)
-                            }
+                    HStack(spacing: 5) {
+                        if let symbol = icon(option.tag) {
+                            Image(systemName: symbol).imageScale(.small)
                         }
+                        Text(option.label)
+                    }
+                    .font(.subheadline.weight(isSelected ? .semibold : .regular))
+                    .foregroundStyle(isSelected ? Brand.textPrimary : Brand.textSecondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background {
+                        if isSelected {
+                            RoundedRectangle(cornerRadius: Brand.Radius.small - 3, style: .continuous)
+                                .fill(colorScheme == .dark ? Brand.surfaceRaised : Brand.surface)
+                                .matchedGeometryEffect(id: "selection", in: indicator)
+                        }
+                    }
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
             }
         }
-        .padding(4)
+        .padding(3)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: Brand.Radius.small, style: .continuous)
                 .fill(Brand.surfaceSunken)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(Brand.hairline, lineWidth: 1)
         )
     }
 }
 
 // MARK: - Amount entry
 
-/// The large currency field used by the add/edit expense sheets.
+/// The large currency field used by the entry sheets: the hero amount on a
+/// sunken well, with an optional label when the screen needs one.
 struct AmountEntryCard: View {
     @Binding var amount: String
     var focus: FocusState<Bool>.Binding
-    var label: String = "Amount"
+    var label: String? = nil
     /// The currency the amount is in: the selected one unless the caller
     /// knows better (a per diem estimate is always USD).
     var currencyCode: String = Currency.code
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(label).brandEyebrow()
+        VStack(alignment: .leading, spacing: 7) {
+            if let label {
+                Text(label).brandLabel()
+            }
 
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text(Currency.symbol(for: currencyCode))
-                    .font(Brand.number(26, .medium))
+                    .font(.title2)
                     .foregroundStyle(Brand.textSecondary)
 
                 TextField(AmountInput.text(cents: 0, code: currencyCode), text: $amount)
                     .accessibilityIdentifier("amountField")
-                    .font(Brand.number(40))
+                    .font(Brand.hero)
+                    .moneyStyle()
                     .foregroundStyle(Brand.textPrimary)
                     .keyboardType(.decimalPad)
                     .focused(focus)
@@ -451,26 +509,27 @@ struct AmountEntryCard: View {
                         amount = AmountInput.sanitize(newValue, code: currencyCode)
                     }
             }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: Brand.Radius.small, style: .continuous)
+                    .fill(Brand.surfaceSunken)
+            )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .brandCard()
     }
 }
 
 // MARK: - Tag
 
-/// A small accent-tinted capsule label ("Coming soon").
+/// A small tinted capsule label ("Edited by you"). Same look as `StatusChip`.
 struct BrandTag: View {
     let text: String
     var tint: Color = Brand.accent
 
     var body: some View {
-        Text(text)
-            .font(Brand.display(12, .semibold))
-            .foregroundStyle(tint)
-            .padding(.horizontal, 9)
-            .padding(.vertical, 4)
-            .background(Capsule().fill(tint.opacity(0.14)))
+        StatusChip(title: text, color: tint)
     }
 }
 
@@ -488,7 +547,7 @@ struct BrandStepper: View {
     var body: some View {
         HStack(spacing: 12) {
             Text(title)
-                .font(Brand.display(15, .medium))
+                .font(.body)
                 .foregroundStyle(Brand.textPrimary)
 
             Spacer(minLength: 8)
@@ -498,9 +557,9 @@ struct BrandStepper: View {
             }
 
             Text("\(value)")
-                .font(Brand.number(20, .semibold))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(Brand.textPrimary)
-                .monospacedDigit()
+                .moneyStyle()
                 .frame(minWidth: 28)
                 .contentTransition(.numericText())
                 .animation(.easeOut(duration: 0.15), value: value)
@@ -530,7 +589,7 @@ struct BrandStepper: View {
         Button(action: action) {
             Image(systemName: systemImage)
                 .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(enabled ? Brand.accent : Brand.textTertiary)
+                .foregroundStyle(enabled ? Brand.accentText : Brand.textTertiary)
                 .frame(width: 34, height: 34)
                 .background(Circle().fill(enabled ? Brand.accent.opacity(0.14) : Brand.track))
         }
@@ -552,18 +611,18 @@ struct BrandEmptyStateCard: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: Brand.Radius.small, style: .continuous)
                 .fill(Brand.accent.opacity(0.12))
                 .frame(width: 54, height: 54)
                 .overlay(
                     Image(systemName: systemImage)
                         .font(.system(size: 22, weight: .medium))
-                        .foregroundStyle(Brand.accent)
+                        .foregroundStyle(Brand.accentText)
                 )
                 .accessibilityHidden(true)
 
             Text(title)
-                .font(Brand.display(17, .semibold))
+                .font(.headline)
                 .foregroundStyle(Brand.textPrimary)
 
             Text(message)
@@ -572,32 +631,49 @@ struct BrandEmptyStateCard: View {
                 .multilineTextAlignment(.center)
 
             Button(actionTitle, action: action)
-                .buttonStyle(GradientButtonStyle())
+                .buttonStyle(PrimaryButtonStyle())
                 .accessibilityIdentifier(actionIdentifier ?? "")
                 .padding(.top, 4)
         }
         .frame(maxWidth: .infinity)
-        .brandCard(padding: 22)
+        .brandCard(padding: Brand.Space.xl)
+    }
+}
+
+// MARK: - Toolbar
+
+/// A toolbar button drawn as plain text or a symbol, as native iOS did before
+/// iOS 26 gave every item a shared glass capsule.
+struct PlainToolbarItem<Content: View>: ToolbarContent {
+    let placement: ToolbarItemPlacement
+    @ViewBuilder var content: Content
+
+    var body: some ToolbarContent {
+        if #available(iOS 26, *) {
+            ToolbarItem(placement: placement) { content }
+                .sharedBackgroundVisibility(.hidden)
+        } else {
+            ToolbarItem(placement: placement) { content }
+        }
     }
 }
 
 // MARK: - Tab bar
 
-/// Brand colours for the root tab bar. UIKit appearance is the only way to
-/// colour unselected items, so this is applied once before the bar is built.
+/// Brand colours for the root tab bar and navigation bars. UIKit appearance is
+/// the only way to colour unselected items, so this is applied once before the
+/// bars are built.
 enum BrandTabBar {
     static func applyAppearance() {
         let selected = UIColor(Brand.accent)
         let unselected = UIColor(Brand.textTertiary)
         let titleFont = UIFont.systemFont(ofSize: 10, weight: .semibold)
-        let roundedFont = titleFont.fontDescriptor.withDesign(.rounded)
-            .map { UIFont(descriptor: $0, size: 10) } ?? titleFont
 
         let item = UITabBarItemAppearance()
         item.normal.iconColor = unselected
-        item.normal.titleTextAttributes = [.foregroundColor: unselected, .font: roundedFont]
+        item.normal.titleTextAttributes = [.foregroundColor: unselected, .font: titleFont]
         item.selected.iconColor = selected
-        item.selected.titleTextAttributes = [.foregroundColor: selected, .font: roundedFont]
+        item.selected.titleTextAttributes = [.foregroundColor: selected, .font: titleFont]
 
         let appearance = UITabBarAppearance()
         if #available(iOS 26, *) {
@@ -616,5 +692,17 @@ enum BrandTabBar {
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
         UITabBar.appearance().unselectedItemTintColor = unselected
+
+        // Toolbar items are plain text (PlainToolbarItem), so the bar needs a
+        // solid background or scrolled content shows through behind them.
+        let bar = UINavigationBarAppearance()
+        bar.configureWithOpaqueBackground()
+        bar.backgroundColor = UIColor(Brand.background)
+        bar.shadowColor = UIColor(Brand.hairline)
+        let atTop = bar.copy()
+        atTop.shadowColor = .clear
+        UINavigationBar.appearance().standardAppearance = bar
+        UINavigationBar.appearance().compactAppearance = bar
+        UINavigationBar.appearance().scrollEdgeAppearance = atTop
     }
 }

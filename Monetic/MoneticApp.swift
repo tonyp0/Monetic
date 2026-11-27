@@ -37,12 +37,12 @@ struct MoneticApp: App {
             case .success(let container):
                 RootView()
                     .preferredColorScheme(appearance.colorScheme)
-                    .tint(Brand.accent)
+                    .tint(Brand.accentText)
                     .modelContainer(container)
             case .failure(let error):
                 StoreUnavailableView(error: error)
                     .preferredColorScheme(appearance.colorScheme)
-                    .tint(Brand.accent)
+                    .tint(Brand.accentText)
             }
         }
     }

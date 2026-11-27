@@ -67,14 +67,14 @@ struct SetBudgetView: View {
                                     + Text(monthlyBudget, format: .currency(code: Currency.code))
                                     + Text(")")
                             }
-                            .buttonStyle(GradientButtonStyle())
+                            .buttonStyle(PrimaryButtonStyle())
 
                             Button("Set a Different Amount", action: save)
                                 .buttonStyle(SoftButtonStyle())
                                 .disabled(parsedAmount <= 0)
                         } else {
                             Button("Save Budget", action: save)
-                                .buttonStyle(GradientButtonStyle())
+                                .buttonStyle(PrimaryButtonStyle())
                                 .disabled(parsedAmount <= 0)
                                 .accessibilityIdentifier("saveBudgetButton")
 
@@ -96,12 +96,12 @@ struct SetBudgetView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text(currentMonthName).brandEyebrow()
+                    Text(currentMonthName).brandLabel()
                 }
                 if !isNewMonthPrompt {
-                    ToolbarItem(placement: .topBarLeading) {
+                    PlainToolbarItem(placement: .topBarLeading) {
                         Button("Cancel") { dismiss() }
-                            .foregroundStyle(Brand.textSecondary)
+                            .foregroundStyle(Brand.accentText)
                     }
                 }
             }
@@ -112,11 +112,10 @@ struct SetBudgetView: View {
                 isFocused = true
             }
         }
-        .tint(Brand.accent)
+        .tint(Brand.accentText)
     }
 
-    /// The one screen in the app that's mostly a single number, so it gets the
-    /// full gradient treatment.
+    /// The one screen in the app that's mostly a single number.
     private var amountDisplay: some View {
         HStack(alignment: .firstTextBaseline, spacing: 5) {
             Text(Currency.symbol)
@@ -125,7 +124,7 @@ struct SetBudgetView: View {
 
             Text(isEmpty ? "0" : input)
                 .font(Brand.number(64))
-                .foregroundStyle(isEmpty ? AnyShapeStyle(Brand.textTertiary) : AnyShapeStyle(Brand.gradient))
+                .foregroundStyle(isEmpty ? Brand.textTertiary : Brand.textPrimary)
                 .minimumScaleFactor(0.4)
                 .lineLimit(1)
         }
