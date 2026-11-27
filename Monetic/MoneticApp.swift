@@ -1,11 +1,29 @@
 import SwiftUI
 import SwiftData
 
+/// How the app chooses Light or Dark.
+/// Existing users: anyone who picked Dark or Light has it stored and keeps it.
+/// Anyone who never touched the setting has nothing stored and now follows the
+/// system, so no migration is needed. Unknown stored values also fall back to
+/// system, because @AppStorage uses its default when init(rawValue:) fails.
+enum AppAppearance: String, CaseIterable {
+    case system, light, dark
+
+    static let storageKey = "appAppearance"
+
+    /// `nil` hands the choice to iOS.
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: nil
+        case .light:  .light
+        case .dark:   .dark
+        }
+    }
+}
+
 @main
 struct MoneticApp: App {
-    // Dark is the mode the brand is designed for, so it's the default for
-    // anyone who hasn't explicitly chosen otherwise.
-    @AppStorage("appAppearance") var appearance: String = "dark"
+    @AppStorage(AppAppearance.storageKey) var appearance: AppAppearance = .system
 
     private let store: Result<ModelContainer, Error>
 
@@ -13,25 +31,17 @@ struct MoneticApp: App {
         store = Self.loadStore()
     }
 
-    var preferredScheme: ColorScheme? {
-        switch appearance {
-        case "light": return .light
-        case "dark":  return .dark
-        default:      return nil
-        }
-    }
-
     var body: some Scene {
         WindowGroup {
             switch store {
             case .success(let container):
                 RootView()
-                    .preferredColorScheme(preferredScheme)
+                    .preferredColorScheme(appearance.colorScheme)
                     .tint(Brand.accent)
                     .modelContainer(container)
             case .failure(let error):
                 StoreUnavailableView(error: error)
-                    .preferredColorScheme(preferredScheme)
+                    .preferredColorScheme(appearance.colorScheme)
                     .tint(Brand.accent)
             }
         }
@@ -96,7 +106,7 @@ struct MoneticApp: App {
             "repeatMonthlyBudget",
             "lastMonthlyBudget",
             "selectedCurrencyCode",
-            "appAppearance",
+            AppAppearance.storageKey,
         ]
         for key in keys {
             UserDefaults.standard.removeObject(forKey: key)

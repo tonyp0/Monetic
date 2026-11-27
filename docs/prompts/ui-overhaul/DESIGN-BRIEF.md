@@ -84,9 +84,11 @@ Keep the **stored keys unchanged** (they're saved in user data) and keep the leg
 | `magenta` | `#9A4A9E` | `#C77FCB` | plum |
 | `rose` | `#C2477A` | `#E68AAE` | berry |
 | `coral` | `#D9534A` | `#F07A6E` | tomato |
-| `amber` | `#C98A0B` | `#E8B04A` | saffron |
+| `amber` | `#C7880B` | `#E8B04A` | saffron |
 | `mint` | `#4F8A4A` | `#8DBA7A` | sage |
 | `cyan` | `#1F8A88` | `#4DBDB8` | teal |
+
+Light `amber` was darkened slightly from `#C98A0B` to `#C7880B` so it reaches 3:1 on white (`BrandContrastTests` checks every pair).
 
 Each hue also gets a **tint** (the hue at about 14% opacity over `surface`) for icon tile backgrounds.
 

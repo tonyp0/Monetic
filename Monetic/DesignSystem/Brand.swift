@@ -32,41 +32,47 @@ private func adaptive(light: UInt32, dark: UInt32, opacity: Double = 1) -> Color
 
 // MARK: - Brand
 
-/// The single source of truth for Monetic's visual language.
-///
-/// The palette is lifted from the logo: an electric blue that runs through
-/// violet into magenta, sitting on near-black. Dark is the mode the brand is
-/// tuned for; light is fully supported but reads as the quieter of the two.
+/// The single source of truth for Monetic's visual language: a "pocket
+/// notebook" of warm paper, dark ink and one confident accent colour.
+/// Values come from `docs/prompts/ui-overhaul/DESIGN-BRIEF.md`; both modes are
+/// first-class, and `BrandContrastTests` guards their readability.
 enum Brand {
 
     // MARK: Logo hues
 
+    /// Logo and app icon only. Not for buttons, text, selection or charts.
     static let cyan    = Color(hex: 0x22A7F5)
+    /// Logo and app icon only.
     static let blue    = Color(hex: 0x1B6EF3)
+    /// Logo and app icon only.
     static let violet  = Color(hex: 0x7B2FF7)
+    /// Logo and app icon only.
     static let magenta = Color(hex: 0xC026D3)
 
-    /// The accent used for interactive elements that aren't gradient-filled.
-    /// Lifted slightly in dark mode so it holds up against a near-black field.
-    static let accent = adaptive(light: 0x1B6EF3, dark: 0x3D8BFF)
+    // MARK: Accent
 
-    // MARK: Signature gradient
+    /// The one brand colour: primary button, links, selection.
+    static let accent   = adaptive(light: 0x2B59E0, dark: 0x7FA2FF)
+    /// Text and icons on an `accent` fill.
+    static let onAccent = adaptive(light: 0xFFFFFF, dark: 0x0E1A3D)
 
-    /// Left-to-right, mirroring the logo's own sweep.
+    // MARK: Logo gradients
+
+    /// Logo and app icon only. Left-to-right, mirroring the logo's own sweep.
     static let gradient = LinearGradient(
         colors: [cyan, blue, violet, magenta],
         startPoint: .leading,
         endPoint: .trailing
     )
 
-    /// For fills that need the sweep to read across a box rather than a bar.
+    /// Logo and app icon only.
     static let gradientDiagonal = LinearGradient(
         colors: [blue, violet, magenta],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    /// Rotated so the sweep starts at 12 o'clock, where a progress ring begins.
+    /// Logo and app icon only. Rotated so the sweep starts at 12 o'clock.
     static let ringGradient = AngularGradient(
         gradient: Gradient(colors: [cyan, blue, violet, magenta]),
         center: .center,
@@ -76,62 +82,101 @@ enum Brand {
 
     // MARK: Surfaces
 
-    static let background    = adaptive(light: 0xF3F4F8, dark: 0x07070C)
-    static let surface       = adaptive(light: 0xFFFFFF, dark: 0x13131D)
-    static let surfaceRaised = adaptive(light: 0xFFFFFF, dark: 0x1C1C29)
-    static let surfaceSunken = adaptive(light: 0xEBECF2, dark: 0x0E0E16)
+    /// Screen background: flat, no gradient.
+    static let background    = adaptive(light: 0xF7F5F0, dark: 0x141312)
+    /// List groups and the one card a screen may have.
+    static let surface       = adaptive(light: 0xFFFFFF, dark: 0x1E1D1B)
+    /// Floating elements (the Add button, menus).
+    static let surfaceRaised = adaptive(light: 0xFFFFFF, dark: 0x272523)
+    /// Input wells and segmented-control tracks.
+    static let surfaceSunken = adaptive(light: 0xEFECE5, dark: 0x0F0E0D)
 
-    /// Card borders. Carries most of the separation in dark mode, where
-    /// shadows are nearly invisible against black.
-    static let hairline = adaptive(light: 0x000000, dark: 0xFFFFFF, opacity: 0.09)
+    /// Row dividers only, not card borders.
+    static let hairline = adaptive(light: 0x000000, dark: 0xFFFFFF, opacity: 0.08)
 
-    /// Empty track behind any progress bar or ring.
-    static let track = adaptive(light: 0x000000, dark: 0xFFFFFF, opacity: 0.08)
+    /// Empty part of any progress bar.
+    static let track = adaptive(light: 0x000000, dark: 0xFFFFFF, opacity: 0.07)
 
     // MARK: Text
 
-    static let textPrimary   = adaptive(light: 0x0B0B14, dark: 0xF5F5FA)
-    static let textSecondary = adaptive(light: 0x6C6C7E, dark: 0x9292A8)
-    static let textTertiary  = adaptive(light: 0x9E9EB0, dark: 0x60607A)
+    static let textPrimary   = adaptive(light: 0x1C1B18, dark: 0xF3F1EC)
+    /// Supporting text (meets 4.5:1).
+    static let textSecondary = adaptive(light: 0x6B675F, dark: 0xA9A49A)
+    /// Placeholders and decoration only, never essential text.
+    static let textTertiary  = adaptive(light: 0x9C978D, dark: 0x6E6A63)
 
     // MARK: Status
-    // Tuned toward the brand rather than stock system green/orange/red, so a
-    // budget warning still looks like it belongs to this app.
 
-    static let positive = adaptive(light: 0x0E9E7A, dark: 0x2DD4A7)
-    static let warning  = adaptive(light: 0xC17A00, dark: 0xF5A524)
-    static let danger   = adaptive(light: 0xD32B52, dark: 0xFF4D6D)
+    /// Under budget, on track.
+    static let positive = adaptive(light: 0x1F8A5B, dark: 0x4CC38A)
+    /// Close to budget (80% or more).
+    static let warning  = adaptive(light: 0xB26B00, dark: 0xF0B44C)
+    /// Over budget, destructive actions.
+    static let danger   = adaptive(light: 0xC8372D, dark: 0xFF7A6B)
 
     // MARK: Metrics
 
+    /// Two radii only.
     enum Radius {
-        static let card: CGFloat    = 22
-        static let row: CGFloat     = 18
-        static let control: CGFloat = 14
-        static let chip: CGFloat    = 8
+        /// Tiles, controls, chips.
+        static let small: CGFloat = 12
+        /// List groups, sheets, the one card.
+        static let large: CGFloat = 20
+
+        @available(*, deprecated, message: "Use Radius.small/large")
+        static let card: CGFloat = large
+        @available(*, deprecated, message: "Use Radius.small/large")
+        static let row: CGFloat = large
+        @available(*, deprecated, message: "Use Radius.small/large")
+        static let control: CGFloat = small
+        @available(*, deprecated, message: "Use Radius.small/large")
+        static let chip: CGFloat = small
     }
 
+    /// Spacing scale: 4, 8, 12, 16, 24, 32.
     enum Space {
-        static let gutter: CGFloat = 18
-        static let card: CGFloat   = 18
-        static let tight: CGFloat  = 8
-        static let stack: CGFloat  = 14
+        static let xs: CGFloat  = 4
+        static let s: CGFloat   = 8
+        static let m: CGFloat   = 12
+        static let l: CGFloat   = 16
+        static let xl: CGFloat  = 24
+        static let xxl: CGFloat = 32
+        /// Screen edge inset.
+        static let gutter: CGFloat = 16
+
+        @available(*, deprecated, message: "Use Space.xs…xxl")
+        static let card: CGFloat = l
+        @available(*, deprecated, message: "Use Space.xs…xxl")
+        static let tight: CGFloat = s
+        @available(*, deprecated, message: "Use Space.xs…xxl")
+        static let stack: CGFloat = m
     }
 
     // MARK: Type
-    // Rounded for anything numeric or headline-weight — it's the strongest
-    // non-color signal that separates this from a default SwiftUI app.
-    // Body copy stays in system SF so long text remains comfortable.
+    // Use SF Pro text styles (.body, .headline…) so Dynamic Type works.
+    // Rounded is reserved for the single hero amount on a screen.
 
+    /// The one hero amount on a screen. Scales with Dynamic Type.
+    static let hero: Font = .system(.largeTitle, design: .rounded, weight: .semibold)
+
+    @available(*, deprecated, message: "Use a text style; Brand.hero for the hero amount")
     static func number(_ size: CGFloat, _ weight: Font.Weight = .bold) -> Font {
         .system(size: size, weight: weight, design: .rounded)
     }
 
+    @available(*, deprecated, message: "Use a text style such as .headline or .title2")
     static func display(_ size: CGFloat, _ weight: Font.Weight = .semibold) -> Font {
         .system(size: size, weight: weight, design: .rounded)
     }
 
-    /// Small all-caps labels ("MONTHLY BUDGET", "SPENT"). Tracking is applied
-    /// at the call site via `.brandEyebrow()`.
+    /// Small all-caps labels. Tracking is applied at the call site via `.brandEyebrow()`.
+    @available(*, deprecated, message: "Use sentence case: .subheadline in textSecondary")
     static let eyebrow: Font = .system(size: 11, weight: .semibold, design: .rounded)
+}
+
+extension View {
+    /// Money amounts: monospaced digits so columns line up.
+    func moneyStyle() -> some View {
+        monospacedDigit()
+    }
 }

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("appAppearance") var appearance: String = "dark"
+    @AppStorage(AppAppearance.storageKey) var appearance: AppAppearance = .system
     @AppStorage("repeatMonthlyBudget") private var repeatMonthlyBudget: Bool = false
     @AppStorage("monthlyBudget") private var monthlyBudget: Double = 0
     @AppStorage("budgetSetMonth") private var budgetSetMonth: String = ""
@@ -55,7 +55,7 @@ struct SettingsView: View {
 
             AppearanceSelector(selection: $appearance)
 
-            Text("Monetic is designed for dark mode. Light mode is fully supported if you prefer it.")
+            Text("Matches your iPhone unless you pick Light or Dark.")
                 .font(.caption)
                 .foregroundStyle(Brand.textTertiary)
         }
@@ -227,13 +227,13 @@ struct SettingsView: View {
 /// A segmented control with the brand gradient riding the selection, rather
 /// than the stock grey `.segmented` picker.
 struct AppearanceSelector: View {
-    @Binding var selection: String
+    @Binding var selection: AppAppearance
     @Namespace private var indicator
 
-    private let options: [(tag: String, label: String, icon: String)] = [
-        ("dark",   "Dark",   "moon.fill"),
-        ("light",  "Light",  "sun.max.fill"),
-        ("system", "System", "iphone"),
+    private let options: [(tag: AppAppearance, label: String, icon: String)] = [
+        (.system, "System", "iphone"),
+        (.light,  "Light",  "sun.max.fill"),
+        (.dark,   "Dark",   "moon.fill"),
     ]
 
     var body: some View {

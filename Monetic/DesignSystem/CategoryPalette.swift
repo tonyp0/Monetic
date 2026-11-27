@@ -3,10 +3,9 @@ import UIKit
 
 /// The hues a group can be tinted with.
 ///
-/// These are deliberately *not* system colors. They're spread far enough around
-/// the wheel to stay legible next to each other in a donut chart, but share one
-/// register — vivid, slightly cool, high-chroma — so they read as a family with
-/// the logo's blue/violet rather than as nine unrelated crayons.
+/// Softer, mid-chroma, earthy hues that sit together without fighting. Each is
+/// at least 3:1 against `Brand.surface` in both modes, since they're used as
+/// graphics (`BrandContrastTests`).
 enum CategoryPalette {
 
     /// Stable keys stored on `BudgetCategory.color`.
@@ -16,15 +15,15 @@ enum CategoryPalette {
     ]
 
     private static let hues: [String: (light: UInt32, dark: UInt32)] = [
-        "azure":   (0x1F6FEB, 0x2E8CFF),
-        "indigo":  (0x4F46E5, 0x6366F1),
-        "violet":  (0x7C3AED, 0x9B6BFF),
-        "magenta": (0xB021BC, 0xD946C4),
-        "rose":    (0xE0446F, 0xFB6F92),
-        "coral":   (0xE04A2F, 0xFF6B57),
-        "amber":   (0xB97600, 0xF5A524),
-        "mint":    (0x0E9E7A, 0x2DD4A7),
-        "cyan":    (0x0E8EA8, 0x22D3EE),
+        "azure":   (0x2F7FD1, 0x6AAAF0), // sky
+        "indigo":  (0x5B5BD6, 0x8E8CF0), // iris
+        "violet":  (0x7D5BBE, 0xAB8FE6), // lavender
+        "magenta": (0x9A4A9E, 0xC77FCB), // plum
+        "rose":    (0xC2477A, 0xE68AAE), // berry
+        "coral":   (0xD9534A, 0xF07A6E), // tomato
+        "amber":   (0xC7880B, 0xE8B04A), // saffron
+        "mint":    (0x4F8A4A, 0x8DBA7A), // sage
+        "cyan":    (0x1F8A88, 0x4DBDB8), // teal
     ]
 
     /// Maps the system color names stored by earlier versions onto the new
@@ -43,6 +42,11 @@ enum CategoryPalette {
         let key = resolvedKey(for: stored)
         guard let hue = hues[key] else { return Brand.accent }
         return adaptiveHue(hue)
+    }
+
+    /// The group's hue at about 14% opacity, for icon tile backgrounds.
+    static func tint(for stored: String) -> Color {
+        color(for: stored).opacity(0.14)
     }
 
     /// The hue to assign to the nth group created, cycling so that consecutive
