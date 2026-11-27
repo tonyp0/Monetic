@@ -6,3 +6,5 @@ data/raw/
 data/seasonality/drafts/
 __pycache__/
 screenshots/
+graphify-out/
+docs/

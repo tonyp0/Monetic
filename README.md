@@ -69,7 +69,7 @@ The interface is built on a single design system rather than SwiftUI defaults. E
 - `CategoryPalette.swift` — the nine hues a spending group can be tinted with, plus the mapping that resolves color names stored by earlier versions.
 - `BrandComponents.swift` — shared cards, buttons, the budget ring, progress bars, the segmented control, the amount field, and the tab bar.
 
-The look is a "pocket notebook": warm paper, dark ink, and one accent color used for primary buttons, links, and selection. The logo's blue-to-magenta gradient is kept for the logo and app icon only. The full spec is in `docs/prompts/ui-overhaul/DESIGN-BRIEF.md`, and `BrandContrastTests` checks contrast in both modes.
+The look is a "pocket notebook": warm paper, dark ink, and one accent color used for primary buttons, links, and selection. The logo's blue-to-magenta gradient is kept for the logo and app icon only. `BrandContrastTests` checks contrast in both modes.
 
 The app follows the iPhone's Light or Dark setting by default. Users can pick Light or Dark in Settings instead.
 
@@ -100,7 +100,7 @@ Per diem estimates are always in U.S. dollars, since Monetic doesn't convert cur
 
 ### Coming next
 
-- Live sync for group trips, so changes reach everyone who joined. It's designed in `docs/design/group-trips-sync.md` but not built.
+- Live sync for group trips, so changes reach everyone who joined. It's designed but not built.
 - Seasonal lodging prices for popular single-rate destinations. The research and review pipeline is built (`scripts/research-seasonality/`), but no destinations have been approved yet, so the app doesn't apply any.
 
 ### Budget Rollover
