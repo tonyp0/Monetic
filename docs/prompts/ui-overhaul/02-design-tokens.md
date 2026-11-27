@@ -25,7 +25,7 @@ Read `docs/prompts/ui-overhaul/DESIGN-BRIEF.md` first. This step implements its 
 
 ## Don't
 
-- Restructure any view or component. Deprecation warnings at call sites are expected and are cleaned up in steps 3–7.
+- Restructure any view or component. Deprecation warnings at call sites are expected and are cleaned up in steps 3–8.
 - Rename or migrate stored category keys.
 
 ## Done when

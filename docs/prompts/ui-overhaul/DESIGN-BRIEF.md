@@ -2,9 +2,26 @@
 
 The shared reference for every UI-overhaul step. Prompts in this folder tell Claude to read it before changing anything. Edit this file, not the prompts, to change a decision.
 
-## Who it's for
+## What Monetic is
 
-Students in grades K–12 learning their first money habits, and the parents or teachers next to them. The app should feel **calm, friendly and trustworthy**, like a well-made school notebook rather than a crypto dashboard. A 10-year-old should understand every screen without help.
+Monetic helps **college students afford the trips they want**: know what a trip will really cost, save for it inside their real monthly budget, and plan it with friends. It's still a budgeting app, but **trips are the reason students download it and keep opening it**.
+
+- **Who it's for:** college students, especially groups planning spring break or study abroad.
+- **The problem:** students pick trips without knowing the real cost, don't save in time, and end up short, in debt, or covering for friends.
+- **What it does:** estimates the trip cost from real, cited data; turns it into a savings plan that fits their monthly budget; counts down to departure; brings their friends into the plan.
+- **What makes it different:** it's the only app that connects a trip goal to everyday budgeting, it uses cited cost data instead of guesses, and it spreads from one organizer through a friend group.
+
+### What it's not (keep these out of the UI)
+
+- **Not an in-trip spending tracker** (that's TravelSpend, Trail Wallet). No "log spending while abroad" flows, currency converters or daily travel budgets.
+- **Not a bill-splitter** (that's Splitwise). No "who owes whom", no settle-up, no shared expenses. Students can keep using Splitwise once the trip starts.
+- **Not a trip planner** (that's Wanderlog). No itineraries, bookings, maps or activity lists.
+
+If a design idea drifts into one of these, drop it.
+
+## Who we're designing for
+
+Students aged roughly 18–23, on a phone, often between classes, usually with less money than they'd like and a group chat full of trip plans. The app should feel **confident, optimistic and honest about money**, like a sharp friend who's good with money: not a bank, not a kids' app, not a hype-y fintech. Every screen should answer one question quickly, usually "Can I afford this?" or "Am I on track?"
 
 ## What we're moving away from
 
@@ -19,9 +36,15 @@ The current UI looks generic and machine-generated because of these patterns. No
 - Nine neon, high-chroma category colours.
 - Rounded SF used for every number and heading.
 
-## Direction: "pocket notebook"
+## Direction: "travel notebook"
 
-Warm paper, dark ink, **one** confident accent colour, and plain sentences instead of labels. Depth comes from background colour steps, not borders and glows.
+Warm paper, dark ink, **one** confident accent colour, and plain sentences instead of labels. Depth comes from background colour steps, not borders and glows. The excitement comes from **the trip itself**, meaning the destination name, the countdown and the progress toward it, never from decoration.
+
+### App structure
+
+- **Trips is the first tab and where the app opens.** Budget is the second tab. Settings is reached from a toolbar button, not a tab.
+- The **next upcoming trip** is the hero of the app: destination, countdown, saved vs goal, and what to save next.
+- The **Budget tab** answers "how much can I spend this month while still saving for my trip?" It shows trip savings as money set aside, never as spending.
 
 ### Appearance
 
@@ -87,15 +110,21 @@ Each hue also gets a **tint** (the hue at about 14% opacity over `surface`) for 
 - **One card per screen at most**, and never a card inside a card.
 - **One filled button per screen** (the primary action) in solid `accent`. Everything else is plain text-style or `.bordered` tinted.
 - **Toolbar buttons are plain** text or SF Symbols with no capsule background, as in native iOS.
-- **Emoji stay** as group icons: kids like them and they're instantly recognisable. Show them on the category `tint` in a 12pt-radius tile, with no border and no glow.
-- **Progress is a bar, not a ring.** One horizontal bar, split by group colour where useful.
+- **Emoji stay** as spending-group icons: they're quick to scan and students like them. Show them on the category `tint` in a 12pt-radius tile, with no border and no glow. Trips use the destination country's **flag emoji** when the country is known, and an SF Symbol (`airplane`) otherwise.
+- **Two kinds of progress, two shapes.** Saving toward a **trip goal** uses a ring (`ProgressRing`, solid `accent`, no gradient): it's the app's signature, and only trip savings get it. **Monthly budgets** use a horizontal bar (`BudgetBar`), split by group colour where useful. Never show both for the same number.
+- **The countdown is a number, not a widget.** "108 days" in `Brand.hero`, with the destination name above it. No flip-clocks, boarding-pass mockups, stamps, maps or stock travel photos.
+- **Status chips** ("On track", "Behind", "Funded") are small sentence-case capsules: tint background at about 14%, text in the status colour. Always pair the colour with the word.
+- **Cited numbers show their source.** Any estimate built from data has a one-line footnote naming the source and its effective date. Numbers the user typed are marked as theirs ("You entered").
 
 ### Voice
 
-- Plain, warm, second person, around a grade-4 reading level. Say "You have $240 left for November", not "Remaining balance".
-- Prefer a sentence to a label-plus-value pair.
-- Empty states say what to do next, in one short line and one button.
+- Talk like a friend who's good with money: direct, short, second person, a little warm, never preachy, never cutesy. No exclamation marks except for real wins ("Fully funded!").
+- Lead with the answer: "Cancún in 108 days", "Save $42 a week to make it", "You're $60 behind. Put in $102 this week to catch up."
+- **Be honest.** If a plan isn't realistic, say so plainly and give the two real options (save more, or change the goal or dates). Never guilt or shame.
+- Prefer a sentence to a label-plus-value pair. Say "You have $240 left for November", not "Remaining balance".
+- Empty states sell the next step in one line and one button: "Where do you want to go? Find out what it'll cost." → **Plan a trip**.
 - Never say "Expense" as a title. Fall back to the note, then the group name.
+- Group copy is about planning together, never about who owes what.
 
 ### Motion and feel
 
@@ -106,11 +135,11 @@ Each hue also gets a **tint** (the hue at about 14% opacity over `surface`) for 
 
 ## Engineering ground rules (every step)
 
-1. **iOS 17.0+, SwiftUI, no new dependencies.** Don't change the SwiftData models (`Monetic/Models/`).
-2. **Keep every accessibility identifier**: `addExpenseButton`, `addTransactionButton`, `addGroupButton`, `amountField`, `budgetAmountField`, `getStartedButton`, `groupMonthlySpent`, `saveBudgetButton`, `saveExpenseButton`, `saveGroupButton`, `settingsButton`, `spentTotal`, `budgetTotal` (the last two are built from a label in `ContentView.swift`, so keep that working if the label changes). If an element moves, its identifier moves with it.
+1. **iOS 17.0+, SwiftUI, no new dependencies.** Don't change SwiftData models (`Monetic/Models/`, `Trip`, `SavingsContribution`) or the trip estimator and savings-plan maths. This overhaul changes how things look and read, not what they calculate.
+2. **Keep every accessibility identifier**: `tripsTab`, `addTripButton`, `saveTripButton`, `tripRow_<name>` (and any others the Trips prompts added; check `grep -rn accessibilityIdentifier Monetic/`), `addExpenseButton`, `addTransactionButton`, `addGroupButton`, `amountField`, `budgetAmountField`, `getStartedButton`, `groupMonthlySpent`, `saveBudgetButton`, `saveExpenseButton`, `saveGroupButton`, `settingsButton`, `spentTotal`, `budgetTotal` (the last two are built from a label in `ContentView.swift`, so keep that working if the label changes). If an element moves, its identifier moves with it.
 3. **UI tests also match visible text**: "Save Budget", "Get Started", "Done", "Save", "Food & Dining", and amounts like "$6.25". If copy changes, update `MoneticUITests/` in the same step.
 4. **The Xcode project doesn't use synchronized folders.** Any new `.swift` file must be added to the right target in `Monetic.xcodeproj/project.pbxproj`. Prove it by building.
-5. **Home stays a `List`** so swipe-to-delete and drag-to-reorder keep working.
+5. **Lists that support swipe-to-delete or reorder stay `List`s** (budget groups, trips, contributions, expenses).
 6. **Stay in scope.** Only change what the current step asks for. Note anything else you spot in the final summary instead of fixing it.
 7. **Verify before finishing**: build, run `scripts/test.sh` (unit tests) and `scripts/test.sh ui`, run `scripts/screenshots.sh <step label>` (the tour from step 0; if automatic simulator selection fails, pass `DESTINATION='id=<simulator UDID>'`; if a launch fails with a "preflight checks (Busy)" error, shut down and reboot the simulator cleanly and rerun), and look at the light and dark screenshots yourself. Report anything that looks off.
 8. Finish with a short summary: what changed, which screenshots to look at, any test changes, and anything deferred.

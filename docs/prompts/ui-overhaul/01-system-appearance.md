@@ -23,7 +23,7 @@ Read `docs/prompts/ui-overhaul/DESIGN-BRIEF.md` first. In this step, change **on
 
 ## Don't
 
-- Restyle the selector or the Settings screen (that's step 7).
+- Restyle the selector or the Settings screen (that's step 8).
 
 ## Done when
 

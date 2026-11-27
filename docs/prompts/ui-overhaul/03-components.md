@@ -10,6 +10,7 @@ Read `docs/prompts/ui-overhaul/DESIGN-BRIEF.md` first, especially **What we're m
 
 - `Monetic/DesignSystem/BrandComponents.swift` (all of it)
 - `Monetic/DesignSystem/Brand.swift` (as updated in step 2)
+- Any Trips screens that exist (`grep -rln "Trip" Monetic/Views Monetic/Trips 2>/dev/null`): they use these components too, so they'll change with them.
 - Call sites: `grep -rn "BrandBackground\|brandCard\|brandEyebrow\|GradientButtonStyle\|SoftButtonStyle\|BudgetRing\|BrandProgressBar\|MoneticWordmark\|CategoryTile\|BrandSectionHeader\|BrandField\|BrandSegmented\|AmountEntryCard" Monetic/`
 
 ## Do
@@ -22,8 +23,9 @@ Read `docs/prompts/ui-overhaul/DESIGN-BRIEF.md` first, especially **What we're m
 4. **Labels**: change `brandEyebrow()` to render sentence case in `.subheadline` / `textSecondary` with no tracking, and deprecate it. Then go through every call site. Where the label repeats what's obvious from context (`REMAINING`, `TOTAL`, `BY GROUP`, `AMOUNT`…), delete it. Where it's needed, write it in sentence case. List what you removed in your summary.
 5. **Progress**
    - Add `BudgetBar`: a horizontal capsule bar 10–12pt tall on `track`. It takes either a single fraction (coloured `positive`, `warning` at ≥ 80% or `danger` when over) or an array of `(colour, amount)` segments for a split-by-group view, with 2pt gaps between segments. When spending is over budget, the bar is full in `danger` and an overflow label is shown by the caller. Animate width changes with `.smooth` (none under Reduce Motion). Add an accessibility label and value ("62% of budget used").
-   - Keep `BudgetRing` compiling, but mark it deprecated; step 4 removes its last use.
+   - Turn `BudgetRing` into **`ProgressRing`**, the trip-savings signature: a solid `accent` arc on a `track` ring (no gradient, no glow), round caps, a configurable line width, and a centre slot for content. Over 100% it stays full and switches to `positive`. Keep a deprecated `typealias BudgetRing = ProgressRing` so existing call sites compile. Per the brief, only trip savings may use it; step 6 moves the budget off it.
    - Bring `BrandProgressBar` in line with `BudgetBar` (or have it wrap it).
+   - Add **`StatusChip`**: a small sentence-case capsule taking a title and a status colour (`positive`, `warning`, `danger`, `accent`), with the tint at about 14% opacity and the text in the colour. If the Trips feature already draws its own status chip, switch it to this one without changing its states or wording.
 6. **`MoneticWordmark`**: if it still has a use, render it as plain `textPrimary` in `.headline` with normal tracking. The gradient belongs to the logo mark only.
 7. **`CategoryTile`**: the emoji on `CategoryPalette.tint(for:)`, `Radius.small`, no border, no shadow. Size driven by a parameter with sensible defaults (36pt in rows, 56pt in headers).
 8. **`BrandSegmented`** and the appearance selector: the selected segment is a `surface` (light) or `surfaceRaised` (dark) pill on a `surfaceSunken` track with `textPrimary` text, like the native segmented control. No gradient.
@@ -33,7 +35,9 @@ Read `docs/prompts/ui-overhaul/DESIGN-BRIEF.md` first, especially **What we're m
 
 ## Don't
 
-- Restructure screen layouts (steps 4–7). Swapping component calls is fine; moving sections around isn't.
+- Restructure Trips screens. If Trips code exists, it should only change by picking up these shared components.
+
+- Restructure screen layouts (steps 4–8). Swapping component calls is fine; moving sections around isn't.
 - Delete deprecated APIs that are still in use.
 
 ## Done when
