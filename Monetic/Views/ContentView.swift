@@ -37,10 +37,12 @@ struct ContentView: View {
             uniqueKeysWithValues: categories.map { ($0.id, $0.monthlySpending()) }
         )
         let totalSpent = categorySpending.values.reduce(0, +)
-        let remaining = monthlyBudget - totalSpent
+        // Money put aside for trips this month comes out of the budget too.
+        let setAside = Trip.setAside(in: trips, monthOf: Date(), currencyCode: Currency.code)
+        let remaining = monthlyBudget - totalSpent - setAside
         // Unclamped on purpose — the ring needs to know it has been *passed*,
         // not just that it's full.
-        let ratio = monthlyBudget > 0 ? totalSpent / monthlyBudget : 0
+        let ratio = monthlyBudget > 0 ? (totalSpent + setAside) / monthlyBudget : 0
         let hasSpending = categorySpending.values.contains { $0 > 0 }
 
         NavigationStack {
@@ -52,6 +54,7 @@ struct ContentView: View {
                         BudgetHeroCard(
                             monthlyBudget: monthlyBudget,
                             totalSpent: totalSpent,
+                            setAside: setAside,
                             remaining: remaining,
                             ratio: ratio,
                             onSetBudget: {
@@ -62,8 +65,6 @@ struct ContentView: View {
                         .padding(.top, 4)
                         .padding(.bottom, 10)
 
-                        // Trip savings live apart from the budget: this card
-                        // reads them, and nothing above it does.
                         if let next = UpcomingTripCard.pick(from: trips, asOf: Date()) {
                             UpcomingTripCard(
                                 trip: next.trip,
@@ -292,6 +293,8 @@ struct BudgetHeroCard: View {
     private var currency: String { Currency.code(stored: storedCurrency) }
     let monthlyBudget: Double
     let totalSpent: Double
+    /// Put aside for trips this month; shown as its own stat when there is any.
+    var setAside: Double = 0
     let remaining: Double
     let ratio: Double
     let onSetBudget: () -> Void
@@ -350,6 +353,17 @@ struct BudgetHeroCard: View {
     private var statsRow: some View {
         HStack(spacing: 0) {
             stat(label: "Spent", value: totalSpent, tint: Brand.textPrimary)
+
+            if setAside > 0 {
+                Rectangle()
+                    .fill(Brand.hairline)
+                    .frame(width: 1, height: 30)
+
+                stat(label: "Trips", value: setAside, tint: Brand.textPrimary)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Put aside for trips")
+                    .accessibilityValue(setAside.formatted(.currency(code: currency)))
+            }
 
             Rectangle()
                 .fill(Brand.hairline)

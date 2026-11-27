@@ -185,6 +185,21 @@ final class Trip: Identifiable {
         Double(contributions.reduce(0) { $0 + Int(($1.amount * 100).rounded()) }) / 100
     }
 
+    /// Money put aside for trips in the month containing `date`, which the
+    /// dashboard takes out of the monthly budget. Deposits minus withdrawals
+    /// in cents, never below zero: taking out money saved in an earlier month
+    /// doesn't add to this month's budget. Trips in another currency are left
+    /// out, since Monetic doesn't convert.
+    static func setAside(in trips: [Trip], monthOf date: Date, currencyCode: String,
+                         calendar: Calendar = .current) -> Double {
+        let cents = trips
+            .filter { $0.totalCurrencyCode == currencyCode }
+            .flatMap(\.contributions)
+            .filter { calendar.isDate($0.date, equalTo: date, toGranularity: .month) }
+            .reduce(0) { $0 + Int(($1.amount * 100).rounded()) }
+        return Double(max(cents, 0)) / 100
+    }
+
     /// Contributions, newest first.
     var sortedContributions: [SavingsContribution] {
         contributions.sorted { ($0.date, $0.createdAt) > ($1.date, $1.createdAt) }

@@ -4,7 +4,8 @@ import SwiftData
 /// Money set aside for a trip (positive) or taken back out (negative).
 ///
 /// Kept apart from `Transaction` on purpose: saving for a trip isn't
-/// spending, so it never counts toward the monthly budget or any group.
+/// spending, so it never counts toward any group. It does come out of the
+/// monthly budget for the month it's saved in (`Trip.setAside`).
 @Model
 final class SavingsContribution: Identifiable {
     @Attribute(.unique) var id: UUID

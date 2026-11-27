@@ -4,7 +4,8 @@ import Testing
 @testable import Monetic
 
 /// Contributions in a real (in-memory) store: they belong to their trip, they
-/// add up, and they never touch the monthly budget.
+/// add up, they never touch a group, and they come out of the monthly budget
+/// for the month they were saved in.
 @Suite("Savings contributions")
 @MainActor
 struct SavingsContributionTests {
@@ -43,7 +44,7 @@ struct SavingsContributionTests {
 
     // MARK: Budget isolation
 
-    @Test("Saving for a trip never changes a group's spending or the dashboard total")
+    @Test("Saving for a trip never changes a group's spending or the spent total")
     func budgetUntouched() throws {
         let food = try TestSupport.makeGroup("Food", monthlyBudget: 400, in: context)
         let fun = try TestSupport.makeGroup("Fun", monthlyBudget: 200, in: context)
@@ -69,6 +70,45 @@ struct SavingsContributionTests {
         #expect(try context.fetchCount(FetchDescriptor<Transaction>()) == transactionsBefore)
         #expect(try dashboardTotal(asOf: TestSupport.date(2027, 4, 15)) == 60, "April: only the recurring expense")
         #expect(trip.totalSaved == 725.25)
+    }
+
+    @Test("Money put aside this month comes out of the monthly budget, net of withdrawals")
+    func setAsideThisMonth() throws {
+        let code = Currency.code
+        let trip = try makeTrip()
+        let other = try makeTrip()
+        try contribute(500, to: trip)
+        try contribute(250.25, to: other, on: TestSupport.date(2027, 3, 1))
+        try contribute(-100, to: trip)
+        try contribute(75, to: trip, on: TestSupport.date(2027, 4, 2))
+        try contribute(40, to: trip, on: TestSupport.date(2026, 3, 10))   // same month, last year
+
+        #expect(Trip.setAside(in: [trip, other], monthOf: march, currencyCode: code) == 650.25)
+        #expect(Trip.setAside(in: [trip, other], monthOf: TestSupport.date(2027, 4, 30), currencyCode: code) == 75)
+        #expect(Trip.setAside(in: [trip, other], monthOf: TestSupport.date(2027, 5, 1), currencyCode: code) == 0)
+        #expect(Trip.setAside(in: [], monthOf: march, currencyCode: code) == 0)
+    }
+
+    @Test("Withdrawing earlier savings never adds to this month's budget")
+    func withdrawalFloor() throws {
+        let trip = try makeTrip()
+        try contribute(300, to: trip, on: TestSupport.date(2027, 2, 10))
+        try contribute(-200, to: trip)
+        #expect(Trip.setAside(in: [trip], monthOf: march, currencyCode: Currency.code) == 0)
+    }
+
+    @Test("Trips in another currency don't come out of the budget")
+    func otherCurrencyLeftOut() throws {
+        let trip = Trip(name: "Paris", destination: "Paris", startDate: TestSupport.date(2027, 6, 1),
+                        endDate: TestSupport.date(2027, 6, 8), travelers: 2, estimatedTotal: 3000,
+                        estimateSource: Trip.EstimateSource.perDiem.rawValue, createdAt: TestSupport.date(2027, 1, 4))
+        context.insert(trip)
+        try context.save()
+        try contribute(200, to: trip)
+
+        #expect(trip.totalCurrencyCode == "USD")
+        #expect(Trip.setAside(in: [trip], monthOf: march, currencyCode: "USD") == 200)
+        #expect(Trip.setAside(in: [trip], monthOf: march, currencyCode: "EUR") == 0)
     }
 
     // MARK: Relationship
